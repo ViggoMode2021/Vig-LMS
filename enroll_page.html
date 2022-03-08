@@ -1,0 +1,83 @@
+{% block title %}Enroll page{% endblock %}
+
+{% block content %}
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="/static/css/period_1_Spanish_1_enroll.css">
+
+ <div class="topnav">
+   <a class="active" href="{{url_for('home')}}">Main</a>
+   <a href="{{url_for('register')}}">{{ class_name }}</a>
+   <a href="{{url_for('main_class_page')}}">Your class roster</a>
+  <a href="{{url_for('logout')}}">Logout</a>
+</div>
+
+<h1>Enroll or check enrollment - P.1 Spanish 1</h1>
+
+<form action="/update" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="class name" name='class_name' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="teacher name" name='teacher' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="first name" name='first name' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="last name" name='last name' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="graduation year" name='graduation year' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp" placeholder="grade"
+            name='grade' style="width: 200px;">
+    </div>
+
+    <button type="submit" class="btn btn-warning">Enroll student</button>
+
+</form>
+
+    <form action="/query" method="GET">
+    <button type="submit" class="btn btn-warning">Show class roster</button>
+</form>
+
+ <h7>This is a photo of PgAdmin for Period 1 Spanish 1 table once the 'gradebook.sql' starter code is ran. Table can be changed with the above form (enroll student) and edited once 'show class roster' is clicked.</h7>
+
+
+    <img src="static/images/table.png"
+        id="img1"
+      />
+      <br /><br /><br />
+       </div>
+
+    <img src="static/images/database.png"
+        id="img2"
+
+      />
+      <br /><br /><br />
+       </div>
+
+    <form action="/take_attendance_period_1" method="GET">
+    <button type="submit" class="btn btn-warning">Take attendance period 1</button>
+</form>
+
+<form action="/attendance_dates" method="GET">
+    <button type="submit" class="btn btn-warning">Check attendance period 1</button>
+</form>
+
+
+{% endblock %}
