@@ -43,6 +43,8 @@ def login():
         account = cursor.fetchone()
         cursor.execute('SELECT * FROM classes WHERE class_creator = %s', (email,))
         account_2 = cursor.fetchone()
+        cursor.execute('SELECT class_name FROM classes WHERE class_creator = %s', (email,))
+        class_name_print = cursor.fetchone()
 
         if account and account_2:
             password_rs = account['password']
@@ -55,7 +57,7 @@ def login():
                 session['username'] = account['username']
                 session['email'] = account_2['class_creator']
                 # Redirect to home page
-                return redirect(url_for('home'))
+                return redirect(url_for('home', class_name_print = class_name_print))
             else:
                 # Account doesnt exist or username/password incorrect
                 flash('Incorrect username/password')
@@ -127,6 +129,38 @@ def profile():
         return render_template('profile.html', account=account)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
+
+
+@app.route('/enroll_page', methods=['GET','POST'])
+def enroll_page():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+
+    insert_script = "INSERT INTO classes (class_name, teacher, student_first_name, student_last_name, student_graduation_year, student_grade) VALUES (%s, %s, %s, %s, %s, %s)"
+
+    class_name = request.form.get("class_name")
+    teacher = request.form.get("teacher")
+    first_name = request.form.get("first name")
+    last_name = request.form.get("last name")
+    graduation_year = request.form.get("graduation year")
+    grade = request.form.get("grade")
+    email = session['email']
+
+    insert_values = [(class_name, teacher, first_name,
+                        last_name, graduation_year, grade, email)]
+
+    for record in insert_values:
+        cursor.execute(insert_script, record)
+
+    cursor.execute('SELECT * FROM classes')
+    for record in cursor.fetchall():
+        print(record)
+
+    conn.commit()
+
+    return render_template('enroll_page.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
