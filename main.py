@@ -31,18 +31,20 @@ def login():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
         print(password)
 
         # Check if account exists using MySQL
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         # Fetch one record and return result
         account = cursor.fetchone()
-        cursor.execute('SELECT * FROM classes WHERE username')
+        cursor.execute('SELECT * FROM classes WHERE class_creator = %s', (email,))
+        account_2 = cursor.fetchone()
 
-        if account:
+        if account and account_2:
             password_rs = account['password']
             print(password_rs)
             # If account exists in users table in out database
@@ -51,6 +53,7 @@ def login():
                 session['loggedin'] = True
                 session['id'] = account['id']
                 session['username'] = account['username']
+                session['email'] = account_2['class_creator']
                 # Redirect to home page
                 return redirect(url_for('home'))
             else:
@@ -94,7 +97,7 @@ def register():
             # Account doesn't exist and the form data is valid, now insert new account into users table
             cursor.execute("INSERT INTO users (fullname, username, password, email, class) VALUES (%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name))
             conn.commit()
-            cursor.execute("INSERT INTO classes (class_name, teacher, user_id) VALUES (%s,%s, (SELECT id from users WHERE fullname = %s))", (fullname, class_name, fullname))
+            cursor.execute("INSERT INTO classes (class_name, teacher, class_creator, user_id) VALUES (%s,%s,%s, (SELECT id from users WHERE fullname = %s))", (class_name, fullname, email, fullname))
             conn.commit()
             flash('You have successfully registered!')
     elif request.method == 'POST':
