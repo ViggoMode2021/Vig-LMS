@@ -99,7 +99,7 @@ def register():
             # Account doesn't exist and the form data is valid, now insert new account into users table
             cursor.execute("INSERT INTO users (fullname, username, password, email, class) VALUES (%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name))
             conn.commit()
-            cursor.execute("INSERT INTO classes (class_name, teacher, class_creator, user_id) VALUES (%s,%s,%s, (SELECT id from users WHERE fullname = %s))", (class_name, fullname, email, fullname))
+            cursor.execute("INSERT INTO classes (class_name, teacher, class_creator) VALUES (%s,%s, (SELECT email from users WHERE fullname = %s))", (class_name, fullname, fullname))
             conn.commit()
             flash('You have successfully registered!')
     elif request.method == 'POST':
@@ -130,15 +130,21 @@ def profile():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
-
-@app.route('/enroll_page', methods=['GET','POST'])
+@app.route('/enroll_page', methods=['GET'])
 def enroll_page():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+        return render_template('enroll_page.html', account = account)
 
-    insert_script = "INSERT INTO classes (class_name, teacher, student_first_name, student_last_name, student_graduation_year, student_grade) VALUES (%s, %s, %s, %s, %s, %s)"
+    return redirect(url_for('login'))
+
+
+@app.route('/enroll_page_submit', methods=['POST'])
+def enroll_page_submit():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     class_name = request.form.get("class_name")
     teacher = request.form.get("teacher")
@@ -146,17 +152,8 @@ def enroll_page():
     last_name = request.form.get("last name")
     graduation_year = request.form.get("graduation year")
     grade = request.form.get("grade")
-    email = session['email']
 
-    insert_values = [(class_name, teacher, first_name,
-                        last_name, graduation_year, grade, email)]
-
-    for record in insert_values:
-        cursor.execute(insert_script, record)
-
-    cursor.execute('SELECT * FROM classes')
-    for record in cursor.fetchall():
-        print(record)
+    cursor.execute("INSERT INTO classes (class_name, teacher, student_first_name, student_last_name, student_graduation_year, student_grade, class_creator) VALUES (%s,%s,%s,%s,%s,%s, (SELECT email from users WHERE email = %s))", (class_name, teacher, first_name, last_name, graduation_year, grade, session['email']))
 
     conn.commit()
 
