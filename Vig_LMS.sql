@@ -17,7 +17,5 @@ CREATE TABLE classes(
 	student_last_name TEXT,
 	student_graduation_year INT,
 	student_grade INT,
-	user_id INT NOT NULL,
 	class_creator VARCHAR (50) NOT NULL,
-	FOREIGN KEY ("user_id") REFERENCES users("id") ON DELETE CASCADE
 	FOREIGN KEY ("class_creator") REFERENCES users("email") ON DELETE CASCADE);
