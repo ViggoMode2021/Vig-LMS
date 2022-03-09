@@ -10,13 +10,13 @@
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
    <a href="{{url_for('register')}}">{{ class_name }}</a>
-   <a href="{{url_for('main_class_page')}}">Your class roster</a>
+   <a href="{{url_for('enroll_page')}}">Your class roster</a>
   <a href="{{url_for('logout')}}">Logout</a>
 </div>
 
 <h1>Enroll or check enrollment - P.1 Spanish 1</h1>
 
-<form action="/update" method="POST">
+<form action="/enroll_page_submit" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
             placeholder="class name" name='class_name' style="width: 200px;">
