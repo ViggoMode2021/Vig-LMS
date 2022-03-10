@@ -141,7 +141,6 @@ def enroll_page():
 
     return redirect(url_for('login'))
 
-
 @app.route('/enroll_page_submit', methods=['POST'])
 def enroll_page_submit():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -158,6 +157,147 @@ def enroll_page_submit():
     conn.commit()
 
     return render_template('enroll_page.html')
+
+#period_1_spanish_1 show class roster #READ
+@app.route('/query', methods=['GET'])
+def query():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         account = cursor.fetchone()
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+         records_2 = cursor.fetchall()
+
+         return render_template('query_page.html', records_2=records_2, account = account)
+
+    return redirect(url_for('login'))
+
+@app.route('/alphabetically', methods=['GET'])
+def alphabetically():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC", [session['email']])
+        records_2 = cursor.fetchall()
+
+        return render_template('query_page.html', records_2=records_2, account = account)
+
+    return redirect(url_for('login'))
+
+#period_1_sort_grade_ascending
+@app.route('/grade_ASC', methods=['GET'])
+def grade_ASC():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC", [session['email']])
+        records_2 = cursor.fetchall()
+
+        return render_template('query_page.html', records_2=records_2, account = account)
+
+    return redirect(url_for('login'))
+
+#period_1_sort_grade_descending
+@app.route('/grade_DESC', methods=['GET'])
+def grade_DESC():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC", [session['email']])
+        records_2 = cursor.fetchall()
+
+        return render_template('query_page.html', records_2=records_2, account = account)
+
+    return redirect(url_for('login'))
+
+@app.route('/delete/<string:id>', methods = ['DELETE', 'GET'])
+def delete_student(id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+        cursor.execute('DELETE FROM classes WHERE id = {0}'.format(id))
+        conn.commit()
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+        records_2 = cursor.fetchall()
+        return render_template('query_page.html', records_2=records_2, account = account)
+
+    return redirect(url_for('login'))
+
+@app.route('/update_grade/<id>', methods = ['PATCH', 'GET', 'POST'])
+def update_grade(id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        updated_grade = request.form.get("update grade")
+
+        cur = conn.cursor()
+
+        cur.execute("""UPDATE classes 
+        SET student_grade = %s 
+        WHERE id = %s""", (updated_grade, id))
+
+        conn.commit()
+
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+        records_2 = cursor.fetchall()
+        return render_template('query_page.html', records_2=records_2, account = account)
+
+    return redirect(url_for('login'))
+
+@app.route('/assignment', methods=['GET', 'POST'])
+def assignment():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+        assignments = cursor.fetchall()
+        return render_template('assignment.html', account = account, assignments = assignments)
+
+    return redirect(url_for('login'))
+
+@app.route('/new_assignment', methods=['POST'])
+def new_assignment():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        assignment_name = request.form.get("assignment name")
+        category = request.form.get("category")
+        due_date = request.form.get("due date")
+        overall_points = request.form.get("max points")
+
+        cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
+
+        conn.commit()
+
+        return render_template('assignment.html', account = account)
+
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)
