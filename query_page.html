@@ -1,0 +1,75 @@
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="static/css/query_page_2.css">
+
+ <div class="topnav">
+   <a class="active" href="{{url_for('home')}}">Main</a>
+   <a href="{{url_for('register')}}">{{ class_name }}</a>
+   <a href="{{url_for('enroll_page')}}">Your class roster</a>
+  <a href="{{url_for('logout')}}">Logout</a>
+           <div class="dropdown">
+  <button class="dropbtn">Sort by:</button>
+  <div class="dropdown-content">
+    <a href="/alphabetically">Last name</a>
+    <a href="/alphabetically">First name</a>
+    <a href="/grade_ASC">Grade (low - high)</a>
+      <a href="/grade_DESC">Grade (high - low)</a>
+  </div>
+</div>
+
+</div>
+
+<h8>Your class gradebook</h8>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Subject</td>
+                <td>Teacher</td>
+                <td>Student First Name</td>
+                <td>Student Last Name</td>
+                <td>Graduation Year</td>
+                <td>Grade</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in records_2 %}
+            <tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+                <td>{{row[2]}}</td>
+                <td>{{row[3]}}</td>
+                <td>{{row[4]}}</td>
+                <td>{{row[5]}}</td>
+                <td>{{row[6]}}</td>
+                <td width="130">
+                    <a href="/delete/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">unenroll student</a>
+                    <form action="/update_grade/{{row[0]}}" method="POST">
+                    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="update grade here" name='update grade' style="width: 200px;">
+                         <button type="submit" class="btn btn-warning">update grade</button>
+
+</form>
+                        </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<form action="/assignment" method="GET">
+    <button type="submit" class="btn btn-warning">Edit assignment grades for this class</button>
+</form>
+
+{% endblock %}
