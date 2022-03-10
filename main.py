@@ -235,7 +235,7 @@ def delete_student(id):
         conn.commit()
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
         records_2 = cursor.fetchall()
-        return render_template('query_page.html', records_2=records_2, account = account)
+        return redirect(url_for('query', records_2=records_2, account = account))
 
     return redirect(url_for('login'))
 
@@ -260,7 +260,7 @@ def update_grade(id):
 
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
         records_2 = cursor.fetchall()
-        return render_template('query_page.html', records_2=records_2, account = account)
+        return redirect(url_for('query', records_2=records_2, account = account))
 
     return redirect(url_for('login'))
 
@@ -296,6 +296,92 @@ def new_assignment():
         conn.commit()
 
         return render_template('assignment.html', account = account)
+
+    return redirect(url_for('login'))
+
+@app.route('/edit_assignment_grade/<string:id>', methods=['GET'])
+def edit_assignment_grade(id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cur = conn.cursor()
+
+        cur.execute("SELECT assignment_name FROM assignments WHERE id = {0}".format(id))
+        records_2 = cur.fetchall()
+
+        cur.execute('SELECT * FROM classes WHERE class_creator = %s', [session['email']])
+        records_3 = cur.fetchall()
+
+        cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
+        records_4 = cur.fetchone()
+
+        return render_template('edit_assignment_grade.html', account = account, records_2 = records_2, records_3 = records_3, records_4 = records_4)
+
+    return redirect(url_for('login'))
+
+@app.route('/edit_assignment_grade_2', methods=['POST','GET'])
+def edit_assignment_grade_2():
+
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        grade_assignment = request.form.get("grade_assignment")
+        input_id = request.form.get("input_id")
+        student_id = request.form.get("student_id")
+
+        cur = conn.cursor()
+
+        conn.commit()
+
+        cur.execute("""INSERT INTO assignment_results
+        (score, student_id, assignment_id) VALUES (%s, %s, %s) 
+        """, (grade_assignment, student_id, input_id))
+
+        conn.commit()
+
+        cur.execute("""UPDATE classes 
+                    SET student_grade = (
+                    SELECT ROUND(AVG(score))
+                    FROM assignment_results)
+                    WHERE id = %s""", (student_id,))
+
+        conn.commit()
+
+        return render_template('edit_assignment_grade.html', account = account, grade_assignment = grade_assignment, student_id = student_id)
+
+    return redirect(url_for('login'))
+
+@app.route('/view_assignment_scores', methods=['GET'])
+def view_assignment_scores():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute("""SELECT
+        ci.id AS score_id,
+        s.student_first_name,
+        s.student_last_name,
+        ci.score,
+        cu.assignment_name
+        FROM classes s
+        INNER JOIN assignment_results AS ci
+        ON ci.student_id = s.id
+        INNER JOIN assignments cu  
+        ON cu.id = ci.assignment_id
+        WHERE class_creator = %s
+        ORDER BY cu.assignment_name ASC;""", [session['email']])
+
+        assignment_scores = cursor.fetchall()
+
+        return render_template('view_assignment_scores.html', account = account, assignment_scores = assignment_scores)
 
     return redirect(url_for('login'))
 
