@@ -1,0 +1,74 @@
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="static/css/query_page_2.css">
+
+ <div class="topnav">
+   <a class="active" href="{{url_for('home')}}">Main</a>
+   <a href="{{url_for('enroll_page')}}">Your class roster</a>
+  <a href="{{url_for('logout')}}">Logout</a>
+</div>
+
+{% for row in records_2 %}
+
+                <h43>Assignment name:</h43>
+                <h44>{{row[0]}}</h44>
+                {% endfor %}
+
+<br /><br />
+
+<h13>Assignment ID</h13>
+{{records_4}}
+
+<br /><br />
+
+<h8>Edit this assignment's grades</h8>
+
+{{score_results}}
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Subject</td>
+                <td>Teacher</td>
+                <td>Student First Name</td>
+                <td>Student Last Name</td>
+                <td>Input assignment grade</td></tr>
+        </thead>
+        <tbody>
+            {% for row in records_3 %}
+            <tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+                <td>{{row[2]}}</td>
+                <td>{{row[3]}}</td>
+                <td>{{row[4]}}</td>
+                <td width="130">
+                    <div class="form-group">
+                <form action="/edit_assignment_grade_2" method="POST">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="update grade here" name='grade_assignment' style="width: 160px;">
+                        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="input assignment id here" name='input_id' style="width: 170px;">
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="input student id here" name='student_id' style="width: 180px;">
+                         <button type="submit" class="btn btn-warning">update grade</button>
+</form>
+                        </div>
+                </td>
+            </tr>
+                                                  {% endfor %}
+            </tbody>
+    </table>
+</div>
+
+
+
+{% endblock %}

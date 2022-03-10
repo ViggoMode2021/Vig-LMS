@@ -9,7 +9,6 @@
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
-   <a href="{{url_for('register')}}">{{ class_name }}</a>
    <a href="{{url_for('enroll_page')}}">Your class roster</a>
   <a href="{{url_for('logout')}}">Logout</a>
 </div>
@@ -126,7 +125,7 @@ first before doing so.</p>
 </div>
 
 
-    <form action="/new_assignment_update" method="GET">
+    <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-warning">Update/refresh assignment list</button>
 </form>
 
