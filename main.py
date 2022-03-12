@@ -22,7 +22,7 @@ def home():
     if 'loggedin' in session:
 
         # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
+        return render_template('home.html', username=session['username'], class_name = session['class_name'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
@@ -140,7 +140,7 @@ def enroll_page():
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
-        return render_template('enroll_page.html', account = account)
+        return render_template('enroll_page.html', account = account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -172,7 +172,7 @@ def query():
          cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
          records_2 = cursor.fetchall()
 
-         return render_template('query_page.html', records_2=records_2, account = account)
+         return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -188,7 +188,7 @@ def alphabetically():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC", [session['email']])
         records_2 = cursor.fetchall()
 
-        return render_template('query_page.html', records_2=records_2, account = account)
+        return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -205,7 +205,7 @@ def grade_ASC():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC", [session['email']])
         records_2 = cursor.fetchall()
 
-        return render_template('query_page.html', records_2=records_2, account = account)
+        return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -222,7 +222,7 @@ def grade_DESC():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC", [session['email']])
         records_2 = cursor.fetchall()
 
-        return render_template('query_page.html', records_2=records_2, account = account)
+        return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -263,7 +263,7 @@ def update_grade(id):
 
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
         records_2 = cursor.fetchall()
-        return redirect(url_for('query', records_2=records_2, account = account))
+        return redirect(url_for('query', records_2=records_2, account = account, username=session['username'], class_name = session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -277,7 +277,7 @@ def assignment():
 
         cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
         assignments = cursor.fetchall()
-        return render_template('assignment.html', account = account, assignments = assignments)
+        return render_template('assignment.html', account = account, assignments = assignments, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -298,7 +298,7 @@ def new_assignment():
 
         conn.commit()
 
-        return render_template('assignment.html', account = account)
+        return render_template('assignment.html', account = account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -321,7 +321,7 @@ def edit_assignment_grade(id):
         cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
         records_4 = cur.fetchone()
 
-        return render_template('edit_assignment_grade.html', account = account, records_2 = records_2, records_3 = records_3, records_4 = records_4)
+        return render_template('edit_assignment_grade.html', account = account, records_2 = records_2, records_3 = records_3, records_4 = records_4, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -356,7 +356,7 @@ def edit_assignment_grade_2():
 
         conn.commit()
 
-        return render_template('edit_assignment_grade.html', account = account, grade_assignment = grade_assignment, student_id = student_id)
+        return render_template('edit_assignment_grade.html', account = account, grade_assignment = grade_assignment, student_id = student_id, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -384,7 +384,7 @@ def view_assignment_scores():
 
         assignment_scores = cursor.fetchall()
 
-        return render_template('view_assignment_scores.html', account = account, assignment_scores = assignment_scores)
+        return render_template('view_assignment_scores.html', account = account, assignment_scores = assignment_scores, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -424,10 +424,9 @@ def delete_assignment_score(id):
 
         assignments = cursor.fetchall()
 
-        return redirect(url_for('view_assignment_scores', account = account, assignments = assignments))
+        return redirect(url_for('view_assignment_scores', account = account, assignments = assignments, username=session['username'], class_name = session['class_name']))
 
     return redirect(url_for('login'))
-
 
 if __name__ == "__main__":
     app.run(debug=True)
