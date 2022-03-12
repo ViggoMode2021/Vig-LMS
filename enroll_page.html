@@ -9,11 +9,11 @@
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
-   <a href="{{url_for('enroll_page')}}">Your class roster</a>
+   <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
   <a href="{{url_for('logout')}}">Logout</a>
 </div>
 
-<h1>Enroll or check enrollment - P.1 Spanish 1</h1>
+<h1>Enroll or check enrollment</h1>
 
 <form action="/enroll_page_submit" method="POST">
     <div class="form-group">
@@ -53,30 +53,5 @@
     <form action="/query" method="GET">
     <button type="submit" class="btn btn-warning">Show class roster</button>
 </form>
-
- <h7>This is a photo of PgAdmin for Period 1 Spanish 1 table once the 'gradebook.sql' starter code is ran. Table can be changed with the above form (enroll student) and edited once 'show class roster' is clicked.</h7>
-
-
-    <img src="static/images/table.png"
-        id="img1"
-      />
-      <br /><br /><br />
-       </div>
-
-    <img src="static/images/database.png"
-        id="img2"
-
-      />
-      <br /><br /><br />
-       </div>
-
-    <form action="/take_attendance_period_1" method="GET">
-    <button type="submit" class="btn btn-warning">Take attendance period 1</button>
-</form>
-
-<form action="/attendance_dates" method="GET">
-    <button type="submit" class="btn btn-warning">Check attendance period 1</button>
-</form>
-
 
 {% endblock %}
