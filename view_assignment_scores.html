@@ -7,6 +7,11 @@
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 <link rel="stylesheet" href="static/css/query_page_2.css">
 
+ <div class="topnav">
+   <a class="active" href="{{url_for('home')}}">Main</a>
+   <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
+  <a href="{{url_for('logout')}}">Logout</a>
+</div>
 
 <h8>Assignment scores</h8>
 
@@ -30,7 +35,7 @@
                 <td>{{row[3]}}</td>
                 <td>{{row[4]}}</td>
                 <td width="110">
-                <a href="/delete_assignment_score_period_1/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete assignment score</a>
+                <a href="/delete_assignment_score/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete assignment score</a>
                     <form action="/delete_assignment_score_period_1/{{row[0]}}" method="POST">
 </form>
                 </td>
