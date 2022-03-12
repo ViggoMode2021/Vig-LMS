@@ -35,6 +35,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+
         print(password)
 
         # Check if account exists using MySQL
@@ -56,6 +57,8 @@ def login():
                 session['id'] = account['id']
                 session['username'] = account['username']
                 session['email'] = account_2['class_creator']
+                session['class_name'] = account_2['class_name']
+
                 # Redirect to home page
                 return redirect(url_for('home', class_name_print = class_name_print))
             else:
@@ -384,6 +387,47 @@ def view_assignment_scores():
         return render_template('view_assignment_scores.html', account = account, assignment_scores = assignment_scores)
 
     return redirect(url_for('login'))
+
+@app.route('/delete_assignment/<string:id>', methods = ['DELETE','GET'])
+def delete_assignment(id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute('DELETE FROM assignments WHERE id = {0}'.format(id))
+
+        conn.commit()
+
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+
+        assignments = cursor.fetchall()
+
+        return redirect(url_for('assignment', account = account, assignments = assignments))
+
+    return redirect(url_for('login'))
+
+@app.route('/delete_assignment_score/<string:id>', methods = ['DELETE','GET'])
+def delete_assignment_score(id):
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute('DELETE FROM assignment_results WHERE id = {0}'.format(id))
+
+        conn.commit()
+
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+
+        assignments = cursor.fetchall()
+
+        return redirect(url_for('view_assignment_scores', account = account, assignments = assignments))
+
+    return redirect(url_for('login'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
