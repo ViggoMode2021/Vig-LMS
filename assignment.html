@@ -9,7 +9,7 @@
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
-   <a href="{{url_for('enroll_page')}}">Your class roster</a>
+   <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
   <a href="{{url_for('logout')}}">Logout</a>
 </div>
 
@@ -46,7 +46,7 @@ first before doing so.</p>
                     <a href="/edit_assignment_grade/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Add/update student grades</a>
                     <form action="/edit_assignment_grade/{{row[0]}}" method="POST">
 </form>
-         <a href="/delete_assignment_period_1/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete assignment</a>
+         <a href="/delete_assignment/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete assignment</a>
                     <form action="/delete_assignment_period_1/{{row[0]}}" method="POST">
 </form>
                         </div>
@@ -133,10 +133,6 @@ first before doing so.</p>
 
     <form action="/view_assignment_scores" method="GET">
     <button type="submit" class="btn btn-success">View scores for all assignments</button>
-</form>
-
-    <form action="/view_assignment_scores_last_name" method="GET">
-    <button type="submit" class="btn btn-dark">View scores for all assignments (Alphabetically by last name)</button>
 </form>
 
 </body>
