@@ -10,10 +10,10 @@
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
    <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
-  <a href="{{url_for('logout')}}">Logout</a>
+          <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 </div>
 
-<h8>Assignment grades for students - Period 1 Spanish 1</h8>
+<h8>Assignment grades for students - {{ class_name }}</h8>
 
 <p>The grades inputted for the following assignments will automatically update
 the respective student's overall grade. In the 'class roster & gradebook page',
@@ -107,6 +107,19 @@ first before doing so.</p>
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
             placeholder="Max points" name='max points' style="width: 200px;">
     </div>
+
+                    {% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
     <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-warning">Create assignment</button>

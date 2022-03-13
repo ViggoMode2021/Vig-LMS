@@ -1,5 +1,3 @@
-{% block title %}{{title}}{% endblock %}
-
 {% block content %}
 
 
@@ -14,22 +12,16 @@
   <a href="{{url_for('logout')}}">Logout</a>
 </div>
 
-{% for row in records_2 %}
+<h43>Assignment name:</h43>
 
-                <h43>Assignment name:</h43>
-                <h44>{{row[0]}}</h44>
-                {% endfor %}
+<p>{% for row in records_2 %}{{row[0]}} {% endfor %}</p>
 
-<br /><br />
-
-<h13>Assignment ID</h13>
-{{records_4}}
+<p>Assignment ID {{records_4}} </p>
 
 <br /><br />
 
 <h8>Edit this assignment's grades</h8>
 
-{{score_results}}
 
 <div class="col-md-8">
     <table id="example" class="table table-striped table-bordered" style="width:100%">
