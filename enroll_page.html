@@ -13,6 +13,8 @@
 
 <h1>Enroll or check enrollment for {{ class_name }}</h1>
 
+<h2>Enter student credentials below to enroll new student into class.</h2>
+
 <form action="/enroll_page_submit" method="POST">
 
     <div class="form-group">
@@ -31,7 +33,7 @@
     </div>
 
     <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp" placeholder="grade"
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp" placeholder="grade (0-100)"
             name='grade' style="width: 200px;">
     </div>
 
