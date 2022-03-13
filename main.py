@@ -148,16 +148,28 @@ def enroll_page():
 def enroll_page_submit():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    class_name = request.form.get("class_name")
-    teacher = request.form.get("teacher")
     first_name = request.form.get("first name")
     last_name = request.form.get("last name")
     graduation_year = request.form.get("graduation year")
     grade = request.form.get("grade")
 
-    cursor.execute("INSERT INTO classes (class_name, teacher, student_first_name, student_last_name, student_graduation_year, student_grade, class_creator) VALUES (%s,%s,%s,%s,%s,%s, (SELECT email from users WHERE email = %s))", (class_name, teacher, first_name, last_name, graduation_year, grade, session['email']))
+    if not first_name:
+        flash('Please enter a first name.')
+        return render_template('enroll_page.html')
+    elif not last_name:
+        flash('Please enter a last name.')
+        return render_template('enroll_page.html')
+    elif not graduation_year:
+        flash('Please enter a graduation year.')
+        return render_template('enroll_page.html')
+    elif not grade:
+        flash('Please enter a student grade (0-100) to enroll.')
+        return render_template('enroll_page.html')
+    else:
 
-    conn.commit()
+        cursor.execute("INSERT INTO classes (class_name, teacher, student_first_name, student_last_name, student_graduation_year, student_grade, class_creator) VALUES (%s,%s,%s,%s,%s,%s, (SELECT email from users WHERE email = %s))", (session['class_name'], session['username'], first_name, last_name, graduation_year, grade, session['email']))
+
+        conn.commit()
 
     return render_template('enroll_page.html')
 
@@ -294,9 +306,21 @@ def new_assignment():
         due_date = request.form.get("due date")
         overall_points = request.form.get("max points")
 
-        cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
-
-        conn.commit()
+        if not assignment_name:
+            flash('Please enter an assignment name.')
+            return render_template('assignment.html')
+        elif not category:
+            flash('Please enter a category.')
+            return render_template('assignment.html')
+        if not due_date:
+            flash('Please enter an due date.')
+            return render_template('assignment.html')
+        if not overall_points:
+            flash('Please enter an overall point amount.')
+            return render_template('assignment.html')
+        else:
+            cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
+            conn.commit()
 
         return render_template('assignment.html', account = account, username=session['username'], class_name = session['class_name'])
 
