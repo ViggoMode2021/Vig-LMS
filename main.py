@@ -491,7 +491,7 @@ def reset_password():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'email_2' in request.form and 'secret_question_2' in request.form and 'new_password' in request.form:
+    if request.method == 'POST' and 'email_2' in request.form and 'secret_question_2' in request.form and 'new_password' in request.form:
         email_2 = request.form['email_2']
         secret_question_2 = request.form['secret_question_2']
         new_password = request.form['new_password']
@@ -505,9 +505,11 @@ def reset_password():
 
         if account_password_reset:
 
+            print('hello')
+
             cursor.execute("""UPDATE users 
             SET password = %s 
-            WHERE email = %s""", (new_password, email_2))
+            WHERE email = %s""", (_hashed_password_reset, email_2))
 
             conn.commit()
 
