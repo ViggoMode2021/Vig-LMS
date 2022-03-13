@@ -82,6 +82,7 @@ def register():
         password = request.form['password']
         email = request.form['email']
         class_name = request.form['class_name']
+        secret_question = request.form['secret_question']
 
         _hashed_password = generate_password_hash(password)
 
@@ -100,7 +101,7 @@ def register():
             flash('Please fill out the form!')
         else:
             # Account doesn't exist and the form data is valid, now insert new account into users table
-            cursor.execute("INSERT INTO users (fullname, username, password, email, class) VALUES (%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name))
+            cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name, secret_question))
             conn.commit()
             cursor.execute("INSERT INTO classes (class_name, teacher, class_creator) VALUES (%s,%s, (SELECT email from users WHERE fullname = %s))", (class_name, fullname, fullname))
             conn.commit()
@@ -164,6 +165,12 @@ def enroll_page_submit():
         return render_template('enroll_page.html')
     elif not grade:
         flash('Please enter a student grade (0-100) to enroll.')
+        return render_template('enroll_page.html')
+    elif graduation_year.isalpha():
+        flash('Please enter a graduation year that is a number.')
+        return render_template('enroll_page.html')
+    elif grade.isalpha():
+        flash('Please enter a grade number between 0 - 100.')
         return render_template('enroll_page.html')
     else:
 
@@ -267,15 +274,22 @@ def update_grade(id):
 
         cur = conn.cursor()
 
-        cur.execute("""UPDATE classes 
-        SET student_grade = %s 
-        WHERE id = %s""", (updated_grade, id))
+        if not updated_grade:
+            flash("Please enter a new grade if you wish to update the student's grade.")
+            return redirect(url_for('query'))
+        if updated_grade.isalpha():
+            flash("Please enter a new grade number if you wish to update the student's grade.")
+            return redirect(url_for('query'))
+        else:
+            cur.execute("""UPDATE classes 
+            SET student_grade = %s 
+            WHERE id = %s""", (updated_grade, id))
 
-        conn.commit()
+            conn.commit()
 
-        cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
-        records_2 = cursor.fetchall()
-        return redirect(url_for('query', records_2=records_2, account = account, username=session['username'], class_name = session['class_name']))
+            cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+            records_2 = cursor.fetchall()
+            return redirect(url_for('query', records_2=records_2, account = account, username=session['username'], class_name = session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -366,23 +380,42 @@ def edit_assignment_grade_2():
 
         conn.commit()
 
-        cur.execute("""INSERT INTO assignment_results
-        (score, student_id, assignment_id) VALUES (%s, %s, %s) 
-        """, (grade_assignment, student_id, input_id))
+        if not grade_assignment:
+            return redirect(url_for('assignment'))
+            flash('Please input the updated grade here.')
+        elif not input_id:
+            flash('Please confirm the assignment ID here (located at the top left corner of page).')
+            return redirect(url_for('assignment'))
+        elif not student_id:
+            flash('Please confirm the student ID here (located in this row on the left).')
+            return redirect(url_for('assignment'))
+        elif grade_assignment.isalpha():
+            flash('Please enter an assignment grade (0-100).')
+            return redirect(url_for('assignment'))
+        elif input_id.isalpha():
+            flash('Please enter a graduation year that is a number.')
+            return redirect(url_for('assignment'))
+        elif student_id.isalpha():
+            flash('Please enter a grade number between 0 - 100.')
+            return redirect(url_for('assignment'))
+        else:
+            cur.execute("""INSERT INTO assignment_results
+            (score, student_id, assignment_id) VALUES (%s, %s, %s) 
+            """, (grade_assignment, student_id, input_id))
 
-        conn.commit()
+            conn.commit()
 
-        cur.execute("""UPDATE classes 
-                    SET student_grade = (
-                    SELECT ROUND(AVG(score))
-                    FROM assignment_results)
-                    WHERE id = %s""", (student_id,))
+            cur.execute("""UPDATE classes 
+                        SET student_grade = (
+                        SELECT ROUND(AVG(score))
+                        FROM assignment_results)
+                        WHERE id = %s""", (student_id,))
 
-        conn.commit()
+            conn.commit()
 
-        return render_template('edit_assignment_grade.html', account = account, grade_assignment = grade_assignment, student_id = student_id, username=session['username'], class_name = session['class_name'])
+            return render_template('assignment.html', account = account, grade_assignment = grade_assignment, student_id = student_id, username=session['username'], class_name = session['class_name'])
 
-    return redirect(url_for('login'))
+        return redirect(url_for('login'))
 
 @app.route('/view_assignment_scores', methods=['GET'])
 def view_assignment_scores():
@@ -451,6 +484,40 @@ def delete_assignment_score(id):
         return redirect(url_for('view_assignment_scores', account = account, assignments = assignments, username=session['username'], class_name = session['class_name']))
 
     return redirect(url_for('login'))
+
+##############
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'email_2' in request.form and 'secret_question_2' in request.form and 'new_password' in request.form:
+        email_2 = request.form['email_2']
+        secret_question_2 = request.form['secret_question_2']
+        new_password = request.form['new_password']
+
+        # Check if account exists using MySQL
+        cursor.execute('SELECT * FROM users WHERE email = %s AND secret_question = %s', (email_2, secret_question_2))
+        # Fetch one record and return result
+        account_password_reset = cursor.fetchone()
+
+        _hashed_password_reset = generate_password_hash(new_password)
+
+        if account_password_reset:
+
+            cursor.execute("""UPDATE users 
+            SET password = %s 
+            WHERE email = %s""", (new_password, email_2))
+
+            conn.commit()
+
+            # Redirect to home page
+            return redirect(url_for('login'))
+        else:
+            # Account doesnt exist or username/password incorrect
+            flash('Incorrect username/password')
+
+    return render_template('reset_password.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
