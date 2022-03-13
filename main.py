@@ -1,4 +1,3 @@
-#app.py
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 import psycopg2
 import psycopg2.extras
@@ -485,7 +484,6 @@ def delete_assignment_score(id):
 
     return redirect(url_for('login'))
 
-##############
 @app.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -514,10 +512,11 @@ def reset_password():
             conn.commit()
 
             # Redirect to home page
-            return redirect(url_for('login'))
+            flash(f'Password updated for {email_2}')
+            return redirect(url_for('reset_password'))
         else:
             # Account doesnt exist or username/password incorrect
-            flash('Incorrect username/password')
+            flash('Incorrect credentials')
 
     return render_template('reset_password.html')
 
