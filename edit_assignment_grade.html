@@ -1,10 +1,9 @@
 {% block content %}
 
-
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="static/css/query_page_2.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/query_page_2.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
@@ -14,9 +13,13 @@
 
 <h43>Assignment name:</h43>
 
-<p>{% for row in records_2 %}{{row[0]}} {% endfor %}</p>
+<h44>{% for row in records_2 %}{{row[0]}} {% endfor %}</h44>
 
-<p>Assignment ID {{records_4}} </p>
+<br /><br />
+
+<h45>Assignment ID:</h45>
+
+<h46>{% for record in records_4 %} {{record}} {% endfor %}</h46>
 
 <br /><br />
 
