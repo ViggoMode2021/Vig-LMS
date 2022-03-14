@@ -3,6 +3,9 @@ import psycopg2
 import psycopg2.extras
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
+
+date_object = datetime.date.today()
 
 app = Flask(__name__)
 app.secret_key = 'ryanv203'
@@ -28,6 +31,10 @@ def home():
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cursor.execute('SELECT COUNT (username) FROM users;')
+    user_count = cursor.fetchall()
+
 
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
@@ -67,7 +74,7 @@ def login():
             # Account doesnt exist or username/password incorrect
             flash('Incorrect username/password')
 
-    return render_template('login.html')
+    return render_template('login.html', user_count = user_count, date_object = date_object)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -321,7 +328,6 @@ def new_assignment():
 
         if not assignment_name:
             flash('Please enter an assignment name.')
-            return render_template('assignment.html')
         elif not category:
             flash('Please enter a category.')
             return render_template('assignment.html')
