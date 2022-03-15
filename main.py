@@ -13,7 +13,7 @@ app.secret_key = 'ryanv203'
 DB_HOST = "localhost"
 DB_NAME = "Vig_LMS"
 DB_USER = "postgres"
-DB_PASS = ""
+DB_PASS = "admin"
 DB_PORT_ID = 5432
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -386,8 +386,8 @@ def edit_assignment_grade_2():
         conn.commit()
 
         if not grade_assignment:
-            return redirect(url_for('assignment'))
             flash('Please input the updated grade here.')
+            return redirect(url_for('assignment'))
         elif not input_id:
             flash('Please confirm the assignment ID here (located at the top left corner of page).')
             return redirect(url_for('assignment'))
@@ -449,6 +449,41 @@ def view_assignment_scores():
         return render_template('view_assignment_scores.html', account = account, assignment_scores = assignment_scores, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
+
+@app.route('/view_assignment_scores_by_student', methods=['POST', 'GET'])
+def view_assignment_scores_by_student():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        session['student_name'] = request.form['student_name']
+
+        cursor.execute("""SELECT
+        ci.id AS score_id,
+        s.student_first_name,
+        s.student_last_name,
+        ci.score,
+        cu.assignment_name
+        FROM classes s
+        INNER JOIN assignment_results AS ci
+        ON ci.student_id = s.id
+        INNER JOIN assignments cu  
+        ON cu.id = ci.assignment_id
+        WHERE class_creator = %s AND s.student_last_name = %s
+        ORDER BY cu.assignment_name ASC;""", [session['email'], session['student_name']])
+
+        assignment_scores_by_student = cursor.fetchall()
+
+        if not assignment_scores_by_student:
+            flash('Student not enrolled in class.')
+            return redirect(url_for('assignment'))
+
+        return render_template('view_assignment_scores_by_student.html', account = account, assignment_scores_by_student = assignment_scores_by_student, username=session['username'], class_name = session['class_name'], student_name = session['student_name'])
+
+    return redirect(url_for('login'))
+
 
 @app.route('/delete_assignment/<string:id>', methods = ['DELETE','GET'])
 def delete_assignment(id):
