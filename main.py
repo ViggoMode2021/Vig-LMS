@@ -20,10 +20,10 @@ conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_
 
 @app.route('/')
 def home():
-    # Check if user is loggedin
+    
     if 'loggedin' in session:
 
-        # User is loggedin show them the home page
+        
         return render_template('home.html', username=session['username'], class_name = session['class_name'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
