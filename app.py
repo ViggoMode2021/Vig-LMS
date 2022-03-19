@@ -8,22 +8,22 @@ import datetime
 date_object = datetime.date.today()
 
 app = Flask(__name__)
+
 app.secret_key = 'ryanv203'
 
-DB_HOST = "localhost"
-DB_NAME = "Vig_LMS"
+DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "admin"
-DB_PORT_ID = 5432
+DB_PASS = ""
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
 @app.route('/')
 def home():
-    
+    # Check if user is loggedin
     if 'loggedin' in session:
 
-        
+        # User is loggedin show them the home page
         return render_template('home.html', username=session['username'], class_name = session['class_name'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
@@ -368,7 +368,7 @@ def edit_assignment_grade(id):
 
     return redirect(url_for('login'))
 
-@app.route('/edit_assignment_grade_2', methods=['POST','GET'])
+@app.route('/edit_assignment_grade_2', methods=['POST', 'GET'])
 def edit_assignment_grade_2():
 
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -485,7 +485,7 @@ def view_assignment_scores_by_student():
     return redirect(url_for('login'))
 
 
-@app.route('/delete_assignment/<string:id>', methods = ['DELETE','GET'])
+@app.route('/delete_assignment/<string:id>', methods = ['DELETE', 'GET'])
 def delete_assignment(id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -505,7 +505,7 @@ def delete_assignment(id):
 
     return redirect(url_for('login'))
 
-@app.route('/delete_assignment_score/<string:id>', methods = ['DELETE','GET'])
+@app.route('/delete_assignment_score/<string:id>', methods = ['DELETE', 'GET'])
 def delete_assignment_score(id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
