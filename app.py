@@ -14,7 +14,7 @@ app.secret_key = 'ryanv203'
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = ""
+DB_PASS = "#topsecret"
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
@@ -560,6 +560,52 @@ def reset_password():
             flash('Incorrect credentials')
 
     return render_template('reset_password.html')
+
+################## STUDENT ACCOUNT PORTION ###################################
+
+@app.route('/student_register', methods=['GET', 'POST'])
+def student_register():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'student_username' in request.form and 'student_password' in request.form and 'student_email' in request.form:
+        # Create variables for easy access
+        student_firstname = request.form['student_firstname']
+        student_lastname = request.form['student_lastname']
+        student_username = request.form['student_username']
+        student_email = request.form['student_email']
+        student_password = request.form['student_password']
+        student_class_name = request.form['student_class_name']
+        student_secret_question = request.form['student_secret_question']
+
+        _hashed_password_student = generate_password_hash(student_password)
+
+        cursor.execute('SELECT * FROM student_accounts WHERE username = %s', (student_username,))
+        student_account = cursor.fetchone()
+
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_firstname, student_lastname, student_class_name))
+        student_verify = cursor.fetchone()
+
+        if student_account:
+            flash('Student account already exists!')
+        elif not student_verify:
+            flash('Student not enrolled in class!')
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', student_email):
+            flash('Invalid email address!')
+        elif not re.match(r'[A-Za-z0-9]+', student_username):
+            flash('Username must contain only characters and numbers!')
+        elif not student_username or not student_password or not student_email:
+            flash('Please fill out the form!')
+        else:
+            # Account doesn't exist and the form data is valid, now insert new account into users table
+            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, username, email, password, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s,%s)", (student_firstname, student_lastname, student_username, _hashed_password_student, student_email, student_class_name, student_secret_question))
+            conn.commit()
+            flash('You have successfully registered!')
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        flash('Please fill out the form!')
+    # Show registration form with message (if any)
+    return render_template('student_register.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
