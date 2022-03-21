@@ -9,31 +9,33 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = 'ryanv203'
+app.secret_key = 'ryanv203' #Secret key for sessions
+
+#Database info below:
 
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
-DB_USER = "postgres"
-DB_PASS = "#topsecret"
+DB_USER = ""
+DB_PASS = "Carrotcake2021"
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
 @app.route('/')
 def home():
-    # Check if user is loggedin
+    # Check if user is logged in
     if 'loggedin' in session:
 
-        # User is loggedin show them the home page
+        # If user is logged in, they are directed to home page.
         return render_template('home.html', username=session['username'], class_name = session['class_name'])
-    # User is not loggedin redirect to login page
+    # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) #Make connection to db via Psycopg2
 
     cursor.execute('SELECT COUNT (username) FROM users;')
-    user_count = cursor.fetchall()
+    user_count = cursor.fetchall() #This shows the number of users using the application
 
 
     # Check if "username" and "password" POST requests exist (user submitted form)
@@ -44,15 +46,17 @@ def login():
 
         print(password)
 
-        # Check if account exists using MySQL
+        # Check if account exists
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
-        # Fetch one record and return result
         account = cursor.fetchone()
+        # Grab user information from classes table. The classes table contains information that the user submitted. This is student information and grades.
         cursor.execute('SELECT * FROM classes WHERE class_creator = %s', (email,))
         account_2 = cursor.fetchone()
+        # Grab class name to be stored in session data
         cursor.execute('SELECT class_name FROM classes WHERE class_creator = %s', (email,))
         class_name_print = cursor.fetchone()
 
+        # If above information is adequate:
         if account and account_2:
             password_rs = account['password']
             print(password_rs)
@@ -66,15 +70,15 @@ def login():
                 session['class_name'] = account_2['class_name']
 
                 # Redirect to home page
-                return redirect(url_for('home', class_name_print = class_name_print))
+                return redirect(url_for('home', class_name_print=class_name_print))
             else:
-                # Account doesnt exist or username/password incorrect
+                # Account doesn't exist or username/password incorrect
                 flash('Incorrect username/password')
         else:
-            # Account doesnt exist or username/password incorrect
+            # Account doesn't exist or username/password incorrect
             flash('Incorrect username/password')
 
-    return render_template('login.html', user_count = user_count, date_object = date_object)
+    return render_template('login.html', user_count=user_count, date_object=date_object)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -82,7 +86,7 @@ def register():
 
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
-        # Create variables for easy access
+        # Create variables to reference for below queries
         fullname = request.form['fullname']
         username = request.form['username']
         password = request.form['password']
@@ -92,7 +96,7 @@ def register():
 
         _hashed_password = generate_password_hash(password)
 
-        #Check if account exists using MySQL
+        # Check if account exists:
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         account = cursor.fetchone()
         print(account)
@@ -106,16 +110,16 @@ def register():
         elif not username or not password or not email:
             flash('Please fill out the form!')
         else:
-            # Account doesn't exist and the form data is valid, now insert new account into users table
+            # Account doesn't exist and the form data is valid, new account is created in the users table with the below queries:
             cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name, secret_question))
             conn.commit()
             cursor.execute("INSERT INTO classes (class_name, teacher, class_creator) VALUES (%s,%s, (SELECT email from users WHERE fullname = %s))", (class_name, fullname, fullname))
             conn.commit()
             flash('You have successfully registered!')
     elif request.method == 'POST':
-        # Form is empty... (no POST data)
+        # Form is empty
         flash('Please fill out the form!')
-    # Show registration form with message (if any)
+    # Show registration form with message (if applicable)
     return render_template('register.html')
 
 @app.route('/logout')
@@ -137,24 +141,25 @@ def profile():
         account = cursor.fetchone()
         # Show the profile page with account info
         return render_template('profile.html', account=account)
-    # User is not loggedin redirect to login page
+    # User is not logged in and will be redirected to login page
     return redirect(url_for('login'))
 
 @app.route('/enroll_page', methods=['GET'])
-def enroll_page():
+def enroll_page(): #This function routes the logged in user to the page to enroll students
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
-        return render_template('enroll_page.html', account = account, username=session['username'], class_name = session['class_name'])
+        return render_template('enroll_page.html', account=account, username=session['username'], class_name=session['class_name'])
 
-    return redirect(url_for('login'))
+    return redirect(url_for('login')) #User is redirected to the log in page if there is no session data
 
 @app.route('/enroll_page_submit', methods=['POST'])
 def enroll_page_submit():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+    # Get information from forms to enroll students
     first_name = request.form.get("first name")
     last_name = request.form.get("last name")
     graduation_year = request.form.get("graduation year")
@@ -191,13 +196,13 @@ def enroll_page_submit():
 def query():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # Show user and student information from the db
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
          cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
          records_2 = cursor.fetchall()
 
-         return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
+         return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -205,7 +210,7 @@ def query():
 def alphabetically():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This orders the students alphabetically by first name
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -213,7 +218,7 @@ def alphabetically():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC", [session['email']])
         records_2 = cursor.fetchall()
 
-        return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
+        return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -222,7 +227,7 @@ def alphabetically():
 def grade_ASC():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This orders the students by grade (lowest - highest)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -239,7 +244,7 @@ def grade_ASC():
 def grade_DESC():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This orders the students by grade (highest - lowest)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -247,7 +252,7 @@ def grade_DESC():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC", [session['email']])
         records_2 = cursor.fetchall()
 
-        return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
+        return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -255,7 +260,7 @@ def grade_DESC():
 def delete_student(id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This removes a student from the class
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -263,7 +268,7 @@ def delete_student(id):
         conn.commit()
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
         records_2 = cursor.fetchall()
-        return redirect(url_for('query', records_2=records_2, account = account))
+        return redirect(url_for('query', records_2=records_2, account=account))
 
     return redirect(url_for('login'))
 
@@ -271,7 +276,7 @@ def delete_student(id):
 def update_grade(id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This updates the student grade via user input.
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -295,7 +300,7 @@ def update_grade(id):
 
             cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
             records_2 = cursor.fetchall()
-            return redirect(url_for('query', records_2=records_2, account = account, username=session['username'], class_name = session['class_name']))
+            return redirect(url_for('query', records_2=records_2, account=account, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -303,13 +308,13 @@ def update_grade(id):
 def assignment():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session:# This selects the assignments that the user created
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
         cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
         assignments = cursor.fetchall()
-        return render_template('assignment.html', account = account, assignments = assignments, username=session['username'], class_name = session['class_name'])
+        return render_template('assignment.html', account=account, assignment =assignments, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -317,7 +322,7 @@ def assignment():
 def new_assignment():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This creates a new assignment
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -349,7 +354,7 @@ def new_assignment():
 def edit_assignment_grade(id):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if 'loggedin' in session:
+    if 'loggedin' in session: # This routes the user to the edit assignment grade page.
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -364,7 +369,7 @@ def edit_assignment_grade(id):
         cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
         records_4 = cur.fetchone()
 
-        return render_template('edit_assignment_grade.html', account = account, records_2 = records_2, records_3 = records_3, records_4 = records_4, username=session['username'], class_name = session['class_name'])
+        return render_template('edit_assignment_grade.html', account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -418,9 +423,9 @@ def edit_assignment_grade_2():
 
             conn.commit()
 
-            return render_template('assignment.html', account = account, grade_assignment = grade_assignment, student_id = student_id, username=session['username'], class_name = session['class_name'])
+            return render_template('assignment.html', account=account, grade_assignment=grade_assignment, student_id=student_id, username=session['username'], class_name = session['class_name'])
 
-        return redirect(url_for('login'))
+    return redirect(url_for('login'))
 
 @app.route('/view_assignment_scores', methods=['GET'])
 def view_assignment_scores():
@@ -446,7 +451,7 @@ def view_assignment_scores():
 
         assignment_scores = cursor.fetchall()
 
-        return render_template('view_assignment_scores.html', account = account, assignment_scores = assignment_scores, username=session['username'], class_name = session['class_name'])
+        return render_template('view_assignment_scores.html', account=account, assignment_scores=assignment_scores, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -480,7 +485,7 @@ def view_assignment_scores_by_student():
             flash('Student not enrolled in class.')
             return redirect(url_for('assignment'))
 
-        return render_template('view_assignment_scores_by_student.html', account = account, assignment_scores_by_student = assignment_scores_by_student, username=session['username'], class_name = session['class_name'], student_name = session['student_name'])
+        return render_template('view_assignment_scores_by_student.html', account=account, assignment_scores_by_student=assignment_scores_by_student, username=session['username'], class_name=session['class_name'], student_name=session['student_name'])
 
     return redirect(url_for('login'))
 
@@ -501,7 +506,7 @@ def delete_assignment(id):
 
         assignments = cursor.fetchall()
 
-        return redirect(url_for('assignment', account = account, assignments = assignments))
+        return redirect(url_for('assignment', account=account, assignments=assignments))
 
     return redirect(url_for('login'))
 
@@ -521,7 +526,7 @@ def delete_assignment_score(id):
 
         assignments = cursor.fetchall()
 
-        return redirect(url_for('view_assignment_scores', account = account, assignments = assignments, username=session['username'], class_name = session['class_name']))
+        return redirect(url_for('view_assignment_scores', account=account, assignments=assignments, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -535,9 +540,9 @@ def reset_password():
         secret_question_2 = request.form['secret_question_2']
         new_password = request.form['new_password']
 
-        # Check if account exists using MySQL
+        # Check if account exists
         cursor.execute('SELECT * FROM users WHERE email = %s AND secret_question = %s', (email_2, secret_question_2))
-        # Fetch one record and return result
+
         account_password_reset = cursor.fetchone()
 
         _hashed_password_reset = generate_password_hash(new_password)
@@ -556,7 +561,7 @@ def reset_password():
             flash(f'Password updated for {email_2}')
             return redirect(url_for('reset_password'))
         else:
-            # Account doesnt exist or username/password incorrect
+            # Account doesn't exist or username/password incorrect
             flash('Incorrect credentials')
 
     return render_template('reset_password.html')
@@ -606,6 +611,60 @@ def student_register():
         flash('Please fill out the form!')
     # Show registration form with message (if any)
     return render_template('student_register.html')
+
+@app.route('/student_login/', methods=['GET', 'POST'])
+def student_login():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cursor.execute('SELECT COUNT (username) FROM student_accounts;')
+    student_count = cursor.fetchall()
+
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'student_first_name_2' in request.form and 'student_last_name_2' in request.form and 'student_password_2' in request.form and 'student_email_2' in request.form:
+        student_first_name_2 = request.form['student_first_name_2']
+        student_last_name_2 = request.form['student_last_name_2']
+        student_password_2 = request.form['student_password_2']
+
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
+
+        student_account = cursor.fetchone()
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
+        student_class_info = cursor.fetchone()
+
+        if student_account and student_class_info:
+            password_student = student_account['password']
+            # If account exists in users table in out database
+            if check_password_hash(password_student, student_password_2):
+                # Create session data, we can access this data in other routes
+                session['loggedin'] = True
+                session['id'] = student_account['id']
+                session['student_first_name_2'] = student_account['student_first_name']
+                session['student_last_name_2'] = student_account['student_last_name']
+
+                # Redirect to home page
+                return redirect(url_for('student_home', student_class_info=student_class_info))
+            else:
+                # Account doesn't exist or username/password incorrect
+                flash('Incorrect username/password')
+        else:
+            # Account doesn't exist or username/password incorrect
+            flash('Incorrect username/password')
+
+    return render_template('student_login.html', student_count=student_count, date_object=date_object)
+
+@app.route('/student_home', methods=['GET'])
+def student_home():
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session: # Show user and student information from the db
+         cursor.execute('SELECT * FROM student_accounts WHERE id = %s', [session['id']])
+         student_account_2 = cursor.fetchone()
+         cursor.execute("SELECT * FROM classes WHERE student_first_name = %s", [session['student_first_name']])
+         student_class_info = cursor.fetchall()
+
+         return render_template('student_home.html', student_class_info = student_class_info, student_account_2 = student_account_2)
+
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)
