@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <h20>Welcome to the student login page for Vig LMS!</h20>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+ <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ </head>
+  <style>
+body {
+  background-image: url('/static/images/Sky.jpg');
+}
+</style>
+  <div class="login-box" >
+  <div class="login-body">
+    <p>Please enter your credentials below:</p>
+    <form class="form-group" action="{{ url_for('student_login') }}" method="post">
+        <label>First name:</label>
+        <input type="text" class="form-control" style="width: 300px" name="student_first_name_2" placeholder="First name" id="student_first_name_2" required>
+        <label>Last name:</label>
+        <input type="text" class="form-control" style="width: 300px" name="student_last_name_2" placeholder="Last name" id="student_last_name_2" required>
+        <label>Password:</label>
+        <input type="password" class="form-control" style="width: 300px" name="student_password_2" placeholder="Password" id="student_password_2" required>
+        <input type="checkbox" value="checked"><b>Remember</b>
+        <input type="submit" value="Login" style="width: 150px" class="form-control btn btn-success " name="">
+    </form>
+    {% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <p>No account <a href="{{ url_for('student_register') }}">Register</a></p>
+          <p>Forgot password? <a href="{{ url_for('reset_password') }}">Reset password here</a></p>
+
+      <h100>As of {{ date_object }}, there are {% for row in user_count %} {{row}} {% endfor %} users that are using Vig LMS!</h100>
+
+  </div>
+ </div>
+ </body>
+</html>
