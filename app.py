@@ -15,10 +15,8 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
-DB_USER = ""
+DB_USER = "postgres"
 DB_PASS = "Carrotcake2021"
-
-conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
 @app.route('/')
 def home():
@@ -32,6 +30,7 @@ def home():
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) #Make connection to db via Psycopg2
 
     cursor.execute('SELECT COUNT (username) FROM users;')
@@ -69,19 +68,28 @@ def login():
                 session['email'] = account_2['class_creator']
                 session['class_name'] = account_2['class_name']
 
+                cursor.close()
+                conn.close()
+
                 # Redirect to home page
                 return redirect(url_for('home', class_name_print=class_name_print))
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect username/password')
+                cursor.close()
+                conn.close()
         else:
             # Account doesn't exist or username/password incorrect
             flash('Incorrect username/password')
+            cursor.close()
+            conn.close()
 
     return render_template('login.html', user_count=user_count, date_object=date_object)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
@@ -103,12 +111,20 @@ def register():
         # If account exists show error and validation checks
         if account:
             flash('Account already exists!')
+            cursor.close()
+            conn.close()
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             flash('Invalid email address!')
+            cursor.close()
+            conn.close()
         elif not re.match(r'[A-Za-z0-9]+', username):
             flash('Username must contain only characters and numbers!')
+            cursor.close()
+            conn.close()
         elif not username or not password or not email:
             flash('Please fill out the form!')
+            cursor.close()
+            conn.close()
         else:
             # Account doesn't exist and the form data is valid, new account is created in the users table with the below queries:
             cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name, secret_question))
@@ -116,9 +132,13 @@ def register():
             cursor.execute("INSERT INTO classes (class_name, teacher, class_creator) VALUES (%s,%s, (SELECT email from users WHERE fullname = %s))", (class_name, fullname, fullname))
             conn.commit()
             flash('You have successfully registered!')
+            cursor.close()
+            conn.close()
     elif request.method == 'POST':
         # Form is empty
         flash('Please fill out the form!')
+        cursor.close()
+        conn.close()
     # Show registration form with message (if applicable)
     return render_template('register.html')
 
@@ -133,12 +153,15 @@ def logout():
 
 @app.route('/profile')
 def profile():
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if user is loggedin
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
+        cursor.close()
+        conn.close()
         # Show the profile page with account info
         return render_template('profile.html', account=account)
     # User is not logged in and will be redirected to login page
@@ -146,17 +169,23 @@ def profile():
 
 @app.route('/enroll_page', methods=['GET'])
 def enroll_page(): #This function routes the logged in user to the page to enroll students
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
+        cursor.close()
+        conn.close()
         return render_template('enroll_page.html', account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login')) #User is redirected to the log in page if there is no session data
 
 @app.route('/enroll_page_submit', methods=['POST'])
 def enroll_page_submit():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Get information from forms to enroll students
@@ -167,20 +196,32 @@ def enroll_page_submit():
 
     if not first_name:
         flash('Please enter a first name.')
+        cursor.close()
+        conn.close()
         return render_template('enroll_page.html')
     elif not last_name:
+        cursor.close()
+        conn.close()
         flash('Please enter a last name.')
         return render_template('enroll_page.html')
     elif not graduation_year:
+        cursor.close()
+        conn.close()
         flash('Please enter a graduation year.')
         return render_template('enroll_page.html')
     elif not grade:
+        cursor.close()
+        conn.close()
         flash('Please enter a student grade (0-100) to enroll.')
         return render_template('enroll_page.html')
     elif graduation_year.isalpha():
+        cursor.close()
+        conn.close()
         flash('Please enter a graduation year that is a number.')
         return render_template('enroll_page.html')
     elif grade.isalpha():
+        cursor.close()
+        conn.close()
         flash('Please enter a grade number between 0 - 100.')
         return render_template('enroll_page.html')
     else:
@@ -189,18 +230,25 @@ def enroll_page_submit():
 
         conn.commit()
 
+        cursor.close()
+        conn.close()
+
     return render_template('enroll_page.html')
 
 #period_1_spanish_1 show class roster #READ
 @app.route('/query', methods=['GET'])
 def query():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
          cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
          records_2 = cursor.fetchall()
+
+         cursor.close()
+         conn.close()
 
          return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
@@ -208,15 +256,20 @@ def query():
 
 @app.route('/alphabetically', methods=['GET'])
 def alphabetically():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This orders the students alphabetically by first name
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC", [session['email']])
         records_2 = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
 
         return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
@@ -225,15 +278,20 @@ def alphabetically():
 #period_1_sort_grade_ascending
 @app.route('/grade_ASC', methods=['GET'])
 def grade_ASC():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This orders the students by grade (lowest - highest)
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC", [session['email']])
         records_2 = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
 
         return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
 
@@ -242,9 +300,11 @@ def grade_ASC():
 #period_1_sort_grade_descending
 @app.route('/grade_DESC', methods=['GET'])
 def grade_DESC():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This orders the students by grade (highest - lowest)
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -252,15 +312,20 @@ def grade_DESC():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC", [session['email']])
         records_2 = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
+
         return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
 @app.route('/delete/<string:id>', methods = ['DELETE', 'GET'])
 def delete_student(id):
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This removes a student from the class
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -268,15 +333,21 @@ def delete_student(id):
         conn.commit()
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
         records_2 = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
         return redirect(url_for('query', records_2=records_2, account=account))
 
     return redirect(url_for('login'))
 
 @app.route('/update_grade/<id>', methods = ['PATCH', 'GET', 'POST'])
 def update_grade(id):
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This updates the student grade via user input.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
@@ -287,9 +358,13 @@ def update_grade(id):
 
         if not updated_grade:
             flash("Please enter a new grade if you wish to update the student's grade.")
+            cursor.close()
+            conn.close()
             return redirect(url_for('query'))
         if updated_grade.isalpha():
             flash("Please enter a new grade number if you wish to update the student's grade.")
+            cursor.close()
+            conn.close()
             return redirect(url_for('query'))
         else:
             cur.execute("""UPDATE classes 
@@ -300,29 +375,41 @@ def update_grade(id):
 
             cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
             records_2 = cursor.fetchall()
+
+            cursor.close()
+            conn.close()
             return redirect(url_for('query', records_2=records_2, account=account, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
 @app.route('/assignment', methods=['GET', 'POST'])
 def assignment():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:# This selects the assignments that the user created
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
         cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
         assignments = cursor.fetchall()
-        return render_template('assignment.html', account=account, assignment =assignments, username=session['username'], class_name=session['class_name'])
+
+        cursor.close()
+        conn.close()
+
+        return render_template('assignment.html', account=account, assignments =assignments, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
 @app.route('/new_assignment', methods=['POST'])
 def new_assignment():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This creates a new assignment
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -333,18 +420,29 @@ def new_assignment():
 
         if not assignment_name:
             flash('Please enter an assignment name.')
+            cursor.close()
+            conn.close()
         elif not category:
             flash('Please enter a category.')
+            cursor.close()
+            conn.close()
             return render_template('assignment.html')
         if not due_date:
             flash('Please enter an due date.')
+            cursor.close()
+            conn.close()
             return render_template('assignment.html')
         if not overall_points:
             flash('Please enter an overall point amount.')
+            cursor.close()
+            conn.close()
             return render_template('assignment.html')
         else:
             cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
             conn.commit()
+
+            cursor.close()
+            conn.close()
 
         return render_template('assignment.html', account = account, username=session['username'], class_name = session['class_name'])
 
@@ -352,9 +450,12 @@ def new_assignment():
 
 @app.route('/edit_assignment_grade/<string:id>', methods=['GET'])
 def edit_assignment_grade(id):
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # This routes the user to the edit assignment grade page.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -369,6 +470,9 @@ def edit_assignment_grade(id):
         cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
         records_4 = cur.fetchone()
 
+        cursor.close()
+        conn.close()
+
         return render_template('edit_assignment_grade.html', account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
@@ -376,9 +480,11 @@ def edit_assignment_grade(id):
 @app.route('/edit_assignment_grade_2', methods=['POST', 'GET'])
 def edit_assignment_grade_2():
 
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
     if 'loggedin' in session:
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -392,21 +498,33 @@ def edit_assignment_grade_2():
 
         if not grade_assignment:
             flash('Please input the updated grade here.')
+            cursor.close()
+            conn.close()
             return redirect(url_for('assignment'))
         elif not input_id:
             flash('Please confirm the assignment ID here (located at the top left corner of page).')
+            cursor.close()
+            conn.close()
             return redirect(url_for('assignment'))
         elif not student_id:
             flash('Please confirm the student ID here (located in this row on the left).')
+            cursor.close()
+            conn.close()
             return redirect(url_for('assignment'))
         elif grade_assignment.isalpha():
             flash('Please enter an assignment grade (0-100).')
+            cursor.close()
+            conn.close()
             return redirect(url_for('assignment'))
         elif input_id.isalpha():
             flash('Please enter a graduation year that is a number.')
+            cursor.close()
+            conn.close()
             return redirect(url_for('assignment'))
         elif student_id.isalpha():
             flash('Please enter a grade number between 0 - 100.')
+            cursor.close()
+            conn.close()
             return redirect(url_for('assignment'))
         else:
             cur.execute("""INSERT INTO assignment_results
@@ -423,15 +541,21 @@ def edit_assignment_grade_2():
 
             conn.commit()
 
+            cursor.close()
+            conn.close()
+
             return render_template('assignment.html', account=account, grade_assignment=grade_assignment, student_id=student_id, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
 @app.route('/view_assignment_scores', methods=['GET'])
 def view_assignment_scores():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -451,15 +575,20 @@ def view_assignment_scores():
 
         assignment_scores = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
+
         return render_template('view_assignment_scores.html', account=account, assignment_scores=assignment_scores, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
 @app.route('/view_assignment_scores_by_student', methods=['POST', 'GET'])
 def view_assignment_scores_by_student():
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -481,20 +610,28 @@ def view_assignment_scores_by_student():
 
         assignment_scores_by_student = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
+
         if not assignment_scores_by_student:
             flash('Student not enrolled in class.')
+            cursor.close()
+            conn.close()
+
             return redirect(url_for('assignment'))
 
         return render_template('view_assignment_scores_by_student.html', account=account, assignment_scores_by_student=assignment_scores_by_student, username=session['username'], class_name=session['class_name'], student_name=session['student_name'])
 
     return redirect(url_for('login'))
 
-
 @app.route('/delete_assignment/<string:id>', methods = ['DELETE', 'GET'])
 def delete_assignment(id):
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -506,15 +643,20 @@ def delete_assignment(id):
 
         assignments = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
+
         return redirect(url_for('assignment', account=account, assignments=assignments))
 
     return redirect(url_for('login'))
 
 @app.route('/delete_assignment_score/<string:id>', methods = ['DELETE', 'GET'])
 def delete_assignment_score(id):
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
@@ -526,12 +668,17 @@ def delete_assignment_score(id):
 
         assignments = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
+
         return redirect(url_for('view_assignment_scores', account=account, assignments=assignments, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
 @app.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username" and "password" POST requests exist (user submitted form)
@@ -559,10 +706,15 @@ def reset_password():
 
             # Redirect to home page
             flash(f'Password updated for {email_2}')
+
+            cursor.close()
+            conn.close()
             return redirect(url_for('reset_password'))
         else:
             # Account doesn't exist or username/password incorrect
             flash('Incorrect credentials')
+            cursor.close()
+            conn.close()
 
     return render_template('reset_password.html')
 
@@ -626,7 +778,6 @@ def student_login():
         student_password_2 = request.form['student_password_2']
 
         cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
-
         student_account = cursor.fetchone()
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
         student_class_info = cursor.fetchone()
