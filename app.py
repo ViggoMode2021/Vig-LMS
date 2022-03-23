@@ -777,7 +777,7 @@ def student_login():
         student_account = cursor.fetchone()
         session['student_class_name'] = student_account['class']
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_first_name_2, student_last_name_2, session['student_class_name']))
-        student_class_info = cursor.fetchone()
+        student_class_info = cursor.fetchall()
 
         if student_account:
             password_student = student_account['password']
@@ -801,12 +801,12 @@ def student_login():
                 INNER JOIN assignments cu  
                 ON cu.id = ci.assignment_id
                 WHERE s.student_last_name = %s AND s.class_name = %s
-                ORDER BY cu.assignment_name ASC;""", (session['student_last_name'], session['student_class_name']))
+                ORDER BY cu.assignment_name ASC;""", [session['student_last_name'], session['student_class_name']])
 
                 student_assignments = cursor.fetchall()
 
                 # Redirect to home page
-                return redirect(url_for('student_home', student_class_info=student_class_info, student_assignments=student_assignments))
+                return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
