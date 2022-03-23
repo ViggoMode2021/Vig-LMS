@@ -5,7 +5,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="static/css/query_page_2.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/query_page_2.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
@@ -13,7 +13,6 @@
   <div class="dropdown-content">
     <a href="/">View my assignment grades</a>
         <a href="{{url_for('logout')}}">Logout</a>
-
 
   </div>
 </div>
@@ -76,8 +75,6 @@
                 <td>{{row[2]}}</td>
                 <td>{{row[3]}}</td>
                 <td>{{row[4]}}</td>
-                <td>{{row[5]}}</td>
-                <td>{{row[6]}}</td>
                             </tr>
              </td>
             </tr>
