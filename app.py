@@ -16,7 +16,7 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = ""
 
 @app.route('/')
 def home():
@@ -35,7 +35,6 @@ def login():
 
     cursor.execute('SELECT COUNT (username) FROM users;')
     user_count = cursor.fetchall() #This shows the number of users using the application
-
 
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
@@ -722,22 +721,22 @@ def reset_password():
 
 @app.route('/student_register', methods=['GET', 'POST'])
 def student_register():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'student_username' in request.form and 'student_password' in request.form and 'student_email' in request.form:
+    if request.method == 'POST' and 'student_firstname' in request.form and 'student_lastname' in request.form and 'student_password' in request.form:
         # Create variables for easy access
         student_firstname = request.form['student_firstname']
         student_lastname = request.form['student_lastname']
-        student_username = request.form['student_username']
-        student_email = request.form['student_email']
         student_password = request.form['student_password']
         student_class_name = request.form['student_class_name']
         student_secret_question = request.form['student_secret_question']
 
         _hashed_password_student = generate_password_hash(student_password)
 
-        cursor.execute('SELECT * FROM student_accounts WHERE username = %s', (student_username,))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_firstname,student_lastname))
         student_account = cursor.fetchone()
 
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_firstname, student_lastname, student_class_name))
@@ -747,15 +746,11 @@ def student_register():
             flash('Student account already exists!')
         elif not student_verify:
             flash('Student not enrolled in class!')
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', student_email):
-            flash('Invalid email address!')
-        elif not re.match(r'[A-Za-z0-9]+', student_username):
-            flash('Username must contain only characters and numbers!')
-        elif not student_username or not student_password or not student_email:
+        elif not student_firstname or not student_lastname or not student_password:
             flash('Please fill out the form!')
         else:
             # Account doesn't exist and the form data is valid, now insert new account into users table
-            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, username, email, password, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s,%s)", (student_firstname, student_lastname, student_username, _hashed_password_student, student_email, student_class_name, student_secret_question))
+            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, password, class, secret_question) VALUES (%s,%s,%s,%s,%s)", (student_firstname, student_lastname, _hashed_password_student, student_class_name, student_secret_question))
             conn.commit()
             flash('You have successfully registered!')
     elif request.method == 'POST':
@@ -766,45 +761,64 @@ def student_register():
 
 @app.route('/student_login/', methods=['GET', 'POST'])
 def student_login():
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    cursor.execute('SELECT COUNT (username) FROM student_accounts;')
+    cursor.execute('SELECT COUNT (student_first_name) FROM student_accounts;')
     student_count = cursor.fetchall()
 
     # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'student_first_name_2' in request.form and 'student_last_name_2' in request.form and 'student_password_2' in request.form and 'student_email_2' in request.form:
+    if request.method == 'POST' and 'student_first_name_2' in request.form and 'student_last_name_2' in request.form and 'student_password_2' in request.form:
         student_first_name_2 = request.form['student_first_name_2']
         student_last_name_2 = request.form['student_last_name_2']
         student_password_2 = request.form['student_password_2']
 
         cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
         student_account = cursor.fetchone()
-        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
+        session['student_class_name'] = student_account['class']
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_first_name_2, student_last_name_2, session['student_class_name']))
         student_class_info = cursor.fetchone()
 
-        if student_account and student_class_info:
+        if student_account:
             password_student = student_account['password']
             # If account exists in users table in out database
             if check_password_hash(password_student, student_password_2):
                 # Create session data, we can access this data in other routes
                 session['loggedin'] = True
                 session['id'] = student_account['id']
-                session['student_first_name_2'] = student_account['student_first_name']
-                session['student_last_name_2'] = student_account['student_last_name']
+                session['student_first_name'] = student_account['student_first_name']
+                session['student_last_name'] = student_account['student_last_name']
+
+                cursor.execute("""SELECT
+                ci.id AS score_id,
+                s.student_first_name,
+                s.student_last_name,
+                ci.score,
+                cu.assignment_name
+                FROM classes s
+                INNER JOIN assignment_results AS ci
+                ON ci.student_id = s.id
+                INNER JOIN assignments cu  
+                ON cu.id = ci.assignment_id
+                WHERE s.student_last_name = %s AND s.class_name = %s
+                ORDER BY cu.assignment_name ASC;""", (session['student_last_name'], session['student_class_name']))
+
+                student_assignments = cursor.fetchall()
 
                 # Redirect to home page
-                return redirect(url_for('student_home', student_class_info=student_class_info))
+                return redirect(url_for('student_home', student_class_info=student_class_info, student_assignments=student_assignments))
             else:
                 # Account doesn't exist or username/password incorrect
-                flash('Incorrect username/password')
+                flash('Incorrect credentials or account does not exist. Please check your spelling.')
         else:
             # Account doesn't exist or username/password incorrect
-            flash('Incorrect username/password')
+            flash('Incorrect credentials or account does not exist. Please check your spelling.')
 
     return render_template('student_login.html', student_count=student_count, date_object=date_object)
 
 @app.route('/student_home', methods=['GET'])
 def student_home():
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # Show user and student information from the db
