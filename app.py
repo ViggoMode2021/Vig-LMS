@@ -9,14 +9,14 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = 'ryanv203' #Secret key for sessions
+app.secret_key = '#topsecret' #Secret key for sessions
 
 #Database info below:
 
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = ""
+DB_PASS = "#topsecret"
 
 @app.route('/')
 def home():
@@ -41,8 +41,6 @@ def login():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-
-        print(password)
 
         # Check if account exists
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
@@ -106,7 +104,6 @@ def register():
         # Check if account exists:
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         account = cursor.fetchone()
-        print(account)
         # If account exists show error and validation checks
         if account:
             flash('Account already exists!')
@@ -695,8 +692,6 @@ def reset_password():
 
         if account_password_reset:
 
-            print('hello')
-
             cursor.execute("""UPDATE users 
             SET password = %s 
             WHERE email = %s""", (_hashed_password_reset, email_2))
@@ -753,9 +748,13 @@ def student_register():
             cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, password, class, secret_question) VALUES (%s,%s,%s,%s,%s)", (student_firstname, student_lastname, _hashed_password_student, student_class_name, student_secret_question))
             conn.commit()
             flash('You have successfully registered!')
+            cursor.close()
+            conn.close()
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         flash('Please fill out the form!')
+        cursor.close()
+        conn.close()
     # Show registration form with message (if any)
     return render_template('student_register.html')
 
@@ -805,14 +804,21 @@ def student_login():
 
                 student_assignments = cursor.fetchall()
 
+                cursor.close()
+                conn.close()
+
                 # Redirect to home page
                 return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
+                cursor.close()
+                conn.close()
         else:
             # Account doesn't exist or username/password incorrect
             flash('Incorrect credentials or account does not exist. Please check your spelling.')
+            cursor.close()
+            conn.close()
 
     return render_template('student_login.html', student_count=student_count, date_object=date_object)
 
@@ -826,10 +832,54 @@ def student_home():
          student_account_2 = cursor.fetchone()
          cursor.execute("SELECT * FROM classes WHERE student_first_name = %s", [session['student_first_name']])
          student_class_info = cursor.fetchall()
+         cursor.close()
+         conn.close()
 
          return render_template('student_home.html', student_class_info = student_class_info, student_account_2 = student_account_2)
 
     return redirect(url_for('login'))
+
+@app.route('/student_reset_password', methods=['GET', 'POST'])
+def student_reset_password():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'student_last_name_2' in request.form and 'student_secret_question_2' in request.form and 'student_new_password' in request.form:
+        student_last_name_2 = request.form['student_last_name_2']
+        student_secret_question_2 = request.form['student_secret_question_2']
+        student_new_password = request.form['student_new_password']
+
+        # Check if account exists
+        cursor.execute('SELECT * FROM student_accounts WHERE student_last_name = %s AND secret_question = %s', (student_last_name_2, student_secret_question_2))
+
+        student_account_password_reset = cursor.fetchone()
+
+        _hashed_password_reset_student = generate_password_hash(student_new_password)
+
+        if student_account_password_reset:
+
+            cursor.execute("""UPDATE student_accounts 
+            SET password = %s 
+            WHERE student_last_name = %s""", (_hashed_password_reset_student, student_last_name_2))
+
+            conn.commit()
+
+            # Redirect to home page
+            flash(f'Password updated for {student_last_name_2}')
+
+            cursor.close()
+            conn.close()
+            return redirect(url_for('student_reset_password'))
+        else:
+            # Account doesn't exist or username/password incorrect
+            flash('Incorrect credentials')
+            cursor.close()
+            conn.close()
+
+    return render_template('student_reset_password.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
