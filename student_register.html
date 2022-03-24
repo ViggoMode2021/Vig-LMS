@@ -37,24 +37,6 @@ body {
        </div>
       </div>
       <div class="form-group">
-       <label for="email" class="cols-sm-2 control-label">Your email</label>
-       <div class="cols-sm-10">
-        <div class="input-group">
-         <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="student_email" id="student_email"  placeholder="Enter your email"/>
-        </div>
-       </div>
-      </div>
-      <div class="form-group">
-       <label for="username" class="cols-sm-2 control-label">Username</label>
-       <div class="cols-sm-10">
-        <div class="input-group">
-         <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="student_username" id="student_username" placeholder="Enter your username" required>
-        </div>
-       </div>
-      </div>
-      <div class="form-group">
        <label for="password" class="cols-sm-2 control-label">Password</label>
        <div class="cols-sm-10">
         <div class="input-group">
@@ -73,7 +55,7 @@ body {
        </div>
       </div>
        <div class="form-group">
-       <label for="class_name" class="cols-sm-2 control-label">Secret question: What is the name of the street you grew up on?</label>
+       <label for="secret_question" class="cols-sm-2 control-label">Secret question: What is the name of the street you grew up on?</label>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
@@ -96,7 +78,7 @@ body {
         {% endwith %}
        <input type="submit" value="Register" class="form-control btn btn-primary " name="">
        <p style="padding:5px;">
-       <a href="{{ url_for('login') }}" class="btn btn-dark ">Login</a></p>
+       <a href="{{ url_for('student_login') }}" class="btn btn-dark ">Login as a student</a></p>
 
       </div>
 
