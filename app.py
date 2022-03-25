@@ -731,7 +731,7 @@ def student_register():
 
         _hashed_password_student = generate_password_hash(student_password)
 
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_firstname,student_lastname))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_firstname, student_lastname))
         student_account = cursor.fetchone()
 
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_firstname, student_lastname, student_class_name))
@@ -879,7 +879,6 @@ def student_reset_password():
             conn.close()
 
     return render_template('student_reset_password.html')
-
 
 if __name__ == "__main__":
     app.run(debug=True)
