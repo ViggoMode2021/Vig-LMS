@@ -11,6 +11,7 @@
    <a class="active" href="{{url_for('home')}}">Main</a>
   <div class="dropdown-content">
    <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
+              <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
           <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 </div>
 

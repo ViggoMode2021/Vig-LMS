@@ -11,7 +11,7 @@
  </head>
   <style>
 body {
-  background-image: url('/static/images/Sky.jpg');
+  background-image: url('/static/images/space.jpg');
 }
 </style>
   <div class="login-box" >
@@ -42,7 +42,7 @@ body {
     <p>No account <a href="{{ url_for('student_register') }}">Register</a></p>
           <p>Forgot password? <a href="{{ url_for('student_reset_password') }}">Reset password here</a></p>
 
-      <h100>As of {{ date_object }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h100>
+      <h101>As of {{ date_object }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h101>
 
   </div>
  </div>

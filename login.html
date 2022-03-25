@@ -2,7 +2,7 @@
 <html>
  <head>
   <meta charset="utf-8">
-  <h20>Welcome to the Login page for Vig LMS!</h20>
+  <h21>Welcome to the Teacher login page for Vig LMS!</h21>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -48,6 +48,8 @@ body {
  </div>
  </body>
 <p>Register as a student <a href="{{ url_for('student_register') }}">Register</a></p>
-<p>Login as a student <a href="">Register</a></p>
+<p>Login as a student <a href="{{ url_for('student_login') }}">Login</a></p>
+
+<hr class="double">
 
 </html>
