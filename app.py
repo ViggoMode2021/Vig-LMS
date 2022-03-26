@@ -9,14 +9,14 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = '#topsecret' #Secret key for sessions
+app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#topsecret"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
@@ -228,6 +228,7 @@ def enroll_page_submit():
 
         cursor.close()
         conn.close()
+        flash(f'{first_name} {last_name} has been successfully enrolled.')
 
     return render_template('enroll_page.html')
 
