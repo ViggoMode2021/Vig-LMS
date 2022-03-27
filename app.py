@@ -9,7 +9,7 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = 'ryanv203' #Secret key for sessions
+app.secret_key = '#TOPSECRET' #Secret key for sessions
 
 #Database info below:
 
