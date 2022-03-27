@@ -25,10 +25,6 @@
 </div class="container">
 <h5>Click on the GitHub logo photo below to visit the GitHub repository!</h5>
 
-<br /><br />
-
-                         <hr/>
-
                         <p>This app was created with Python/Flask, as well as PostgreSQL/psycopg2. It is a gradebook
                         that reinforces CRUD (Create, Read, Update, Delete). The 'create' allows students to be enrolled, 'read'
                         allows the user to see the class roster, 'update' allows the user to update a student's grade, and 'delete'
@@ -46,6 +42,20 @@
        </a>
     </div>
 
-                     <iframe width="560" height="315" src="https://www.youtube.com/embed/gMCo1c3hmSw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br /><br />
+
+
+<h4>My account information:</h4>
+
+<h6>Name: {{ name }}</h6>
+<h6>Username: {{ username }}</h6>
+<h6>Email: {{ email }}</h6>
+<h6>Class name: {{ class_name }}</h6>
+<h6>Number of students enrolled in {{class_name}}: {% for number in student_count %} {{number}} {% endfor %}</h6>
+<h6>Number of assignments created in {{class_name}}: {% for assignment_number in assignment_count %} {{assignment_number}} {% endfor %}</h6>
+
+<br /><br />
+
+                     <iframe width="560" height="315" src="https://www.youtube.com/watch?v=5Ck1gqS4jxc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 {% endblock %}
