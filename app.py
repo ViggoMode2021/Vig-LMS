@@ -16,15 +16,28 @@ app.secret_key = '#TOPSECRET' #Secret key for sessions
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#TOPSecret"
+DB_PASS = "#TOPSECRET"
 
 @app.route('/')
 def home():
     # Check if user is logged in
     if 'loggedin' in session:
 
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('SELECT COUNT (student_first_name) FROM classes WHERE teacher = %s;', [session['username']])
+        student_count = cursor.fetchall()
+
+        cursor.execute('SELECT COUNT (assignment_name) FROM assignments WHERE assignment_creator = %s;', [session['email']])
+        assignment_count = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
         # If user is logged in, they are directed to home page.
-        return render_template('home.html', username=session['username'], class_name = session['class_name'])
+        return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name = session['name'],
+                               student_count=student_count, assignment_count = assignment_count)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
 
@@ -62,6 +75,7 @@ def login():
                 session['loggedin'] = True
                 session['id'] = account['id']
                 session['username'] = account['username']
+                session['name'] = account['fullname']
                 session['email'] = account_2['class_creator']
                 session['class_name'] = account_2['class_name']
 
