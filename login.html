@@ -52,8 +52,19 @@ body {
 
 <hr class="double">
 
+ <h23>Delete teacher account below:</h23>
+
+<form class="form-group" action="{{ url_for('delete_account') }}" method="POST">
+        <label>Email:</label>
+        <input type="text" class="form-control" style="width: 300px" name="delete_email" placeholder="Email" id="delete_email" required>
+        <label>Username:</label>
+        <input type="text" class="form-control" style="width: 300px" name="delete_username" placeholder="Username" id="delete_username" required>
+        <label>Password:</label>
+        <input type="password" class="form-control" style="width: 300px" name="delete_password" placeholder="Password" id="delete_password" required>
+        <input type="submit" value="Delete teacher account" style="width: 150px" class="form-control btn btn-warning " name="">
+    </form>
+
 <a href = "mailto:ryansviglione@gmail.com?subject = Feedback&body = Message">
-To delete account, send email to ryansviglione@gmail.com with your respective account information. I am in the process
-of trying to create a safe, secure, and optimal way to delete user accounts. Thank you.</a>
+Email the creator: ryansviglione@gmail.com</a>
 
 </html>
