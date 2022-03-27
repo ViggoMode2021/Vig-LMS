@@ -97,6 +97,56 @@ def login():
 
     return render_template('login.html', user_count=user_count, date_object=date_object)
 
+@app.route('/delete_account', methods=['DELETE', 'GET', 'POST'])
+def delete_account():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'delete_username' in request.form and 'delete_password' in request.form and 'delete_email' in request.form:
+        # Create variables to reference for below queries
+        delete_username = request.form['delete_username']
+        delete_password = request.form['delete_password']
+        delete_email = request.form['delete_email']
+
+        _hashed_password_delete = generate_password_hash(delete_password)
+
+        cursor.execute('SELECT COUNT (username) FROM users;')
+        user_count = cursor.fetchall()
+
+        # Check if account exists:
+        cursor.execute('SELECT * FROM users WHERE username = %s AND email = %s', (delete_username, delete_email))
+        delete_account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if delete_account:
+            delete_password_check = delete_account['password']
+            if check_password_hash(delete_password_check, delete_password):
+                cursor.execute('DELETE FROM users WHERE username = %s AND email = %s', (delete_username, delete_email))
+                flash('Account successfully deleted.')
+                conn.commit()
+                cursor.close()
+                conn.close()
+            else:
+                flash('Incorrect password.')
+                cursor.close()
+                conn.close()
+        elif not delete_account:
+            flash('No account found.')
+            cursor.close()
+            conn.close()
+        else:
+            flash('Invalid credentials.')
+            cursor.close()
+            conn.close()
+    elif request.method == 'POST':
+        # Form is empty
+        flash('Please fill out the form!')
+        cursor.close()
+        conn.close()
+    # Show registration form with message (if applicable)
+    return render_template('login.html', user_count=user_count)
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
