@@ -16,7 +16,7 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#TOPSecret"
 
 @app.route('/')
 def home():
@@ -146,22 +146,6 @@ def logout():
    session.pop('username', None)
    # Redirect to login page
    return redirect(url_for('login'))
-
-@app.route('/profile')
-def profile():
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
-        account = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        # Show the profile page with account info
-        return render_template('profile.html', account=account)
-    # User is not logged in and will be redirected to login page
-    return redirect(url_for('login'))
 
 @app.route('/enroll_page', methods=['GET'])
 def enroll_page(): #This function routes the logged in user to the page to enroll students
