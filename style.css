@@ -16,4 +16,47 @@ color:green;
 font-family: times new roman;
 font-size: 20px; }
 
+hr.double {
+ border-top: 3px double;
+ border-bottom: none;
+}
+
+title2{
+color: pink;
+font-family: lucinda;
+font-size: 25px;
+}
+
+h20{
+color: pink;
+font-family: lucinda;
+font-size: 25px;
+}
+
+h101{
+color: white;
+font-family: times;
+font-size: 15px;
+}
+
+h21{
+
+color: black;
+font-family: arial;
+font-size: 25px;}
+
+h55{
+
+color: white;
+font-family: arial;
+font-size: 20px;}
+
+h23{
+
+color: black;
+font-family: times;
+font-size: 20px;
+text-decoration: underline;
+
+}
 
