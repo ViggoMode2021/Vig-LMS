@@ -522,6 +522,37 @@ def edit_assignment_grade(id):
 
     return redirect(url_for('login'))
 
+@app.route('/update_assignment_name/<string:id>', methods=['POST','GET'])
+def update_assignment_name(id):
+
+    if 'loggedin' in session: # This routes the user to the edit assignment grade page.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cur = conn.cursor()
+
+        update_assignment_name = request.form.get("update_assignment_name")
+
+        cur.execute("""UPDATE assignments 
+            SET assignment_name = %s 
+            WHERE id = %s""", (update_assignment_name, id))
+
+        conn.commit()
+
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+        assignments = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('assignment', account=account, assignments = assignments))
+
+    return redirect(url_for('login'))
+
 @app.route('/edit_assignment_grade_2', methods=['POST', 'GET'])
 def edit_assignment_grade_2():
 
@@ -823,6 +854,9 @@ def student_login():
 
         cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
         student_account = cursor.fetchone()
+        if not student_account:
+            flash('Account does not exist!')
+            return render_template('student_login.html', student_count=student_count, date_object=date_object)
         session['student_class_name'] = student_account['class']
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_first_name_2, student_last_name_2, session['student_class_name']))
         student_class_info = cursor.fetchall()
@@ -928,6 +962,56 @@ def student_reset_password():
             conn.close()
 
     return render_template('student_reset_password.html')
+
+@app.route('/delete_student_account', methods=['DELETE', 'GET', 'POST'])
+def delete_student_account():
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'delete_student_first_name' in request.form and 'delete_student_last_name' in request.form and 'delete_student_password' in request.form:
+        # Create variables to reference for below queries
+        delete_student_first_name = request.form['delete_student_first_name']
+        delete_student_last_name = request.form['delete_student_last_name']
+        delete_student_password = request.form['delete_student_password']
+
+        _hashed_password_delete_student = generate_password_hash(delete_student_password)
+
+        cursor.execute('SELECT COUNT (student_first_name) FROM student_accounts;')
+        student_count_2 = cursor.fetchall()
+
+        # Check if account exists:
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (delete_student_first_name, delete_student_last_name))
+        delete_student_account_query = cursor.fetchone()
+        # If account exists show error and validation checks
+        if delete_student_account_query:
+            delete_student_password_check = delete_student_account_query['password']
+            if check_password_hash(delete_student_password_check, delete_student_password):
+                cursor.execute('DELETE FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (delete_student_first_name, delete_student_last_name))
+                flash('Account successfully deleted.')
+                conn.commit()
+                cursor.close()
+                conn.close()
+            else:
+                flash('Incorrect password.')
+                cursor.close()
+                conn.close()
+        elif not delete_student_account_query:
+            flash('No account found.')
+            cursor.close()
+            conn.close()
+        else:
+            flash('Invalid credentials.')
+            cursor.close()
+            conn.close()
+    elif request.method == 'POST':
+        # Form is empty
+        flash('Please fill out the form!')
+        cursor.close()
+        conn.close()
+    # Show registration form with message (if applicable)
+    return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
     app.run(debug=True)
