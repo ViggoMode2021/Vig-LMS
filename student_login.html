@@ -47,4 +47,19 @@ body {
   </div>
  </div>
  </body>
+
+<hr class="double">
+
+ <h25>Delete student account below:</h25>
+
+<form class="form-group" action="{{ url_for('delete_student_account') }}" method="POST">
+        <label>First Name:</label>
+        <input type="text" class="form-control" style="width: 300px" name="delete_student_first_name" placeholder="First name" id="delete_student_first_name" required>
+        <label>Last Name:</label>
+        <input type="text" class="form-control" style="width: 300px" name="delete_student_last_name" placeholder="Last name" id="delete_student_last_name" required>
+        <label>Password:</label>
+        <input type="password" class="form-control" style="width: 300px" name="delete_student_password" placeholder="Password" id="delete_student_password" required>
+        <input type="submit" value="Delete account" style="width: 150px" class="form-control btn btn-warning " name="">
+    </form>
+
 </html>

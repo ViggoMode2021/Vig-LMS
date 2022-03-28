@@ -38,7 +38,10 @@ first before doing so.</p>
              {% for row in assignments %}
             <tr>
                 <td>{{row[0]}}</td>
-                <td>{{row[1]}}</td>
+                <td>{{row[1]}} <form action="/update_assignment_name/{{row[0]}}" method="POST">
+                    <div class="form-group"> <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="update assignment name" name='update_assignment_name' style="width: 200px;">
+                         <button type="submit" class="btn btn-warning">update assignment name</button></td>
                 <td>{{row[2]}}</td>
                 <td>{{row[3]}}</td>
                 <td>{{row[4]}}</td>
@@ -144,5 +147,24 @@ first before doing so.</p>
 </body>
 
 
+     <div class="flashwrapper">
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div id=flashwrapper class="alert alert-{{ category }} alert-dismissible" role="alert">{{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onClick="close('flashwrapper')">
+                                <span aria-hidden="true">&times;</span>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+ <script>
+$(function() {
+   $('#flash').delay(500).fadeIn('normal', function() {
+      $(this).delay(2500).fadeOut();
+   });
+});
+</script>
 
 {% endblock %}
