@@ -39,13 +39,10 @@ CREATE TABLE assignment_results(
 
 CREATE TABLE attendance(
 id SERIAL PRIMARY KEY,
-month TEXT NOT NULL,
-day INT NOT NULL,
+date TEXT NOT NULL,
 attendance_status TEXT NOT NULL,
 student_id INT NOT NULL,
-teacher_id TEXT NOT NULL,
-FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
-FOREIGN KEY ("teacher_id") REFERENCES users("email") ON DELETE CASCADE);
+FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE);
 
 CREATE TABLE student_accounts(
 	id SERIAL PRIMARY KEY,
