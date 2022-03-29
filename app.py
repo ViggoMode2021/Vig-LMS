@@ -9,14 +9,14 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = '#TOPSECRET' #Secret key for sessions
+app.secret_key = '' #Secret key for sessions
 
 #Database info below:
 
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#TOPSECRET"
+DB_PASS = ""
 
 @app.route('/')
 def home():
@@ -280,7 +280,6 @@ def enroll_page_submit():
 
     return render_template('enroll_page.html')
 
-#period_1_spanish_1 show class roster #READ
 @app.route('/query', methods=['GET'])
 def query():
 
@@ -320,7 +319,6 @@ def alphabetically():
 
     return redirect(url_for('login'))
 
-#period_1_sort_grade_ascending
 @app.route('/grade_ASC', methods=['GET'])
 def grade_ASC():
 
@@ -342,7 +340,57 @@ def grade_ASC():
 
     return redirect(url_for('login'))
 
-#period_1_sort_grade_descending
+@app.route('/take_attendance_page', methods=['GET'])
+def take_attendance_page():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         account = cursor.fetchone()
+
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+
+         take_attendance_query = cursor.fetchall()
+
+         cursor.close()
+         conn.close()
+
+         return render_template('take_attendance_page.html', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
+
+    return redirect(url_for('login'))
+
+@app.route('/take_attendance/<string:id>', methods=['POST'])
+def take_attendance(id):
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         account = cursor.fetchone()
+
+         attendance = request.form.get("attendance")
+
+         cursor.execute('INSERT INTO attendance (date, attendance_status, student_id) VALUES (%s, %s, %s)'.format(id),
+                        (date_object, attendance, id))
+
+         conn.commit()
+
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+
+         take_attendance_query = cursor.fetchall()
+
+         cursor.close()
+         conn.close()
+
+         return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
+
+    return redirect(url_for('login'))
+
 @app.route('/grade_DESC', methods=['GET'])
 def grade_DESC():
 
@@ -549,7 +597,7 @@ def update_assignment_name(id):
         cursor.close()
         conn.close()
 
-        return redirect(url_for('assignment', account=account, assignments = assignments))
+        return redirect(url_for('assignment', account=account, assignments=assignments))
 
     return redirect(url_for('login'))
 
