@@ -40,7 +40,7 @@ first before doing so.</p>
                 <td>{{row[0]}}</td>
                 <td>{{row[1]}} <form action="/update_assignment_name/{{row[0]}}" method="POST">
                     <div class="form-group"> <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="update assignment name" name='update_assignment_name' style="width: 200px;">
+            placeholder="update name" name='update_assignment_name' style="width: 200px;">
                          <button type="submit" class="btn btn-warning">update assignment name</button></td>
                 <td>{{row[2]}}</td>
                 <td>{{row[3]}}</td>
@@ -123,6 +123,7 @@ first before doing so.</p>
 
 </div>
 
+ <hr style="width:66%;text-align:center;margin-left:0">
 
     <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-warning">Update/refresh assignment list</button>
