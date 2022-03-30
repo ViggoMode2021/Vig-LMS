@@ -9,14 +9,14 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = '' #Secret key for sessions
+app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
 DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = ""
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -387,7 +387,42 @@ def take_attendance(id):
          cursor.close()
          conn.close()
 
-         return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
+         return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'], attendance=attendance))
+
+    return redirect(url_for('login'))
+
+@app.route('/search_attendance_by_date', methods=['POST', 'GET'])
+def search_attendance_by_date():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         account = cursor.fetchone()
+
+         search_attendance_by_date = request.form['search_attendance_by_date']
+
+         cursor.execute("""SELECT
+            s.student_first_name,
+            s.student_last_name,
+            s.class_creator,
+            a.date,
+            a.attendance_status
+            FROM classes s
+            INNER JOIN attendance AS a
+            ON a.student_id = s.id
+            WHERE a.date = %s AND s.class_creator = %s;""", (search_attendance_by_date, session['email']))
+
+         search_attendance_query = cursor.fetchall()
+
+         print(search_attendance_query)
+
+         cursor.close()
+         conn.close()
+
+         return render_template('search_attendance_by_date.html', search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
