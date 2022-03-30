@@ -18,6 +18,7 @@
       <a href="/grade_DESC">Grade (high - low)</a>
          <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
               <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
+           <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
         <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 
 
@@ -46,7 +47,7 @@
                 <td>{{row[3]}}</td>
                 <td>{{row[4]}}</td>
                 <td>{{ date_object }}</td>
-                <td><label for="cars"></label>
+                <td><label for=""></label>
                     <form action="/take_attendance/{{row[0]}}" method="POST">
                     <div class="form-group">
                 <select name="attendance" id="attendance">
@@ -56,7 +57,6 @@
                 </select>  <button type="submit" class="btn btn-warning">Take attendance</button>
 </td>
                 </form>
-                <td width="130">
                         </div>
 
                 </td>
@@ -71,9 +71,9 @@
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
       {{ message }}
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">×</span>
       </button>
     </div>
@@ -81,12 +81,16 @@
     {% endif %}
     {% endwith %}
 
+ <hr style="width:66%;text-align:center;margin-left:0">
+
+<h45>Search attendance by date. Please type in the format: year-month-day, such as: 2022-03-30 (March 30, 2022)</h45>
+
 <form action="/search_attendance_by_date" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
             placeholder="Search" name='search_attendance_by_date' style="width: 200px;">
     </div>
-        <button type="submit" class="btn btn-success">Search attendance by date. Please type in the format: year-month-day, such as: 2022-03-30 (March 30, 2022)</button>
+        <button type="submit" class="btn btn-success">Search attendance by date.</button>
 </form>
 
 
