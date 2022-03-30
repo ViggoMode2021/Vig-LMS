@@ -387,7 +387,7 @@ def take_attendance(id):
          cursor.close()
          conn.close()
 
-         return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'], attendance=attendance))
+         return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -417,12 +417,15 @@ def search_attendance_by_date():
 
          search_attendance_query = cursor.fetchall()
 
-         print(search_attendance_query)
+         if not search_attendance_by_date:
+             flash('Please enter a date according to the format above to view attendance.')
+             return redirect(url_for('take_attendance_page'))
 
          cursor.close()
          conn.close()
 
-         return render_template('search_attendance_by_date.html', search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('search_attendance_by_date.html', search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'],
+                                search_attendance_by_date=search_attendance_by_date)
 
     return redirect(url_for('login'))
 
