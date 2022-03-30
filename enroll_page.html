@@ -3,7 +3,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="/static/css/period_1_Spanish_1_enroll.css">
+<link rel="stylesheet" href="/static/css/enroll_page.css">
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
@@ -49,9 +49,9 @@
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
       {{ message }}
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">×</span>
       </button>
     </div>
