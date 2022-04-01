@@ -93,5 +93,17 @@
         <button type="submit" class="btn btn-success">Search attendance by date.</button>
 </form>
 
+<hr style="width:66%;text-align:center;margin-left:0">
+
+<h45>Search attendance by student. Please type student id in the box to search. Student ID is found in the left-hand column
+of the table above.</h45>
+
+<form action="/search_attendance_by_student" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Search" name='search_attendance_by_student' style="width: 200px;">
+    </div>
+        <button type="submit" class="btn btn-success">Search attendance by student.</button>
+</form>
 
 {% endblock %}
