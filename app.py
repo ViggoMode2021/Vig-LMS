@@ -211,6 +211,15 @@ def logout():
    # Redirect to login page
    return redirect(url_for('login'))
 
+@app.route('/student_logout')
+def student_logout():
+    # Remove session data, this will log the user out
+   session.pop('loggedin', None)
+   session.pop('id', None)
+   session.pop('username', None)
+   # Redirect to login page
+   return redirect(url_for('student_login'))
+
 @app.route('/enroll_page', methods=['GET'])
 def enroll_page(): #This function routes the logged in user to the page to enroll students
 
@@ -878,6 +887,86 @@ def view_assignment_scores_by_student():
 
     return redirect(url_for('login'))
 
+@app.route('/announcements_page', methods=['GET'])
+def announcements_page(): #This function routes the logged in user to the page to enroll students
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if 'loggedin' in session:
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return render_template('announcements_page.html', account=account, username=session['username'], class_name=session['class_name'])
+
+    return redirect(url_for('login'))
+
+@app.route('/announcements_page_submit', methods=['POST'])
+def announcements_page_submit(): #This function routes the logged in user to the page to enroll students
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    if 'loggedin' in session:
+        announcement_box = request.form.get("announcement_box")
+        cursor.execute("INSERT INTO announcements(announcement_date, class, announcement, announcement_creator) VALUES (%s,%s,%s,%s)", (date_object, session['class_name'], announcement_box, session['email']))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash(f'Announcement recorded for {date_object}')
+        return render_template('announcements_page.html')
+
+@app.route('/view_announcements_by_date', methods=['POST', 'GET'])
+def view_announcements_by_date():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         account = cursor.fetchone()
+
+         search_announcements_by_date = request.form.get("search_announcements_by_date")
+
+         cursor.execute("""SELECT
+            * FROM announcements WHERE announcement_date = %s AND announcement_creator = %s;""", (search_announcements_by_date, session['email']))
+
+         search_announcements_query = cursor.fetchall()
+
+         if not search_announcements_by_date:
+             flash('Please enter a date according to the format above to view announcements.')
+             cursor.close()
+             conn.close()
+             return redirect(url_for('announcements_page'))
+
+         cursor.close()
+         conn.close()
+
+         return render_template('view_announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']
+                                )
+
+    return redirect(url_for('login'))
+
+@app.route('/delete_announcement/<string:id>', methods = ['DELETE', 'GET'])
+def delete_announcement(id):
+
+    if 'loggedin' in session: # This removes an attendance record from the db.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('DELETE FROM announcements WHERE id = {0}'.format(id))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('announcements_page'))
+
+    return redirect(url_for('login'))
+
+
 @app.route('/delete_assignment/<string:id>', methods = ['DELETE', 'GET'])
 def delete_assignment(id):
 
@@ -1079,12 +1168,22 @@ def student_login():
 
                 search_attendance_query_student_login = cursor.fetchall()
 
+                cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+
+                class_fetch = cursor.fetchone()
+
+                session['class_creator'] = class_fetch['class_creator']
+
+                cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
+
+                announcements_student_fetch = cursor.fetchall()
+
                 cursor.close()
                 conn.close()
 
                 # Redirect to home page
                 return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments,
-                                       search_attendance_query_student_login=search_attendance_query_student_login)
+                                       search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
