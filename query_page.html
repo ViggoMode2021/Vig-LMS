@@ -18,6 +18,8 @@
       <a href="/grade_DESC">Grade (high - low)</a>
          <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
               <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
+                  <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
+               <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
         <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 
 

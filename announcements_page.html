@@ -14,38 +14,37 @@
   <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 </div>
 
-<h1>Enroll or check enrollment for {{ class_name }}</h1>
+<style>
+body {
+  background-image: url('/static/images/Notebook.jpg');
+}
+</style>
 
-<h2>Enter student credentials below to enroll new student into class.</h2>
+<h1>Post announcements for {{ class_name }}</h1>
 
-<form action="/enroll_page_submit" method="POST">
+<h2>Announcements posted here will be posted to the student portal.</h2>
 
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="first name" name='first name' style="width: 200px;">
-    </div>
-
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="last name" name='last name' style="width: 200px;">
-    </div>
+<form action="/announcements_page_submit" method="POST">
 
     <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="graduation year" name='graduation year' style="width: 200px;">
+        <textarea name="announcement_box" cols="50" rows="10"></textarea>
+
     </div>
 
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp" placeholder="grade (0-100)"
-            name='grade' style="width: 200px;">
-    </div>
-
-    <button type="submit" class="btn btn-warning">Enroll student</button>
+    <button type="submit" class="btn btn-warning">Post announcement for today</button>
 
 </form>
 
-    <form action="/query" method="GET">
-    <button type="submit" class="btn btn-warning">Show class roster</button>
+<h45>Search announcements by date. Please type in the format: year-month-day, such as: 2022-03-30 (March 30, 2022).</h45>
+<br />
+<h46>Upon search, you can also update announcement records.</h46>
+
+<form action="/view_announcements_by_date" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Search" name='search_announcements_by_date' style="width: 200px;">
+    </div>
+        <button type="submit" class="btn btn-success">Search announcements by date</button>
 </form>
 
 {% with messages = get_flashed_messages()  %}
