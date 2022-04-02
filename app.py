@@ -498,6 +498,29 @@ def delete_attendance_record(id):
 
     return redirect(url_for('login'))
 
+@app.route('/update_attendance_record/<string:id>', methods = ['POST', 'GET'])
+def update_attendance_record(id):
+
+    if 'loggedin' in session: # This updates an attendance record from the db.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        attendance = request.form.get('attendance')
+
+        cursor.execute("""UPDATE attendance 
+            SET attendance_status = %s 
+            WHERE id = %s""", (attendance, id))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('take_attendance_page'))
+
+    return redirect(url_for('login'))
+
 @app.route('/grade_DESC', methods=['GET'])
 def grade_DESC():
 
@@ -1042,11 +1065,26 @@ def student_login():
 
                 student_assignments = cursor.fetchall()
 
+                cursor.execute("""SELECT
+                a.id,
+                s.student_first_name,
+                s.student_last_name,
+                s.class_creator,
+                a.date,
+                a.attendance_status
+                FROM classes s
+                INNER JOIN attendance AS a
+                ON a.student_id = s.id
+                WHERE s.student_last_name = %s""", [session['student_last_name']])
+
+                search_attendance_query_student_login = cursor.fetchall()
+
                 cursor.close()
                 conn.close()
 
                 # Redirect to home page
-                return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments)
+                return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments,
+                                       search_attendance_query_student_login=search_attendance_query_student_login)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
