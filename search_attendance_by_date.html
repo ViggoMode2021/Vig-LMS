@@ -12,10 +12,6 @@
            <div class="dropdown">
   <button class="dropbtn">Sort by:</button>
   <div class="dropdown-content">
-    <a href="/alphabetically">Last name</a>
-    <a href="/alphabetically">First name</a>
-    <a href="/grade_ASC">Grade (low - high)</a>
-      <a href="/grade_DESC">Grade (high - low)</a>
          <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
               <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
            <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
@@ -39,6 +35,7 @@
                 <td>Date</td>
                 <td>Attendance Status</td>
                 <td>Delete Attendance Record</td>
+                <td>Update Attendance Record</td>
             </tr>
         </thead>
         <tbody>
@@ -50,7 +47,16 @@
                 <td>{{row[4]}}</td>
                 <td>{{row[5]}}</td>
                 <td><a href="/delete_attendance_record/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete attendance record</a></td>
-
+                    <td><form action="/update_attendance_record/{{row[0]}}" method="POST">
+                    <div class="form-group">
+                <select name="attendance" id="attendance">
+                  <option value="Present">Present</option>
+                  <option value="Tardy">Tardy</option>
+                  <option value="Absent">Absent</option>
+                </select>  <button type="submit" class="btn btn-warning">Update attendance</button>
+                                        </form>
+</td>
+                        </div>
                 </td>
             </tr>
             {% endfor %}

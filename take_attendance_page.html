@@ -12,10 +12,6 @@
            <div class="dropdown">
   <button class="dropbtn">Sort by:</button>
   <div class="dropdown-content">
-    <a href="/alphabetically">Last name</a>
-    <a href="/alphabetically">First name</a>
-    <a href="/grade_ASC">Grade (low - high)</a>
-      <a href="/grade_DESC">Grade (high - low)</a>
          <a href="{{url_for('enroll_page')}}">My class roster for {{ class_name }}</a>
               <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
            <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
@@ -83,7 +79,9 @@
 
  <hr style="width:66%;text-align:center;margin-left:0">
 
-<h45>Search attendance by date. Please type in the format: year-month-day, such as: 2022-03-30 (March 30, 2022)</h45>
+<h45>Search attendance by date. Please type in the format: year-month-day, such as: 2022-03-30 (March 30, 2022).</h45>
+<br />
+<h46>Upon search, you can also update attendance records.</h46>
 
 <form action="/search_attendance_by_date" method="POST">
     <div class="form-group">
