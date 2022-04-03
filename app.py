@@ -614,6 +614,110 @@ def update_grade(id):
 
     return redirect(url_for('login'))
 
+@app.route('/student_direct_message_page/<string:id>', methods=['GET'])
+def student_direct_message_page(id):
+
+    if 'loggedin' in session: # This routes the user to the edit assignment grade page.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute('SELECT id FROM classes WHERE id = {0}'.format(id))
+
+        student_direct_message_id = cursor.fetchone()
+
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0}'.format(id))
+
+        student_direct_message_first_name = cursor.fetchone()
+
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
+
+        student_direct_message_last_name = cursor.fetchone()
+
+        cursor.execute('SELECT * FROM classes WHERE id = {0}'.format(id))
+
+        student_direct_message_info = cursor.fetchone()
+
+        session['student_id'] = student_direct_message_info['id']
+
+        session['student_first_name'] = student_direct_message_info['student_first_name']
+
+        session['student_last_name'] = student_direct_message_info['student_last_name']
+
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+
+        student_direct_message_class_info = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return render_template('student_direct_message_page.html', account=account, student_direct_message_last_name = student_direct_message_last_name,student_direct_message_first_name=student_direct_message_first_name,student_direct_message_id = student_direct_message_id, student_direct_message_info=student_direct_message_info, student_direct_message_class_info = student_direct_message_class_info, username=session['username'], class_name=session['class_name']
+                               )
+
+    return redirect(url_for('login'))
+
+@app.route('/delete_direct_message_to_student/<string:id>', methods = ['DELETE', 'GET'])
+def delete_direct_message_to_student(id):
+
+    if 'loggedin' in session: # This removes an attendance record from the db.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('DELETE FROM student_direct_message WHERE id = {0}'.format(id))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('query'))
+
+    return redirect(url_for('login'))
+
+@app.route('/view_student_direct_message_page/<string:id>', methods=['GET'])
+def view_student_direct_message_page(id):
+
+    if 'loggedin' in session: # This routes the user to the edit assignment grade page.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute('SELECT id FROM classes WHERE id = {0}'.format(id))
+
+        student_direct_message_id = cursor.fetchone()
+
+        cursor.execute('SELECT * FROM student_direct_message WHERE student_id = {0}'.format(id))
+        view_student_direct_messages = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template('view_student_direct_message_page.html', account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
+                               )
+    return redirect(url_for('login'))
+
+@app.route('/student_direct_message_page_submit', methods=['POST'])
+def student_direct_message_page_submit(): #This function routes the logged in user to the page to students
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    if 'loggedin' in session:
+        message_subject = request.form.get("message_subject")
+        student_direct_message_box = request.form.get("student_direct_message_box")
+        cursor.execute("INSERT INTO student_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('query'))
+
+    return redirect(url_for('login'))
+
 @app.route('/assignment', methods=['GET', 'POST'])
 def assignment():
 
@@ -945,7 +1049,6 @@ def view_announcements_by_date():
 
          return render_template('view_announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']
                                 )
-
     return redirect(url_for('login'))
 
 @app.route('/delete_announcement/<string:id>', methods = ['DELETE', 'GET'])
@@ -965,7 +1068,6 @@ def delete_announcement(id):
         return redirect(url_for('announcements_page'))
 
     return redirect(url_for('login'))
-
 
 @app.route('/delete_assignment/<string:id>', methods = ['DELETE', 'GET'])
 def delete_assignment(id):
@@ -1178,12 +1280,18 @@ def student_login():
 
                 announcements_student_fetch = cursor.fetchall()
 
+                cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s',
+                               [session['student_first_name'], session['student_last_name'], session['class_creator']])
+
+                view_student_direct_messages = cursor.fetchall()
+
                 cursor.close()
                 conn.close()
 
                 # Redirect to home page
                 return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments,
-                                       search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch)
+                                       search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch,
+                                       view_student_direct_messages=view_student_direct_messages)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
