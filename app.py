@@ -1276,6 +1276,8 @@ def student_login():
 
                 session['class_creator'] = class_fetch['class_creator']
 
+                session['id'] = class_fetch['id']
+
                 cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
 
                 announcements_student_fetch = cursor.fetchall()
@@ -1285,13 +1287,18 @@ def student_login():
 
                 view_student_direct_messages = cursor.fetchall()
 
+                cursor.execute('SELECT * FROM teacher_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s',
+                               [session['student_first_name'], session['student_last_name'], session['class_creator']])
+
+                view_teacher_direct_messages = cursor.fetchall()
+
                 cursor.close()
                 conn.close()
 
                 # Redirect to home page
                 return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments,
                                        search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch,
-                                       view_student_direct_messages=view_student_direct_messages)
+                                       view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
@@ -1304,6 +1311,88 @@ def student_login():
             conn.close()
 
     return render_template('student_login.html', student_count=student_count, date_object=date_object)
+
+@app.route('/teacher_direct_message_page_submit', methods=['POST', 'GET'])
+def teacher_direct_message_page_submit(): #This function routes the logged in user to the page to students
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    if 'loggedin' in session:
+        message_subject = request.form.get("message_subject")
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', [session['student_first_name'], session['student_last_name']])
+        student_account = cursor.fetchone()
+        session['student_class_name'] = student_account['class']
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+
+        class_fetch = cursor.fetchone()
+
+        session['class_creator'] = class_fetch['class_creator']
+
+        session['id'] = class_fetch['id']
+        teacher_direct_message_box = request.form.get("teacher_direct_message_box")
+        cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("""SELECT
+        ci.id AS score_id,
+        s.student_first_name,
+        s.student_last_name,
+        ci.score,
+        cu.assignment_name
+        FROM classes s
+        INNER JOIN assignment_results AS ci
+        ON ci.student_id = s.id
+        INNER JOIN assignments cu  
+        ON cu.id = ci.assignment_id
+        WHERE s.student_last_name = %s AND s.class_name = %s
+        ORDER BY cu.assignment_name ASC;""", [session['student_last_name'], session['student_class_name']])
+
+        student_assignments = cursor.fetchall()
+
+        cursor.execute("""SELECT
+        a.id,
+        s.student_first_name,
+        s.student_last_name,
+        s.class_creator,
+        a.date,
+        a.attendance_status
+        FROM classes s
+        INNER JOIN attendance AS a
+        ON a.student_id = s.id
+        WHERE s.student_last_name = %s""", [session['student_last_name']])
+
+        search_attendance_query_student_login = cursor.fetchall()
+
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+
+        class_fetch = cursor.fetchone()
+
+        session['class_creator'] = class_fetch['class_creator']
+
+        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
+
+        announcements_student_fetch = cursor.fetchall()
+
+        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s',
+                       [session['student_first_name'], session['student_last_name'], session['class_creator']])
+
+        view_student_direct_messages = cursor.fetchall()
+
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', ([session['student_first_name'], session['student_last_name'], session['student_class_name']]))
+        student_class_info = cursor.fetchall()
+
+        conn.commit()
+
+        cursor.execute('SELECT * FROM teacher_direct_message WHERE message_recipient = %s', [session['class_creator']])
+        view_teacher_direct_messages = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # Redirect to home page
+        return render_template('student_home.html', student_assignments=student_assignments, student_class_info=student_class_info,
+                               search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch,
+                               view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages)
+
+    return redirect(url_for('login'))
 
 @app.route('/student_home', methods=['GET'])
 def student_home():
