@@ -40,8 +40,8 @@
                 <td>Grade</td>
                 <td>Update grade or delete student</td>
                 <td>Send direct message</td>
-                <td>View direct messages</td>
-
+                <td>View direct messages (Outbox)</td>
+                <td>View direct messages (Inbox)</td>
             </tr>
         </thead>
         <tbody>
@@ -67,7 +67,9 @@
                 </td>
 <td> <a href="/student_direct_message_page/{{row[0]}}" class="btn btn-info btn-delete btn-sm">Send direct message</a>
 </td>
-<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages</a>
+<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages (Outbox)</a>
+</td>
+<td> <a href="/view_teacher_direct_message_page/{{row[0]}}" class="btn btn-primary btn-delete btn-sm">View direct messages (Inbox)</a>
 </td>
             </tr>
             {% endfor %}
