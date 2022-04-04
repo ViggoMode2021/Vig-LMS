@@ -37,6 +37,14 @@ CREATE TABLE assignment_results(
     FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
     FOREIGN KEY ("assignment_id") REFERENCES assignments("id") ON DELETE CASCADE);
 
+CREATE TABLE announcements(
+    id SERIAL PRIMARY KEY,
+    announcement_date TEXT NOT NULL,
+    class TEXT NOT NULL,
+    announcement TEXT NOT NULL,
+	announcement_creator VARCHAR (50) NOT NULL,
+	FOREIGN KEY ("announcement_creator") REFERENCES users("email") ON DELETE CASCADE);
+
 CREATE TABLE attendance(
 id SERIAL PRIMARY KEY,
 date TEXT NOT NULL,
@@ -52,3 +60,29 @@ CREATE TABLE student_accounts(
 	class TEXT NOT NULL,
     secret_question VARCHAR (30) NOT NULL
 );
+
+CREATE TABLE student_direct_message(
+id SERIAL PRIMARY KEY,
+date TEXT NOT NULL,
+class TEXT NOT NULL,
+message_subject TEXT,
+message TEXT NOT NULL,
+student_first_name TEXT NOT NULL,
+student_last_name TEXT NOT NULL,
+student_id INT NOT NULL,
+message_sender VARCHAR (50) NOT NULL,
+FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
+FOREIGN KEY ("message_sender") REFERENCES users("email") ON DELETE CASCADE);
+
+CREATE TABLE teacher_direct_message(
+id SERIAL PRIMARY KEY,
+date TEXT NOT NULL,
+class TEXT NOT NULL,
+message_subject TEXT,
+message TEXT NOT NULL,
+student_first_name TEXT NOT NULL,
+student_last_name TEXT NOT NULL,
+student_id INT NOT NULL,
+message_recipient VARCHAR (50) NOT NULL,
+FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
+FOREIGN KEY ("message_recipient") REFERENCES users("email") ON DELETE CASCADE);
