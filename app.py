@@ -9,14 +9,14 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = '#' #Secret key for sessions
+app.secret_key = '#SECRET' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_HOST = "viglmsdatabase.#SECRETamazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#"
+DB_PASS = "#SECRET"
 
 @app.route('/')
 def home():
@@ -692,13 +692,19 @@ def view_student_direct_message_page(id):
 
         student_direct_message_id = cursor.fetchone()
 
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0}'.format(id))
+        student_first_name_message = cursor.fetchone()
+
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
+        student_last_name_message = cursor.fetchone()
+
         cursor.execute('SELECT * FROM student_direct_message WHERE student_id = {0}'.format(id))
         view_student_direct_messages = cursor.fetchall()
 
         cursor.close()
         conn.close()
 
-        return render_template('view_student_direct_message_page.html', account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('view_student_direct_message_page.html', student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
                                )
     return redirect(url_for('login'))
 
@@ -720,10 +726,16 @@ def view_teacher_direct_message_page(id):
         cursor.execute('SELECT * FROM teacher_direct_message WHERE student_id = {0}'.format(id))
         view_teacher_direct_messages = cursor.fetchall()
 
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0}'.format(id))
+        student_first_name_message = cursor.fetchone()
+
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
+        student_last_name_message = cursor.fetchone()
+
         cursor.close()
         conn.close()
 
-        return render_template('view_teacher_direct_message_page.html', account=account, student_direct_message_id = student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('view_teacher_direct_message_page.html', account=account,student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id = student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
                                )
     return redirect(url_for('login'))
 
@@ -805,7 +817,7 @@ def new_assignment():
             cursor.close()
             conn.close()
 
-        return render_template('assignment.html', account = account, username=session['username'], class_name = session['class_name'])
+        return render_template('assignment.html', account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -830,6 +842,10 @@ def edit_assignment_grade(id):
 
         cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
         records_4 = cur.fetchone()
+
+        cur.execute("SELECT * FROM assignments WHERE id = {0}".format(id))
+        records_5 = cur.fetchone()
+        session['assignment_id'] = records_5[0]
 
         cursor.close()
         conn.close()
@@ -881,7 +897,6 @@ def edit_assignment_grade_2():
         account = cursor.fetchone()
 
         grade_assignment = request.form.get("grade_assignment")
-        input_id = request.form.get("input_id")
         student_id = request.form.get("student_id")
 
         cur = conn.cursor()
@@ -890,11 +905,6 @@ def edit_assignment_grade_2():
 
         if not grade_assignment:
             flash('Please input the updated grade here.')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('assignment'))
-        elif not input_id:
-            flash('Please confirm the assignment ID here (located at the top left corner of page).')
             cursor.close()
             conn.close()
             return redirect(url_for('assignment'))
@@ -908,11 +918,6 @@ def edit_assignment_grade_2():
             cursor.close()
             conn.close()
             return redirect(url_for('assignment'))
-        elif input_id.isalpha():
-            flash('Please enter a graduation year that is a number.')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('assignment'))
         elif student_id.isalpha():
             flash('Please enter a grade number between 0 - 100.')
             cursor.close()
@@ -921,7 +926,7 @@ def edit_assignment_grade_2():
         else:
             cur.execute("""INSERT INTO assignment_results
             (score, student_id, assignment_id) VALUES (%s, %s, %s) 
-            """, (grade_assignment, student_id, input_id))
+            """, (grade_assignment, student_id, session['assignment_id']))
 
             conn.commit()
 
@@ -936,7 +941,7 @@ def edit_assignment_grade_2():
             cursor.close()
             conn.close()
 
-            return render_template('assignment.html', account=account, grade_assignment=grade_assignment, student_id=student_id, username=session['username'], class_name = session['class_name'])
+            return redirect(request.referrer)
 
     return redirect(url_for('login'))
 
@@ -1090,7 +1095,7 @@ def delete_announcement(id):
         cursor.close()
         conn.close()
 
-        return redirect(url_for('announcements_page'))
+        return redirect(url_for('view_announcements_by_date'))
 
     return redirect(url_for('login'))
 
