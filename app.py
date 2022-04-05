@@ -9,14 +9,14 @@ date_object = datetime.date.today()
 
 app = Flask(__name__)
 
-app.secret_key = '#SECRET' #Secret key for sessions
+app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.#SECRETamazonaws.com"
+DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#SECRET"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -389,6 +389,8 @@ def take_attendance(id):
 
          conn.commit()
 
+         flash('Attendance recorded!')
+
          cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
 
          take_attendance_query = cursor.fetchall()
@@ -479,6 +481,8 @@ def search_attendance_by_student():
 
          if not search_attendance_by_student:
              flash('Please enter a student id according to the format above to view attendance.')
+             cursor.close()
+             conn.close()
              return redirect(url_for('take_attendance_page'))
 
          cursor.close()
@@ -673,7 +677,9 @@ def delete_direct_message_to_student(id):
         cursor.close()
         conn.close()
 
-        return redirect(url_for('query'))
+        flash('Message deleted!')
+
+        return redirect(request.referrer)
 
     return redirect(url_for('login'))
 
@@ -751,7 +757,9 @@ def student_direct_message_page_submit(): #This function routes the logged in us
         conn.commit()
         cursor.close()
         conn.close()
-        return redirect(url_for('query'))
+        flash('Message sent!')
+        return redirect(request.referrer)
+
 
     return redirect(url_for('login'))
 
@@ -892,9 +900,6 @@ def edit_assignment_grade_2():
 
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
-        account = cursor.fetchone()
 
         grade_assignment = request.form.get("grade_assignment")
         student_id = request.form.get("student_id")
