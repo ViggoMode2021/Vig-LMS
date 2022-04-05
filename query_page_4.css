@@ -28,9 +28,12 @@ topnav {
   color: white;
 }
 
-
 h8{
 
 color: green;
 font-family: lucinda;
 font-size: 25px;}
+
+.alert {
+   width:20%;
+}

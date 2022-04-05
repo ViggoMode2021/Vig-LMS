@@ -65,3 +65,7 @@ p{
   background-color: #04AA6D;
   color: white;
 }
+
+.alert {
+   width:20%;
+}
