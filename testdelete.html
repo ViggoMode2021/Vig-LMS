@@ -1,0 +1,29 @@
+          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="delete student">
+            Delete
+          </button>
+          <!-- Modal -->
+          <div class="modal fade" id="delete student">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="delete student">Deleting Post Permanently</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <h3>delete</h3>
+                  <p>Are you sure?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                  <form action="/delete/{{row[0]}}" method="post">
+                    <input type="submit" value="Delete" class="btn btn-danger">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+                              <a href="/delete/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">unenroll student</a>

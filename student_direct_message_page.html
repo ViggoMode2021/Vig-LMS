@@ -36,7 +36,7 @@
                 <td>Message</td>
                 <td width="130">
                     <form action="/student_direct_message_page_submit" method="POST">
-                        <input type="text" class="form-control" style="width: 300px" name="teacher_message_subject" placeholder="Subject" id="teacher_message_subject">
+                        <input type="text" class="form-control" style="width: 300px" name="message_subject" placeholder="Subject" id="message_subject">
         <div class="form-group">
         <textarea name="student_direct_message_box" cols="30" rows="10"></textarea>
     </div>
@@ -64,7 +64,5 @@
     {% endfor %}
     {% endif %}
     {% endwith %}
-
-
 
 {% endblock %}
