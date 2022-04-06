@@ -36,7 +36,7 @@ def home():
         conn.close()
 
         # If user is logged in, they are directed to home page.
-        return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name = session['name'],
+        return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name=session['name'],
                                student_count=student_count, assignment_count = assignment_count)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
@@ -567,6 +567,7 @@ def delete_student(id):
         account = cursor.fetchone()
         cursor.execute('DELETE FROM classes WHERE id = {0}'.format(id))
         conn.commit()
+        flash('Student removed successfully.')
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
         records_2 = cursor.fetchall()
 
@@ -759,7 +760,6 @@ def student_direct_message_page_submit(): #This function routes the logged in us
         conn.close()
         flash('Message sent!')
         return redirect(request.referrer)
-
 
     return redirect(url_for('login'))
 
@@ -1119,6 +1119,8 @@ def delete_assignment(id):
 
         conn.commit()
 
+        flash('Assignment removed successfully.')
+
         cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
 
         assignments = cursor.fetchall()
@@ -1366,6 +1368,7 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
         session['id'] = class_fetch['id']
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
         cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+
         cursor.execute("""SELECT
         ci.id AS score_id,
         s.student_first_name,
