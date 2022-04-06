@@ -672,7 +672,7 @@ def delete_direct_message_to_student(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('DELETE FROM student_direct_message WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM student_direct_message_teacher_copy WHERE id = {0}'.format(id))
         conn.commit()
 
         cursor.close()
@@ -705,7 +705,7 @@ def view_student_direct_message_page(id):
         cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
         student_last_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM student_direct_message WHERE student_id = {0}'.format(id))
+        cursor.execute('SELECT * FROM student_direct_message_teacher_copy WHERE student_id = {0}'.format(id))
         view_student_direct_messages = cursor.fetchall()
 
         cursor.close()
@@ -755,6 +755,7 @@ def student_direct_message_page_submit(): #This function routes the logged in us
         message_subject = request.form.get("message_subject")
         student_direct_message_box = request.form.get("student_direct_message_box")
         cursor.execute("INSERT INTO student_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
+        cursor.execute("INSERT INTO student_direct_message_teacher_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
         conn.commit()
         cursor.close()
         conn.close()
@@ -1368,6 +1369,7 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
         session['id'] = class_fetch['id']
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
         cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
 
         cursor.execute("""SELECT
         ci.id AS score_id,
@@ -1419,7 +1421,7 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
 
         conn.commit()
 
-        cursor.execute('SELECT * FROM teacher_direct_message WHERE message_recipient = %s', [session['class_creator']])
+        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE message_recipient = %s', [session['class_creator']])
         view_teacher_direct_messages = cursor.fetchall()
 
         cursor.close()
@@ -1443,7 +1445,7 @@ def delete_direct_message_to_teacher(id):
         cursor.execute("SELECT * FROM classes WHERE student_first_name = %s", [session['student_first_name']])
         student_class_info = cursor.fetchall()
 
-        cursor.execute('DELETE FROM teacher_direct_message WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE id = {0}'.format(id))
         conn.commit()
 
         cursor.execute("""SELECT
