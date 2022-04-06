@@ -52,10 +52,19 @@ first before doing so.</p>
                     <a href="/edit_assignment_grade/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Add/update student grades</a>
                     <form action="/edit_assignment_grade/{{row[0]}}" method="POST">
 </form>
-         <a href="/delete_assignment/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete assignment</a>
-                    <form action="/delete_assignment_period_1/{{row[0]}}" method="POST">
-</form>
-                        </div>
+<h1><div class="box">
+	<a class="button" href="#popup1">Delete assignment</a>
+</div>
+
+<div id="popup1" class="overlay">
+	<div class="popup">
+		<h60>Are you sure you would like to delete this assignment?</h60>
+        <br />
+		<a class="close" href="#">&times;</a>
+                    <a href="/delete_assignment/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Yes, delete assignment</a>
+	</div>
+</div>
+
                 </td>
             </tr>
             {% endfor %}

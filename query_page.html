@@ -62,8 +62,9 @@
 <div id="popup1" class="overlay">
 	<div class="popup">
 		<h60>Are you sure you would like to unenroll this student?</h60>
+        <br />
 		<a class="close" href="#">&times;</a>
-                    <a href="/delete/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">unenroll student</a>
+                    <a href="/delete/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Yes, unenroll student</a>
 	</div>
 </div>
                     <form action="/update_grade/{{row[0]}}" method="POST">
@@ -106,6 +107,5 @@
 <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
 </form>
-
 
 {% endblock %}
