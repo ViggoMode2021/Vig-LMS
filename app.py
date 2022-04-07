@@ -684,6 +684,26 @@ def delete_direct_message_to_student(id):
 
     return redirect(url_for('login'))
 
+@app.route('/delete_direct_message_from_student/<string:id>', methods = ['DELETE', 'GET'])
+def delete_direct_message_from_student(id):
+
+    if 'loggedin' in session: # This removes an attendance record from the db.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('DELETE FROM teacher_direct_message WHERE id = {0}'.format(id))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        flash('Message deleted!')
+
+        return redirect(request.referrer)
+
+    return redirect(url_for('login'))
+
 @app.route('/view_student_direct_message_page/<string:id>', methods=['GET'])
 def view_student_direct_message_page(id):
 
@@ -1369,7 +1389,7 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
         session['id'] = class_fetch['id']
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
         cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
-        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
+        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
 
         cursor.execute("""SELECT
         ci.id AS score_id,
