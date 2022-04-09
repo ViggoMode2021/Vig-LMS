@@ -307,6 +307,68 @@ def query():
 
     return redirect(url_for('login'))
 
+@app.route('/query_individual_student/<string:id>', methods=['GET'])
+def query_individual_student(id):
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute("""SELECT
+         ci.id AS score_id,
+         s.student_first_name,
+         s.student_last_name,
+         cu.assignment_name,
+         ci.score
+         FROM classes s
+         INNER JOIN assignment_results AS ci
+         ON ci.student_id = s.id
+         INNER JOIN assignments cu  
+         ON cu.id = ci.assignment_id
+         WHERE s.id = {0} 
+         ORDER BY cu.assignment_name ASC;""".format(id))
+
+         student_assignment_scores = cursor.fetchall()
+
+         cursor.execute("""SELECT
+         student_first_name
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         student_first_name = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         student_last_name
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         student_last_name = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         a.id,
+         s.student_first_name,
+         s.student_last_name,
+         s.class_creator,
+         a.date,
+         a.attendance_status
+         FROM classes s
+         INNER JOIN attendance AS a
+         ON a.student_id = s.id
+         WHERE s.id = {0}""".format(id))
+
+         search_attendance_query_student_login = cursor.fetchall()
+
+         cursor.execute("""SELECT * FROM classes WHERE id = {0}""".format(id))
+
+         class_fetch = cursor.fetchall()
+
+         cursor.close()
+         conn.close()
+
+         return render_template('query_individual_student.html', search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch, student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name)
+
+    return redirect(url_for('login'))
+
 @app.route('/alphabetically', methods=['GET'])
 def alphabetically():
 
@@ -801,7 +863,7 @@ def assignment():
         cursor.close()
         conn.close()
 
-        return render_template('assignment.html', account=account, assignments =assignments, username=session['username'], class_name=session['class_name'])
+        return render_template('assignment.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -811,9 +873,6 @@ def new_assignment():
     if 'loggedin' in session: # This creates a new assignment
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
-        account = cursor.fetchone()
 
         assignment_name = request.form.get("assignment name")
         category = request.form.get("category")
