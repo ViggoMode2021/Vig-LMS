@@ -37,7 +37,7 @@ def home():
 
         # If user is logged in, they are directed to home page.
         return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name=session['name'],
-                               student_count=student_count, assignment_count = assignment_count)
+                               student_count=student_count, assignment_count=assignment_count)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
 
@@ -287,7 +287,7 @@ def enroll_page_submit():
         conn.close()
         flash(f'{first_name} {last_name} has been successfully enrolled.')
 
-    return render_template('enroll_page.html')
+        return redirect(request.referrer)
 
 @app.route('/query', methods=['GET'])
 def query():
@@ -857,7 +857,7 @@ def assignment():
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s ORDER BY due_date DESC;", [session['email']])
         assignments = cursor.fetchall()
 
         cursor.close()
@@ -931,6 +931,12 @@ def edit_assignment_grade(id):
         cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
         records_4 = cur.fetchone()
 
+        cur.execute("SELECT due_date FROM assignments WHERE id = {0}".format(id))
+        due_date = cur.fetchall()
+
+        cur.execute("SELECT category FROM assignments WHERE id = {0}".format(id))
+        category = cur.fetchall()
+
         cur.execute("SELECT * FROM assignments WHERE id = {0}".format(id))
         records_5 = cur.fetchone()
         session['assignment_id'] = records_5[0]
@@ -938,7 +944,7 @@ def edit_assignment_grade(id):
         cursor.close()
         conn.close()
 
-        return render_template('edit_assignment_grade.html', account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
+        return render_template('edit_assignment_grade.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1140,7 +1146,7 @@ def announcements_page(): #This function routes the logged in user to the page t
 
     return redirect(url_for('login'))
 
-@app.route('/announcements_page_submit', methods=['POST'])
+@app.route('/announcements_page_submit', methods=['POST', 'GET'])
 def announcements_page_submit(): #This function routes the logged in user to the page to enroll students
 
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -1152,7 +1158,7 @@ def announcements_page_submit(): #This function routes the logged in user to the
         cursor.close()
         conn.close()
         flash(f'Announcement recorded for {date_object}')
-        return render_template('announcements_page.html')
+        return redirect(request.referrer)
 
 @app.route('/view_announcements_by_date', methods=['POST', 'GET'])
 def view_announcements_by_date():
