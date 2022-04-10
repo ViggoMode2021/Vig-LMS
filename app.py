@@ -307,6 +307,128 @@ def query():
 
     return redirect(url_for('login'))
 
+@app.route('/edit_individual_student/<string:id>', methods=['GET'])
+def edit_individual_student(id):
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute("""SELECT
+         *
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         student_id_for_edit = cursor.fetchone()
+
+         session['student_id'] = student_id_for_edit['id']
+
+         cursor.execute("""SELECT
+         student_first_name
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         student_first_name = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         student_last_name
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         student_last_name = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         student_graduation_year
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         graduation_year = cursor.fetchone()
+
+         cursor.close()
+         conn.close()
+
+         return render_template('edit_individual_student.html',student_first_name=student_first_name, student_last_name=student_last_name, graduation_year=graduation_year,username=session['username'], class_name=session['class_name'], date_object=date_object)
+
+    return redirect(url_for('login'))
+
+@app.route('/edit_individual_student_first_name', methods=['POST'])
+def edit_individual_student_first_name():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         update_first_name = request.form.get('update_first_name')
+
+         cursor.execute("""UPDATE classes 
+            SET student_first_name = %s 
+            WHERE id = %s""", (update_first_name, session['student_id']))
+
+         conn.commit()
+
+         cursor.close()
+         conn.close()
+
+         flash('First name updated successfully!')
+
+         session.pop('student_id', None)
+
+         return redirect(url_for('query'))
+
+    return redirect(url_for('login'))
+
+@app.route('/edit_individual_student_last_name', methods=['POST'])
+def edit_individual_student_last_name():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         update_last_name = request.form.get('update_last_name')
+
+         cursor.execute("""UPDATE classes 
+            SET student_last_name = %s 
+            WHERE id = %s""", (update_last_name, session['student_id']))
+
+         conn.commit()
+
+         cursor.close()
+         conn.close()
+
+         flash('Last name updated successfully!')
+
+         session.pop('student_id', None)
+
+         return redirect(url_for('query'))
+
+    return redirect(url_for('login'))
+
+@app.route('/edit_individual_student_graduation_year', methods=['POST'])
+def edit_individual_student_graduation_year():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         update_graduation_year = request.form.get('update_graduation_year')
+
+         cursor.execute("""UPDATE classes 
+            SET student_graduation_year = %s 
+            WHERE id = %s""", (update_graduation_year, session['student_id']))
+
+         conn.commit()
+
+         cursor.close()
+         conn.close()
+
+         flash('Graduation year updated successfully!')
+
+         session.pop('student_id', None)
+
+         return redirect(url_for('query'))
+
+    return redirect(url_for('login'))
+
 @app.route('/query_individual_student/<string:id>', methods=['GET'])
 def query_individual_student(id):
 
@@ -617,7 +739,7 @@ def grade_DESC():
 
     return redirect(url_for('login'))
 
-@app.route('/delete/<string:id>', methods = ['DELETE', 'GET'])
+@app.route('/delete_student/<string:id>', methods = ['DELETE', 'GET'])
 def delete_student(id):
 
     if 'loggedin' in session: # This removes a student from the class
@@ -669,6 +791,8 @@ def update_grade(id):
             cur.execute("""UPDATE classes 
             SET student_grade = %s 
             WHERE id = %s""", (updated_grade, id))
+
+            flash("Grade updated successfully!")
 
             conn.commit()
 
