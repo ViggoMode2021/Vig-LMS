@@ -429,6 +429,36 @@ def edit_individual_student_graduation_year():
 
     return redirect(url_for('login'))
 
+@app.route('/update_individual_assignment_grade/<string:id>', methods=['POST'])
+def update_individual_assignment_grade(id):
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         update_assignment_grade = request.form.get('update_assignment_grade')
+
+         cursor.execute("""UPDATE assignment_results 
+            SET score = %s 
+            WHERE id = %s""".format(id), (update_assignment_grade, id))
+
+         cursor.execute("""UPDATE classes 
+                        SET student_grade = (
+                        SELECT ROUND(AVG(score))
+                        FROM assignment_results)
+                        WHERE id = %s""", (session['student_id'],))
+
+         conn.commit()
+
+         flash('Assignment grade updated successfully.')
+
+         cursor.close()
+         conn.close()
+
+         return redirect(request.referrer)
+
+    return redirect(url_for('login'))
+
 @app.route('/query_individual_student/<string:id>', methods=['GET'])
 def query_individual_student(id):
 
