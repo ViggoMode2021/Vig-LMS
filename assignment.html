@@ -62,10 +62,11 @@ first before doing so.</p>
 
 <div id="popup1" class="overlay">
 	<div class="popup">
+                <br />
 		<h60>Are you sure you would like to delete this assignment?</h60>
         <br />
 		<a class="close" href="#">&times;</a>
-                    <a href="/delete_assignment/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Yes, delete assignment</a>
+        <form action="/delete_assignment/{{row[0]}}" method="DELETE"> <button type="submit" class="btn btn-danger btn-delete btn-sm">Confirm</button></form>
 	</div>
 </div>
 
@@ -76,6 +77,17 @@ first before doing so.</p>
     </table>
 </div>
 </div>
+</div>
+
+<div class="box">
+    <h5>Input fields below to delete assignment:</h5>
+            <form action="delete_assignment" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Assignment name" name='delete_assignment_name' style="width: 200px;">
+            <button type="submit" class="btn btn-danger">Delete assignment</button>
+        </form>
+    </div>
 </div>
 
   <meta charset="utf-8">
