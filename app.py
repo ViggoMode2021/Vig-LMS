@@ -739,8 +739,8 @@ def grade_DESC():
 
     return redirect(url_for('login'))
 
-@app.route('/delete_student/<string:id>', methods = ['DELETE', 'GET'])
-def delete_student(id):
+@app.route('/delete_student', methods = ['DELETE', 'GET', 'POST'])
+def delete_student():
 
     if 'loggedin' in session: # This removes a student from the class
 
@@ -749,7 +749,15 @@ def delete_student(id):
 
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
-        cursor.execute('DELETE FROM classes WHERE id = {0}'.format(id))
+        delete_first_name = request.form.get('delete_first_name')
+        delete_last_name = request.form.get('delete_last_name')
+        if not delete_first_name:
+            flash('Please input student first name to delete.')
+        elif not delete_last_name:
+            flash('Please input student last name to delete.')
+        elif not delete_first_name and delete_last_name:
+            flash('Please input student names to delete.')
+        cursor.execute('DELETE FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s',(delete_first_name, delete_last_name, session['email']))
         conn.commit()
         flash('Student removed successfully.')
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
@@ -1333,8 +1341,8 @@ def delete_announcement(id):
 
     return redirect(url_for('login'))
 
-@app.route('/delete_assignment/<string:id>', methods = ['DELETE', 'GET'])
-def delete_assignment(id):
+@app.route('/delete_assignment', methods = ['DELETE', 'POST', 'GET'])
+def delete_assignment():
 
     if 'loggedin' in session:
 
@@ -1344,7 +1352,9 @@ def delete_assignment(id):
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute('DELETE FROM assignments WHERE id = {0}'.format(id))
+        delete_assignment_name = request.form.get('delete_assignment_name')
+
+        cursor.execute('DELETE FROM assignments WHERE assignment_name = %s AND assignment_creator = %s', (delete_assignment_name, session['email']))
 
         conn.commit()
 
