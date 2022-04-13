@@ -445,8 +445,8 @@ def update_individual_assignment_grade(id):
          cursor.execute("""UPDATE classes 
                         SET student_grade = (
                         SELECT ROUND(AVG(score))
-                        FROM assignment_results)
-                        WHERE id = %s""", (session['student_id'],))
+                        FROM assignment_results WHERE student_id = %s)
+                        WHERE id = %s""", (session['student_id'], session['student_id']))
 
          conn.commit()
 
@@ -465,6 +465,15 @@ def query_individual_student(id):
     if 'loggedin' in session: # Show user and student information from the db
          conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute("""SELECT
+         *
+         FROM classes 
+         WHERE id = {0}""".format(id))
+
+         student_id_for_edit = cursor.fetchone()
+
+         session['student_id'] = student_id_for_edit['id']
 
          cursor.execute("""SELECT
          ci.id AS score_id,
@@ -1205,8 +1214,8 @@ def edit_assignment_grade_2():
             cur.execute("""UPDATE classes 
                         SET student_grade = (
                         SELECT ROUND(AVG(score))
-                        FROM assignment_results)
-                        WHERE id = %s""", (student_id,))
+                        FROM assignment_results WHERE student_id = %s)
+                        WHERE id = %s""", (student_id, student_id))
 
             conn.commit()
 
