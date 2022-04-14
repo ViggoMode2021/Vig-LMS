@@ -10,12 +10,6 @@
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
            <div class="dropdown">
-  <button class="dropbtn">Sort by:</button>
-  <div class="dropdown-content">
-    <a href="/alphabetically">Last name</a>
-    <a href="/alphabetically">First name</a>
-    <a href="/grade_ASC">Grade (low - high)</a>
-      <a href="/grade_DESC">Grade (high - low)</a>
          <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
               <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
                   <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
@@ -95,8 +89,8 @@
                 <td width="130">
        <form action="/update_individual_assignment_grade/{{row[0]}}" method="POST">
                     <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="update" name='update_assignment_grade' style="width: 200px;" maxlength="3">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="width: 75px;"
+            placeholder="update" name='update_assignment_grade' style="width: 200px;" maxlength="3" size="4">
                          <button type="submit" class="btn btn-warning">update</button>
 
 </form>
