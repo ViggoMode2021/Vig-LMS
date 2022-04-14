@@ -333,7 +333,7 @@ def edit_individual_student(id):
          cursor.execute("""SELECT
          student_last_name
          FROM classes 
-         WHERE id = {0}""".format(id))
+         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
 
          student_last_name = cursor.fetchone()
 
@@ -469,11 +469,16 @@ def query_individual_student(id):
          cursor.execute("""SELECT
          *
          FROM classes 
-         WHERE id = {0}""".format(id))
+         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
 
          student_id_for_edit = cursor.fetchone()
 
          session['student_id'] = student_id_for_edit['id']
+
+         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         account = cursor.fetchone()
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+         records_2 = cursor.fetchall()
 
          cursor.execute("""SELECT
          ci.id AS score_id,
@@ -526,7 +531,7 @@ def query_individual_student(id):
          cursor.close()
          conn.close()
 
-         return render_template('query_individual_student.html', search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch, student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name)
+         return render_template('query_individual_student.html', search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch, student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name, records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -689,7 +694,7 @@ def search_attendance_by_student():
             FROM classes s
             INNER JOIN attendance AS a
             ON a.student_id = s.id
-            WHERE s.id = %s ORDER BY a.date;""", (search_attendance_by_student,))
+            WHERE s.id = %s AND class_creator = %s ORDER BY a.date;""", (search_attendance_by_student, session['email']))
 
          search_attendance_query_student = cursor.fetchall()
 
@@ -875,7 +880,10 @@ def student_direct_message_page(id):
 
         student_direct_message_last_name = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM classes WHERE id = {0}'.format(id))
+        cursor.execute("""SELECT
+         *
+         FROM classes 
+         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
 
         student_direct_message_info = cursor.fetchone()
 
@@ -952,13 +960,18 @@ def view_student_direct_message_page(id):
 
         student_direct_message_id = cursor.fetchone()
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0}'.format(id))
+        cursor.execute("""SELECT
+         *
+         FROM classes 
+         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
+
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
         student_first_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
         student_last_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM student_direct_message_teacher_copy WHERE student_id = {0}'.format(id))
+        cursor.execute('SELECT * FROM student_direct_message_teacher_copy WHERE student_id = {0} AND message_sender = %s'.format(id), (session['email'],))
         view_student_direct_messages = cursor.fetchall()
 
         cursor.close()
@@ -983,13 +996,13 @@ def view_teacher_direct_message_page(id):
 
         student_direct_message_id = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM teacher_direct_message WHERE student_id = {0}'.format(id))
+        cursor.execute('SELECT * FROM teacher_direct_message WHERE student_id = {0} AND message_recipient = %s'.format(id), (session['email'],))
         view_teacher_direct_messages = cursor.fetchall()
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
         student_first_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
         student_last_name_message = cursor.fetchone()
 
         cursor.close()
@@ -1093,22 +1106,22 @@ def edit_assignment_grade(id):
 
         cur = conn.cursor()
 
-        cur.execute("SELECT assignment_name FROM assignments WHERE id = {0}".format(id))
+        cur.execute("SELECT assignment_name FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
         records_2 = cur.fetchall()
 
         cur.execute('SELECT * FROM classes WHERE class_creator = %s', [session['email']])
         records_3 = cur.fetchall()
 
-        cur.execute("SELECT id FROM assignments WHERE id = {0}".format(id))
+        cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
         records_4 = cur.fetchone()
 
-        cur.execute("SELECT due_date FROM assignments WHERE id = {0}".format(id))
+        cur.execute("SELECT due_date FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
         due_date = cur.fetchall()
 
-        cur.execute("SELECT category FROM assignments WHERE id = {0}".format(id))
+        cur.execute("SELECT category FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
         category = cur.fetchall()
 
-        cur.execute("SELECT * FROM assignments WHERE id = {0}".format(id))
+        cur.execute("SELECT * FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
         records_5 = cur.fetchone()
         session['assignment_id'] = records_5[0]
 
