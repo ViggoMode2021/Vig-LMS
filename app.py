@@ -56,13 +56,13 @@ def login():
         email = request.form['email']
 
         # Check if account exists
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+        cursor.execute('SELECT * FROM users WHERE username = %s;', (username,))
         account = cursor.fetchone()
         # Grab user information from classes table. The classes table contains information that the user submitted. This is student information and grades.
-        cursor.execute('SELECT * FROM classes WHERE class_creator = %s', (email,))
+        cursor.execute('SELECT * FROM classes WHERE class_creator = %s;', (email,))
         account_2 = cursor.fetchone()
         # Grab class name to be stored in session data
-        cursor.execute('SELECT class_name FROM classes WHERE class_creator = %s', (email,))
+        cursor.execute('SELECT class_name FROM classes WHERE class_creator = %s;', (email,))
         class_name_print = cursor.fetchone()
 
         # If above information is adequate:
@@ -116,13 +116,13 @@ def delete_account():
         user_count = cursor.fetchall()
 
         # Check if account exists:
-        cursor.execute('SELECT * FROM users WHERE username = %s AND email = %s', (delete_username, delete_email))
+        cursor.execute('SELECT * FROM users WHERE username = %s AND email = %s;', (delete_username, delete_email))
         delete_account = cursor.fetchone()
         # If account exists show error and validation checks
         if delete_account:
             delete_password_check = delete_account['password']
             if check_password_hash(delete_password_check, delete_password):
-                cursor.execute('DELETE FROM users WHERE username = %s AND email = %s', (delete_username, delete_email))
+                cursor.execute('DELETE FROM users WHERE username = %s AND email = %s;', (delete_username, delete_email))
                 flash('Account successfully deleted.')
                 conn.commit()
                 cursor.close()
@@ -166,7 +166,7 @@ def register():
         _hashed_password = generate_password_hash(password)
 
         # Check if account exists:
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+        cursor.execute('SELECT * FROM users WHERE username = %s;', (username,))
         account = cursor.fetchone()
         # If account exists show error and validation checks
         if account:
@@ -187,7 +187,7 @@ def register():
             conn.close()
         else:
             # Account doesn't exist and the form data is valid, new account is created in the users table with the below queries:
-            cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s)", (fullname, username, _hashed_password, email, class_name, secret_question))
+            cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s);", (fullname, username, _hashed_password, email, class_name, secret_question))
             conn.commit()
             cursor.execute("INSERT INTO classes (class_name, teacher, class_creator) VALUES (%s,%s, (SELECT email from users WHERE fullname = %s))", (class_name, fullname, fullname))
             conn.commit()
@@ -227,7 +227,7 @@ def enroll_page(): #This function routes the logged in user to the page to enrol
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -326,21 +326,21 @@ def edit_individual_student(id):
          cursor.execute("""SELECT
          student_first_name
          FROM classes 
-         WHERE id = {0}""".format(id))
+         WHERE id = {0};""".format(id))
 
          student_first_name = cursor.fetchone()
 
          cursor.execute("""SELECT
          student_last_name
          FROM classes 
-         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
+         WHERE id = {0} AND class_creator = %s;""".format(id), (session['email'],))
 
          student_last_name = cursor.fetchone()
 
          cursor.execute("""SELECT
          student_graduation_year
          FROM classes 
-         WHERE id = {0}""".format(id))
+         WHERE id = {0};""".format(id))
 
          graduation_year = cursor.fetchone()
 
@@ -362,7 +362,7 @@ def edit_individual_student_first_name():
 
          cursor.execute("""UPDATE classes 
             SET student_first_name = %s 
-            WHERE id = %s""", (update_first_name, session['student_id']))
+            WHERE id = %s;""", (update_first_name, session['student_id']))
 
          conn.commit()
 
@@ -388,7 +388,7 @@ def edit_individual_student_last_name():
 
          cursor.execute("""UPDATE classes 
             SET student_last_name = %s 
-            WHERE id = %s""", (update_last_name, session['student_id']))
+            WHERE id = %s;""", (update_last_name, session['student_id']))
 
          conn.commit()
 
@@ -414,7 +414,7 @@ def edit_individual_student_graduation_year():
 
          cursor.execute("""UPDATE classes 
             SET student_graduation_year = %s 
-            WHERE id = %s""", (update_graduation_year, session['student_id']))
+            WHERE id = %s;""", (update_graduation_year, session['student_id']))
 
          conn.commit()
 
@@ -429,6 +429,51 @@ def edit_individual_student_graduation_year():
 
     return redirect(url_for('login'))
 
+@app.route('/update_attendance_record_query_individual_student/<string:id>', methods = ['POST', 'GET'])
+def update_attendance_record_query_individual_student(id):
+
+    if 'loggedin' in session: # This updates an attendance record from the db.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        attendance = request.form.get('attendance')
+
+        cursor.execute("""UPDATE attendance 
+            SET attendance_status = %s 
+            WHERE id = %s;""", (attendance, id))
+
+        conn.commit()
+
+        flash('Attendance updated successfully!')
+
+        cursor.close()
+        conn.close()
+
+        return redirect(request.referrer)
+
+    return redirect(url_for('login'))
+
+@app.route('/delete_attendance_record_query_individual_student/<string:id>', methods = ['DELETE', 'GET'])
+def delete_attendance_record_query_individual_student(id):
+
+    if 'loggedin' in session: # This removes an attendance record from the db.
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('DELETE FROM attendance WHERE id = {0};'.format(id))
+        conn.commit()
+
+        flash('Attendance record deleted successfully!')
+
+        cursor.close()
+        conn.close()
+
+        return redirect(request.referrer)
+
+    return redirect(url_for('login'))
+
 @app.route('/update_individual_assignment_grade/<string:id>', methods=['POST'])
 def update_individual_assignment_grade(id):
 
@@ -440,13 +485,13 @@ def update_individual_assignment_grade(id):
 
          cursor.execute("""UPDATE assignment_results 
             SET score = %s 
-            WHERE id = %s""".format(id), (update_assignment_grade, id))
+            WHERE id = %s;""".format(id), (update_assignment_grade, id))
 
          cursor.execute("""UPDATE classes 
                         SET student_grade = (
                         SELECT ROUND(AVG(score))
                         FROM assignment_results WHERE student_id = %s)
-                        WHERE id = %s""", (session['student_id'], session['student_id']))
+                        WHERE id = %s;""", (session['student_id'], session['student_id']))
 
          conn.commit()
 
@@ -469,7 +514,7 @@ def query_individual_student(id):
          cursor.execute("""SELECT
          *
          FROM classes 
-         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
+         WHERE id = {0} AND class_creator = %s;""".format(id), (session['email'],))
 
          student_id_for_edit = cursor.fetchone()
 
@@ -477,7 +522,7 @@ def query_individual_student(id):
 
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
-         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
          records_2 = cursor.fetchall()
 
          cursor.execute("""SELECT
@@ -499,14 +544,14 @@ def query_individual_student(id):
          cursor.execute("""SELECT
          student_first_name
          FROM classes 
-         WHERE id = {0}""".format(id))
+         WHERE id = {0};""".format(id))
 
          student_first_name = cursor.fetchone()
 
          cursor.execute("""SELECT
          student_last_name
          FROM classes 
-         WHERE id = {0}""".format(id))
+         WHERE id = {0};""".format(id))
 
          student_last_name = cursor.fetchone()
 
@@ -520,9 +565,18 @@ def query_individual_student(id):
          FROM classes s
          INNER JOIN attendance AS a
          ON a.student_id = s.id
-         WHERE s.id = {0}""".format(id))
+         WHERE s.id = {0};""".format(id))
 
          search_attendance_query_student_login = cursor.fetchall()
+
+         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Tardy';".format(id))
+         student_tardy_count = cursor.fetchall()
+
+         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Absent';".format(id))
+         student_absent_count = cursor.fetchall()
+
+         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Present';".format(id))
+         student_present_count = cursor.fetchall()
 
          cursor.execute("""SELECT * FROM classes WHERE id = {0}""".format(id))
 
@@ -531,9 +585,41 @@ def query_individual_student(id):
          cursor.close()
          conn.close()
 
-         return render_template('query_individual_student.html', search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch, student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name, records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('query_individual_student.html', student_tardy_count=student_tardy_count, student_absent_count=student_absent_count,student_present_count = student_present_count,
+                                search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch,
+                                student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name, records_2=records_2,
+                                account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
+
+@app.route('/delete_assignment_score_query_individual_student/<string:id>', methods = ['DELETE', 'GET'])
+def delete_assignment_score_query_individual_student(id):
+
+    if 'loggedin' in session:
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('DELETE FROM assignment_results WHERE id = {0}'.format(id))
+
+        conn.commit()
+
+        cursor.execute("""UPDATE classes 
+            SET student_grade = (
+            SELECT ROUND(AVG(score))
+            FROM assignment_results WHERE student_id = %s)
+            WHERE id = %s;""", (session['student_id'], session['student_id']))
+
+        conn.commit()
+
+        flash('Assignment score successfully deleted!')
+
+        cursor.close()
+        conn.close()
+
+        return redirect(request.referrer)
+
+    return redirect(url_for('login'))
+
 
 @app.route('/alphabetically', methods=['GET'])
 def alphabetically():
@@ -543,10 +629,10 @@ def alphabetically():
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC", [session['email']])
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC;", [session['email']])
         records_2 = cursor.fetchall()
 
         cursor.close()
@@ -564,10 +650,10 @@ def grade_ASC():
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC", [session['email']])
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC;", [session['email']])
         records_2 = cursor.fetchall()
 
         cursor.close()
@@ -588,7 +674,7 @@ def take_attendance_page():
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
 
-         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
 
          take_attendance_query = cursor.fetchall()
 
@@ -607,19 +693,19 @@ def take_attendance(id):
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
 
          attendance = request.form.get("attendance")
 
-         cursor.execute('INSERT INTO attendance (date, attendance_status, student_id) VALUES (%s, %s, %s)'.format(id),
+         cursor.execute('INSERT INTO attendance (date, attendance_status, student_id) VALUES (%s, %s, %s);'.format(id),
                         (date_object, attendance, id))
 
          conn.commit()
 
          flash('Attendance recorded!')
 
-         cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+         cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
 
          take_attendance_query = cursor.fetchall()
 
@@ -627,6 +713,42 @@ def take_attendance(id):
          conn.close()
 
          return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
+
+    return redirect(url_for('login'))
+
+@app.route('/view_attendance_for_today', methods=['GET'])
+def view_attendance_for_today():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
+         account = cursor.fetchone()
+
+         format_code = '%Y-%m-%d'
+
+         new_date_object = date_object.strftime(format_code)
+
+         cursor.execute("""SELECT
+            a.id,
+            s.student_first_name,
+            s.student_last_name,
+            s.class_creator,
+            a.date,
+            a.attendance_status
+            FROM classes s
+            INNER JOIN attendance AS a
+            ON a.student_id = s.id
+            WHERE a.date = %s AND s.class_creator = %s;""", (new_date_object, session['email']))
+
+         search_attendance_query = cursor.fetchall()
+
+         cursor.close()
+         conn.close()
+
+         return render_template('view_attendance_for_today.html', search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -638,7 +760,7 @@ def search_attendance_by_date():
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
 
          search_attendance_by_date = request.form['search_attendance_by_date']
@@ -679,7 +801,7 @@ def search_attendance_by_student():
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+         cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
 
          search_attendance_by_student= request.form['search_attendance_by_student']
@@ -729,7 +851,7 @@ def delete_attendance_record(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('DELETE FROM attendance WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM attendance WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.close()
@@ -751,7 +873,7 @@ def update_attendance_record(id):
 
         cursor.execute("""UPDATE attendance 
             SET attendance_status = %s 
-            WHERE id = %s""", (attendance, id))
+            WHERE id = %s;""", (attendance, id))
 
         conn.commit()
 
@@ -770,10 +892,10 @@ def grade_DESC():
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC", [session['email']])
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC;", [session['email']])
         records_2 = cursor.fetchall()
 
         cursor.close()
@@ -791,7 +913,7 @@ def delete_student():
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
         delete_first_name = request.form.get('delete_first_name')
         delete_last_name = request.form.get('delete_last_name')
@@ -801,10 +923,10 @@ def delete_student():
             flash('Please input student last name to delete.')
         elif not delete_first_name and delete_last_name:
             flash('Please input student names to delete.')
-        cursor.execute('DELETE FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s',(delete_first_name, delete_last_name, session['email']))
+        cursor.execute('DELETE FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;',(delete_first_name, delete_last_name, session['email']))
         conn.commit()
         flash('Student removed successfully.')
-        cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
         records_2 = cursor.fetchall()
 
         cursor.close()
@@ -822,7 +944,7 @@ def update_grade(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
         updated_grade = request.form.get("update grade")
@@ -842,13 +964,13 @@ def update_grade(id):
         else:
             cur.execute("""UPDATE classes 
             SET student_grade = %s 
-            WHERE id = %s""", (updated_grade, id))
+            WHERE id = %s;""", (updated_grade, id))
 
             flash("Grade updated successfully!")
 
             conn.commit()
 
-            cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
+            cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
             records_2 = cursor.fetchall()
 
             cursor.close()
@@ -865,25 +987,25 @@ def student_direct_message_page(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute('SELECT id FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT id FROM classes WHERE id = {0};'.format(id))
 
         student_direct_message_id = cursor.fetchone()
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0};'.format(id))
 
         student_direct_message_first_name = cursor.fetchone()
 
-        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0};'.format(id))
 
         student_direct_message_last_name = cursor.fetchone()
 
         cursor.execute("""SELECT
          *
          FROM classes 
-         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
+         WHERE id = {0} AND class_creator = %s;""".format(id), (session['email'],))
 
         student_direct_message_info = cursor.fetchone()
 
@@ -913,7 +1035,7 @@ def delete_direct_message_to_student(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('DELETE FROM student_direct_message_teacher_copy WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM student_direct_message_teacher_copy WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.close()
@@ -933,7 +1055,7 @@ def delete_direct_message_from_student(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('DELETE FROM teacher_direct_message WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM teacher_direct_message WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.close()
@@ -953,25 +1075,25 @@ def view_student_direct_message_page(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute('SELECT id FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT id FROM classes WHERE id = {0};'.format(id))
 
         student_direct_message_id = cursor.fetchone()
 
         cursor.execute("""SELECT
          *
          FROM classes 
-         WHERE id = {0} AND class_creator = %s""".format(id), (session['email'],))
+         WHERE id = {0} AND class_creator = %s;""".format(id), (session['email'],))
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
         student_first_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
         student_last_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM student_direct_message_teacher_copy WHERE student_id = {0} AND message_sender = %s'.format(id), (session['email'],))
+        cursor.execute('SELECT * FROM student_direct_message_teacher_copy WHERE student_id = {0} AND message_sender = %s;'.format(id), (session['email'],))
         view_student_direct_messages = cursor.fetchall()
 
         cursor.close()
@@ -989,20 +1111,20 @@ def view_teacher_direct_message_page(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute('SELECT id FROM classes WHERE id = {0}'.format(id))
+        cursor.execute('SELECT id FROM classes WHERE id = {0};'.format(id))
 
         student_direct_message_id = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM teacher_direct_message WHERE student_id = {0} AND message_recipient = %s'.format(id), (session['email'],))
+        cursor.execute('SELECT * FROM teacher_direct_message WHERE student_id = {0} AND message_recipient = %s;'.format(id), (session['email'],))
         view_teacher_direct_messages = cursor.fetchall()
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
         student_first_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s'.format(id), (session['email'],))
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
         student_last_name_message = cursor.fetchone()
 
         cursor.close()
@@ -1020,8 +1142,8 @@ def student_direct_message_page_submit(): #This function routes the logged in us
     if 'loggedin' in session:
         message_subject = request.form.get("message_subject")
         student_direct_message_box = request.form.get("student_direct_message_box")
-        cursor.execute("INSERT INTO student_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
-        cursor.execute("INSERT INTO student_direct_message_teacher_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
+        cursor.execute("INSERT INTO student_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
+        cursor.execute("INSERT INTO student_direct_message_teacher_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
         conn.commit()
         cursor.close()
         conn.close()
@@ -1038,7 +1160,7 @@ def assignment():
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
         cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s ORDER BY due_date DESC;", [session['email']])
@@ -1106,22 +1228,22 @@ def edit_assignment_grade(id):
 
         cur = conn.cursor()
 
-        cur.execute("SELECT assignment_name FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
+        cur.execute("SELECT assignment_name FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_2 = cur.fetchall()
 
-        cur.execute('SELECT * FROM classes WHERE class_creator = %s', [session['email']])
+        cur.execute('SELECT * FROM classes WHERE class_creator = %s;', [session['email']])
         records_3 = cur.fetchall()
 
-        cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
+        cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_4 = cur.fetchone()
 
-        cur.execute("SELECT due_date FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
+        cur.execute("SELECT due_date FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         due_date = cur.fetchall()
 
-        cur.execute("SELECT category FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
+        cur.execute("SELECT category FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         category = cur.fetchall()
 
-        cur.execute("SELECT * FROM assignments WHERE id = {0} AND assignment_creator = %s".format(id), (session['email'],))
+        cur.execute("SELECT * FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_5 = cur.fetchone()
         session['assignment_id'] = records_5[0]
 
@@ -1146,7 +1268,7 @@ def update_assignment_name(id):
 
         cur.execute("""UPDATE assignments 
             SET assignment_name = %s 
-            WHERE id = %s""", (update_assignment_name, id))
+            WHERE id = %s;""", (update_assignment_name, id))
 
         conn.commit()
 
@@ -1171,7 +1293,7 @@ def update_assignment_due_date(id):
 
         cur.execute("""UPDATE assignments 
             SET due_date = %s 
-            WHERE id = %s""", (update_assignment_due_date, id))
+            WHERE id = %s;""", (update_assignment_due_date, id))
 
         conn.commit()
 
@@ -1228,9 +1350,11 @@ def edit_assignment_grade_2():
                         SET student_grade = (
                         SELECT ROUND(AVG(score))
                         FROM assignment_results WHERE student_id = %s)
-                        WHERE id = %s""", (student_id, student_id))
+                        WHERE id = %s;""", (student_id, student_id))
 
             conn.commit()
+
+            flash('Assignment grade successfully updated!')
 
             cursor.close()
             conn.close()
@@ -1337,7 +1461,7 @@ def announcements_page_submit(): #This function routes the logged in user to the
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if 'loggedin' in session:
         announcement_box = request.form.get("announcement_box")
-        cursor.execute("INSERT INTO announcements(announcement_date, class, announcement, announcement_creator) VALUES (%s,%s,%s,%s)", (date_object, session['class_name'], announcement_box, session['email']))
+        cursor.execute("INSERT INTO announcements(announcement_date, class, announcement, announcement_creator) VALUES (%s,%s,%s,%s);", (date_object, session['class_name'], announcement_box, session['email']))
         conn.commit()
         cursor.close()
         conn.close()
@@ -1383,7 +1507,7 @@ def delete_announcement(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('DELETE FROM announcements WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM announcements WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.close()
@@ -1401,18 +1525,18 @@ def delete_assignment():
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
         delete_assignment_name = request.form.get('delete_assignment_name')
 
-        cursor.execute('DELETE FROM assignments WHERE assignment_name = %s AND assignment_creator = %s', (delete_assignment_name, session['email']))
+        cursor.execute('DELETE FROM assignments WHERE assignment_name = %s AND assignment_creator = %s;', (delete_assignment_name, session['email']))
 
         conn.commit()
 
         flash('Assignment removed successfully.')
 
-        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s;", [session['email']])
 
         assignments = cursor.fetchall()
 
@@ -1430,14 +1554,14 @@ def delete_assignment_score(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
         account = cursor.fetchone()
 
-        cursor.execute('DELETE FROM assignment_results WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM assignment_results WHERE id = {0};'.format(id))
 
         conn.commit()
 
-        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s", [session['email']])
+        cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s;", [session['email']])
 
         assignments = cursor.fetchall()
 
@@ -1461,7 +1585,7 @@ def reset_password():
         new_password = request.form['new_password']
 
         # Check if account exists
-        cursor.execute('SELECT * FROM users WHERE email = %s AND secret_question = %s', (email_2, secret_question_2))
+        cursor.execute('SELECT * FROM users WHERE email = %s AND secret_question = %s;', (email_2, secret_question_2))
 
         account_password_reset = cursor.fetchone()
 
@@ -1471,7 +1595,7 @@ def reset_password():
 
             cursor.execute("""UPDATE users 
             SET password = %s 
-            WHERE email = %s""", (_hashed_password_reset, email_2))
+            WHERE email = %s;""", (_hashed_password_reset, email_2))
 
             conn.commit()
 
@@ -1508,10 +1632,10 @@ def student_register():
 
         _hashed_password_student = generate_password_hash(student_password)
 
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_firstname, student_lastname))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (student_firstname, student_lastname))
         student_account = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_firstname, student_lastname, student_class_name))
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s;', (student_firstname, student_lastname, student_class_name))
         student_verify = cursor.fetchone()
 
         if student_account:
@@ -1522,7 +1646,7 @@ def student_register():
             flash('Please fill out the form!')
         else:
             # Account doesn't exist and the form data is valid, now insert new account into users table
-            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, password, class, secret_question) VALUES (%s,%s,%s,%s,%s)", (student_firstname, student_lastname, _hashed_password_student, student_class_name, student_secret_question))
+            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, password, class, secret_question) VALUES (%s,%s,%s,%s,%s);", (student_firstname, student_lastname, _hashed_password_student, student_class_name, student_secret_question))
             conn.commit()
             flash('You have successfully registered!')
             cursor.close()
@@ -1549,13 +1673,13 @@ def student_login():
         student_last_name_2 = request.form['student_last_name_2']
         student_password_2 = request.form['student_password_2']
 
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (student_first_name_2, student_last_name_2))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (student_first_name_2, student_last_name_2))
         student_account = cursor.fetchone()
         if not student_account:
             flash('Account does not exist!')
             return render_template('student_login.html', student_count=student_count, date_object=date_object)
         session['student_class_name'] = student_account['class']
-        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', (student_first_name_2, student_last_name_2, session['student_class_name']))
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s;', (student_first_name_2, student_last_name_2, session['student_class_name']))
         student_class_info = cursor.fetchall()
 
         if student_account:
@@ -1594,11 +1718,11 @@ def student_login():
                 FROM classes s
                 INNER JOIN attendance AS a
                 ON a.student_id = s.id
-                WHERE s.student_last_name = %s""", [session['student_last_name']])
+                WHERE s.student_last_name = %s;""", [session['student_last_name']])
 
                 search_attendance_query_student_login = cursor.fetchall()
 
-                cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+                cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
 
                 class_fetch = cursor.fetchone()
 
@@ -1606,16 +1730,16 @@ def student_login():
 
                 session['id'] = class_fetch['id']
 
-                cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
+                cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s;""", [session['class_creator']])
 
                 announcements_student_fetch = cursor.fetchall()
 
-                cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s',
+                cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s;',
                                [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
                 view_student_direct_messages = cursor.fetchall()
 
-                cursor.execute('SELECT * FROM teacher_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s',
+                cursor.execute('SELECT * FROM teacher_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s;',
                                [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
                 view_teacher_direct_messages = cursor.fetchall()
@@ -1647,10 +1771,10 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if 'loggedin' in session:
         message_subject = request.form.get("message_subject")
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', [session['student_first_name'], session['student_last_name']])
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', [session['student_first_name'], session['student_last_name']])
         student_account = cursor.fetchone()
         session['student_class_name'] = student_account['class']
-        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
 
         class_fetch = cursor.fetchone()
 
@@ -1658,8 +1782,8 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
 
         session['id'] = class_fetch['id']
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
-        cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
-        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
 
         cursor.execute("""SELECT
         ci.id AS score_id,
@@ -1687,31 +1811,31 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
         FROM classes s
         INNER JOIN attendance AS a
         ON a.student_id = s.id
-        WHERE s.student_last_name = %s""", [session['student_last_name']])
+        WHERE s.student_last_name = %s;""", [session['student_last_name']])
 
         search_attendance_query_student_login = cursor.fetchall()
 
-        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
 
         class_fetch = cursor.fetchone()
 
         session['class_creator'] = class_fetch['class_creator']
 
-        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
+        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s;""", [session['class_creator']])
 
         announcements_student_fetch = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s',
+        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s;',
                        [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
         view_student_direct_messages = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s', ([session['student_first_name'], session['student_last_name'], session['student_class_name']]))
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s;', ([session['student_first_name'], session['student_last_name'], session['student_class_name']]))
         student_class_info = cursor.fetchall()
 
         conn.commit()
 
-        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE message_recipient = %s', [session['class_creator']])
+        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE message_recipient = %s;', [session['class_creator']])
         view_teacher_direct_messages = cursor.fetchall()
 
         flash('Message sent!')
@@ -1734,10 +1858,10 @@ def delete_direct_message_to_teacher(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute("SELECT * FROM classes WHERE student_first_name = %s", [session['student_first_name']])
+        cursor.execute("SELECT * FROM classes WHERE student_first_name = %s;", [session['student_first_name']])
         student_class_info = cursor.fetchall()
 
-        cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.execute("""SELECT
@@ -1766,11 +1890,11 @@ def delete_direct_message_to_teacher(id):
         FROM classes s
         INNER JOIN attendance AS a
         ON a.student_id = s.id
-        WHERE s.student_last_name = %s""", [session['student_last_name']])
+        WHERE s.student_last_name = %s;""", [session['student_last_name']])
 
         search_attendance_query_student_login = cursor.fetchall()
 
-        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
 
         class_fetch = cursor.fetchone()
 
@@ -1778,16 +1902,16 @@ def delete_direct_message_to_teacher(id):
 
         session['id'] = class_fetch['id']
 
-        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
+        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s;""", [session['class_creator']])
 
         announcements_student_fetch = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s',
+        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s;',
                        [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
         view_student_direct_messages = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s',
+        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s;',
                        [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
         view_teacher_direct_messages = cursor.fetchall()
@@ -1812,10 +1936,10 @@ def delete_direct_message_from_teacher(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute("SELECT * FROM classes WHERE student_first_name = %s", [session['student_first_name']])
+        cursor.execute("SELECT * FROM classes WHERE student_first_name = %s;", [session['student_first_name']])
         student_class_info = cursor.fetchall()
 
-        cursor.execute('DELETE FROM student_direct_message WHERE id = {0}'.format(id))
+        cursor.execute('DELETE FROM student_direct_message WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.execute("""SELECT
@@ -1844,13 +1968,13 @@ def delete_direct_message_from_teacher(id):
         FROM classes s
         INNER JOIN attendance AS a
         ON a.student_id = s.id
-        WHERE s.student_last_name = %s""", [session['student_last_name']])
+        WHERE s.student_last_name = %s;""", [session['student_last_name']])
 
         flash('Message deleted!')
 
         search_attendance_query_student_login = cursor.fetchall()
 
-        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
 
         class_fetch = cursor.fetchone()
 
@@ -1858,16 +1982,16 @@ def delete_direct_message_from_teacher(id):
 
         session['id'] = class_fetch['id']
 
-        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s""", [session['class_creator']])
+        cursor.execute("""SELECT * FROM announcements WHERE announcement_creator = %s;""", [session['class_creator']])
 
         announcements_student_fetch = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s',
+        cursor.execute('SELECT * FROM student_direct_message WHERE student_first_name = %s AND student_last_name = %s AND message_sender = %s;',
                        [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
         view_student_direct_messages = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s',
+        cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE student_first_name = %s AND student_last_name = %s AND message_recipient = %s;',
                        [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
         view_teacher_direct_messages = cursor.fetchall()
@@ -1888,9 +2012,9 @@ def student_home():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session: # Show user and student information from the db
-         cursor.execute('SELECT * FROM student_accounts WHERE id = %s', [session['id']])
+         cursor.execute('SELECT * FROM student_accounts WHERE id = %s;', [session['id']])
          student_account_2 = cursor.fetchone()
-         cursor.execute("SELECT * FROM classes WHERE student_first_name = %s", [session['student_first_name']])
+         cursor.execute("SELECT * FROM classes WHERE student_first_name = %s;", [session['student_first_name']])
          student_class_info = cursor.fetchall()
          cursor.close()
          conn.close()
@@ -1912,7 +2036,7 @@ def student_reset_password():
         student_new_password = request.form['student_new_password']
 
         # Check if account exists
-        cursor.execute('SELECT * FROM student_accounts WHERE student_last_name = %s AND secret_question = %s', (student_last_name_2, student_secret_question_2))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_last_name = %s AND secret_question = %s;', (student_last_name_2, student_secret_question_2))
 
         student_account_password_reset = cursor.fetchone()
 
@@ -1922,7 +2046,7 @@ def student_reset_password():
 
             cursor.execute("""UPDATE student_accounts 
             SET password = %s 
-            WHERE student_last_name = %s""", (_hashed_password_reset_student, student_last_name_2))
+            WHERE student_last_name = %s;""", (_hashed_password_reset_student, student_last_name_2))
 
             conn.commit()
 
@@ -1959,13 +2083,13 @@ def delete_student_account():
         student_count_2 = cursor.fetchall()
 
         # Check if account exists:
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (delete_student_first_name, delete_student_last_name))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (delete_student_first_name, delete_student_last_name))
         delete_student_account_query = cursor.fetchone()
         # If account exists show error and validation checks
         if delete_student_account_query:
             delete_student_password_check = delete_student_account_query['password']
             if check_password_hash(delete_student_password_check, delete_student_password):
-                cursor.execute('DELETE FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s', (delete_student_first_name, delete_student_last_name))
+                cursor.execute('DELETE FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (delete_student_first_name, delete_student_last_name))
                 flash('Account successfully deleted.')
                 conn.commit()
                 cursor.close()
