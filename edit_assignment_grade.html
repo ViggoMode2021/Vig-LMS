@@ -39,6 +39,19 @@
 
 <br /><br />
 
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
 <h8>Edit this assignment's grades</h8>
 
 <div class="col-md-8">
