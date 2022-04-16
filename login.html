@@ -27,6 +27,7 @@ body {
         <input type="checkbox" value="checked"><b>Remember</b>
         <input type="submit" value="Login" style="width: 150px" class="form-control btn btn-success " name="">
     </form>
+
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}
@@ -39,6 +40,7 @@ body {
     {% endfor %}
     {% endif %}
     {% endwith %}
+
     <p>No account <a href="{{ url_for('register') }}">Register</a></p>
           <p>Forgot password? <a href="{{ url_for('reset_password') }}">Reset password here</a></p>
 
