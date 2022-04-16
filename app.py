@@ -212,6 +212,7 @@ def logout():
    session.pop('loggedin', None)
    session.pop('id', None)
    session.pop('username', None)
+   flash('You have been logged out.')
    # Redirect to login page
    return redirect(url_for('login'))
 
@@ -221,6 +222,7 @@ def student_logout():
    session.pop('loggedin', None)
    session.pop('id', None)
    session.pop('username', None)
+   flash('You have been logged out.')
    # Redirect to login page
    return redirect(url_for('student_login'))
 
@@ -1968,7 +1970,7 @@ def delete_direct_message_from_teacher(id):
 
         search_attendance_query_student_login = cursor.fetchall()
 
-        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
+        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s""", [session['student_first_name'], session['student_last_name']])
 
         class_fetch = cursor.fetchone()
 
