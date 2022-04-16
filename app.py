@@ -5,7 +5,11 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
-date_object = datetime.date.today()
+date = datetime.date.today()
+
+format_code = '%m-%d-%Y'
+
+date_object = date.strftime(format_code)
 
 app = Flask(__name__)
 
@@ -727,10 +731,6 @@ def view_attendance_for_today():
          cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
 
-         format_code = '%Y-%m-%d'
-
-         new_date_object = date_object.strftime(format_code)
-
          cursor.execute("""SELECT
             a.id,
             s.student_first_name,
@@ -741,7 +741,7 @@ def view_attendance_for_today():
             FROM classes s
             INNER JOIN attendance AS a
             ON a.student_id = s.id
-            WHERE a.date = %s AND s.class_creator = %s;""", (new_date_object, session['email']))
+            WHERE a.date = %s AND s.class_creator = %s;""", (date_object, session['email']))
 
          search_attendance_query = cursor.fetchall()
 
