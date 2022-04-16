@@ -375,8 +375,6 @@ def edit_individual_student_first_name():
 
          flash('First name updated successfully!')
 
-         session.pop('student_id', None)
-
          return redirect(url_for('query'))
 
     return redirect(url_for('login'))
@@ -401,8 +399,6 @@ def edit_individual_student_last_name():
 
          flash('Last name updated successfully!')
 
-         session.pop('student_id', None)
-
          return redirect(url_for('query'))
 
     return redirect(url_for('login'))
@@ -426,8 +422,6 @@ def edit_individual_student_graduation_year():
          conn.close()
 
          flash('Graduation year updated successfully!')
-
-         session.pop('student_id', None)
 
          return redirect(url_for('query'))
 
