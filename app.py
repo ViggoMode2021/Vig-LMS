@@ -31,10 +31,10 @@ def home():
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         cursor.execute('SELECT COUNT (student_first_name) FROM classes WHERE teacher = %s;', [session['username']])
-        student_count = cursor.fetchall()
+        student_count = cursor.fetchone()
 
         cursor.execute('SELECT COUNT (assignment_name) FROM assignments WHERE assignment_creator = %s;', [session['email']])
-        assignment_count = cursor.fetchall()
+        assignment_count = cursor.fetchone()
 
         cursor.close()
         conn.close()
@@ -51,7 +51,7 @@ def login():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) #Make connection to db via Psycopg2
 
     cursor.execute('SELECT COUNT (username) FROM users;')
-    user_count = cursor.fetchall() #This shows the number of users using the application
+    user_count = cursor.fetchone() #This shows the number of users using the application
 
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
@@ -87,7 +87,7 @@ def login():
                 conn.close()
 
                 # Redirect to home page
-                return redirect(url_for('home', class_name_print=class_name_print))
+                return redirect(url_for('home'))
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect username/password')
@@ -117,7 +117,7 @@ def delete_account():
         _hashed_password_delete = generate_password_hash(delete_password)
 
         cursor.execute('SELECT COUNT (username) FROM users;')
-        user_count = cursor.fetchall()
+        user_count = cursor.fetchone()
 
         # Check if account exists:
         cursor.execute('SELECT * FROM users WHERE username = %s AND email = %s;', (delete_username, delete_email))
@@ -570,13 +570,13 @@ def query_individual_student(id):
          search_attendance_query_student_login = cursor.fetchall()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Tardy';".format(id))
-         student_tardy_count = cursor.fetchall()
+         student_tardy_count = cursor.fetchone()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Absent';".format(id))
-         student_absent_count = cursor.fetchall()
+         student_absent_count = cursor.fetchone()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Present';".format(id))
-         student_present_count = cursor.fetchall()
+         student_present_count = cursor.fetchone()
 
          cursor.execute("""SELECT * FROM classes WHERE id = {0}""".format(id))
 
@@ -817,13 +817,13 @@ def search_attendance_by_student():
          search_attendance_query_student = cursor.fetchall()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Tardy';", (search_attendance_by_student,))
-         student_tardy_count = cursor.fetchall()
+         student_tardy_count = cursor.fetchone()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Absent';", (search_attendance_by_student,))
-         student_absent_count = cursor.fetchall()
+         student_absent_count = cursor.fetchone()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Present';", (search_attendance_by_student,))
-         student_present_count = cursor.fetchall()
+         student_present_count = cursor.fetchone()
 
          if not search_attendance_by_student:
              flash('Please enter a student id according to the format above to view attendance.')
@@ -1622,16 +1622,18 @@ def student_register():
         # Create variables for easy access
         student_firstname = request.form['student_firstname']
         student_lastname = request.form['student_lastname']
+        student_email = request.form['student_email']
         student_password = request.form['student_password']
         student_class_name = request.form['student_class_name']
+        teacher_email = request.form['teacher_email']
         student_secret_question = request.form['student_secret_question']
 
         _hashed_password_student = generate_password_hash(student_password)
 
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (student_firstname, student_lastname))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s AND class = %s AND teacher_email = %s;', (student_firstname, student_lastname, student_class_name, teacher_email))
         student_account = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s;', (student_firstname, student_lastname, student_class_name))
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s AND class_creator = %s;', (student_firstname, student_lastname, student_class_name, teacher_email))
         student_verify = cursor.fetchone()
 
         if student_account:
@@ -1642,7 +1644,7 @@ def student_register():
             flash('Please fill out the form!')
         else:
             # Account doesn't exist and the form data is valid, now insert new account into users table
-            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, password, class, secret_question) VALUES (%s,%s,%s,%s,%s);", (student_firstname, student_lastname, _hashed_password_student, student_class_name, student_secret_question))
+            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, student_email, password, class, teacher_email, secret_question) VALUES (%s,%s,%s,%s,%s,%s,%s);", (student_firstname, student_lastname, student_email, _hashed_password_student, student_class_name, teacher_email, student_secret_question))
             conn.commit()
             flash('You have successfully registered!')
             cursor.close()
@@ -1661,21 +1663,24 @@ def student_login():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     cursor.execute('SELECT COUNT (student_first_name) FROM student_accounts;')
-    student_count = cursor.fetchall()
+    student_count = cursor.fetchone()
 
     # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'student_first_name_2' in request.form and 'student_last_name_2' in request.form and 'student_password_2' in request.form:
-        student_first_name_2 = request.form['student_first_name_2']
-        student_last_name_2 = request.form['student_last_name_2']
+    if request.method == 'POST' and 'student_email_2' in request.form and 'student_password_2' in request.form:
+        student_email_2 = request.form['student_email_2']
         student_password_2 = request.form['student_password_2']
 
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (student_first_name_2, student_last_name_2))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s;', (student_email_2,))
         student_account = cursor.fetchone()
         if not student_account:
             flash('Account does not exist!')
             return render_template('student_login.html', student_count=student_count, date_object=date_object)
         session['student_class_name'] = student_account['class']
-        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s;', (student_first_name_2, student_last_name_2, session['student_class_name']))
+        session['student_first_name'] = student_account['student_first_name']
+        session['student_last_name'] = student_account['student_last_name']
+        session['class_creator'] = student_account['teacher_email']
+
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s AND class_creator = %s;', (session['student_first_name'], session['student_last_name'], session['student_class_name'], session['class_creator']))
         student_class_info = cursor.fetchall()
 
         if student_account:
@@ -1699,8 +1704,8 @@ def student_login():
                 ON ci.student_id = s.id
                 INNER JOIN assignments cu  
                 ON cu.id = ci.assignment_id
-                WHERE s.student_last_name = %s AND s.class_name = %s
-                ORDER BY cu.assignment_name ASC;""", [session['student_last_name'], session['student_class_name']])
+                WHERE s.student_last_name = %s AND s.class_name = %s AND class_creator = %s
+                ORDER BY cu.assignment_name ASC;""", [session['student_last_name'], session['student_class_name'], session['class_creator']])
 
                 student_assignments = cursor.fetchall()
 
@@ -1714,11 +1719,11 @@ def student_login():
                 FROM classes s
                 INNER JOIN attendance AS a
                 ON a.student_id = s.id
-                WHERE s.student_last_name = %s;""", [session['student_last_name']])
+                WHERE s.student_last_name = %s AND class_creator = %s;""", [session['student_last_name'], session['class_creator']])
 
                 search_attendance_query_student_login = cursor.fetchall()
 
-                cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
+                cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;""", [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
                 class_fetch = cursor.fetchone()
 
@@ -2026,13 +2031,13 @@ def student_reset_password():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'student_last_name_2' in request.form and 'student_secret_question_2' in request.form and 'student_new_password' in request.form:
-        student_last_name_2 = request.form['student_last_name_2']
+    if request.method == 'POST' and 'student_email_reset_password' in request.form and 'student_secret_question_2' in request.form and 'student_new_password' in request.form:
+        student_email_reset_password = request.form['student_email_reset_password']
         student_secret_question_2 = request.form['student_secret_question_2']
         student_new_password = request.form['student_new_password']
 
         # Check if account exists
-        cursor.execute('SELECT * FROM student_accounts WHERE student_last_name = %s AND secret_question = %s;', (student_last_name_2, student_secret_question_2))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s AND secret_question = %s;', (student_email_reset_password, student_secret_question_2))
 
         student_account_password_reset = cursor.fetchone()
 
@@ -2042,12 +2047,12 @@ def student_reset_password():
 
             cursor.execute("""UPDATE student_accounts 
             SET password = %s 
-            WHERE student_last_name = %s;""", (_hashed_password_reset_student, student_last_name_2))
+            WHERE student_email = %s;""", (_hashed_password_reset_student, student_email_reset_password))
 
             conn.commit()
 
             # Redirect to home page
-            flash(f'Password updated for {student_last_name_2}')
+            flash(f'Password updated for {student_email_reset_password}')
 
             cursor.close()
             conn.close()
@@ -2067,25 +2072,24 @@ def delete_student_account():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'delete_student_first_name' in request.form and 'delete_student_last_name' in request.form and 'delete_student_password' in request.form:
+    if request.method == 'POST' and 'delete_student_email' in request.form and 'delete_student_password' in request.form:
         # Create variables to reference for below queries
-        delete_student_first_name = request.form['delete_student_first_name']
-        delete_student_last_name = request.form['delete_student_last_name']
+        delete_student_email = request.form['delete_student_email']
         delete_student_password = request.form['delete_student_password']
 
         _hashed_password_delete_student = generate_password_hash(delete_student_password)
 
         cursor.execute('SELECT COUNT (student_first_name) FROM student_accounts;')
-        student_count_2 = cursor.fetchall()
+        student_count_2 = cursor.fetchone()
 
         # Check if account exists:
-        cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (delete_student_first_name, delete_student_last_name))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s;', (delete_student_email,))
         delete_student_account_query = cursor.fetchone()
         # If account exists show error and validation checks
         if delete_student_account_query:
             delete_student_password_check = delete_student_account_query['password']
             if check_password_hash(delete_student_password_check, delete_student_password):
-                cursor.execute('DELETE FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', (delete_student_first_name, delete_student_last_name))
+                cursor.execute('DELETE FROM student_accounts WHERE student_email = %s;', (delete_student_email,))
                 flash('Account successfully deleted.')
                 conn.commit()
                 cursor.close()
