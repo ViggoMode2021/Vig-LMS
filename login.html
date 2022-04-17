@@ -5,6 +5,10 @@
   <h21>Welcome to the Teacher login page for Vig LMS!</h21>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -40,16 +44,16 @@ body {
     {% endif %}
     {% endwith %}
 
-    <p>No account <a href="{{ url_for('register') }}">Register</a></p>
+    <p>No account? <a href="{{ url_for('register') }}">Register</a></p>
           <p>Forgot password? <a href="{{ url_for('reset_password') }}">Reset password here</a></p>
-
-      <h100>As of {{ date_object }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
 
   </div>
  </div>
  </body>
 <p>Register as a student <a href="{{ url_for('student_register') }}">Register</a></p>
 <p>Login as a student <a href="{{ url_for('student_login') }}">Login</a></p>
+
+           <h100>As of {{ date_object }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
 
 <hr class="double">
 

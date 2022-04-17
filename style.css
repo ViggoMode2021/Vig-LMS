@@ -33,10 +33,16 @@ font-family: lucinda;
 font-size: 25px;
 }
 
+h100{
+color: purple;
+font-family: times;
+font-size: 22px;
+}
+
 h101{
 color: white;
 font-family: times;
-font-size: 15px;
+font-size: 22px;
 }
 
 h21{
@@ -69,5 +75,3 @@ font-size: 25px;}
 .alert {
    width:20%;
 }
-
-

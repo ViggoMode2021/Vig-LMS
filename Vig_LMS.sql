@@ -56,9 +56,12 @@ CREATE TABLE student_accounts(
 	id SERIAL PRIMARY KEY,
 	student_first_name TEXT NOT NULL,
 	student_last_name TEXT NOT NULL,
+	student_email TEXT NOT NULL,
 	password VARCHAR (250) NOT NULL,
 	class TEXT NOT NULL,
-    secret_question VARCHAR (30) NOT NULL
+	teacher_email TEXT NOT NULL,
+    secret_question VARCHAR (30) NOT NULL,
+    UNIQUE (student_email)
 );
 
 CREATE TABLE student_direct_message(
@@ -74,7 +77,33 @@ message_sender VARCHAR (50) NOT NULL,
 FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
 FOREIGN KEY ("message_sender") REFERENCES users("email") ON DELETE CASCADE);
 
+CREATE TABLE student_direct_message_teacher_copy(
+id SERIAL PRIMARY KEY,
+date TEXT NOT NULL,
+class TEXT NOT NULL,
+message_subject TEXT,
+message TEXT NOT NULL,
+student_first_name TEXT NOT NULL,
+student_last_name TEXT NOT NULL,
+student_id INT NOT NULL,
+message_sender VARCHAR (50) NOT NULL,
+FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
+FOREIGN KEY ("message_sender") REFERENCES users("email") ON DELETE CASCADE);
+
 CREATE TABLE teacher_direct_message(
+id SERIAL PRIMARY KEY,
+date TEXT NOT NULL,
+class TEXT NOT NULL,
+message_subject TEXT,
+message TEXT NOT NULL,
+student_first_name TEXT NOT NULL,
+student_last_name TEXT NOT NULL,
+student_id INT NOT NULL,
+message_recipient VARCHAR (50) NOT NULL,
+FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
+FOREIGN KEY ("message_recipient") REFERENCES users("email") ON DELETE CASCADE);
+
+CREATE TABLE teacher_direct_message_student_copy(
 id SERIAL PRIMARY KEY,
 date TEXT NOT NULL,
 class TEXT NOT NULL,
