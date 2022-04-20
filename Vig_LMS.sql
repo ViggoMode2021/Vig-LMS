@@ -9,6 +9,8 @@ CREATE TABLE users(
 	UNIQUE (email)
 );
 
+ALTER TABLE users ADD UNIQUE (email);
+
 CREATE TABLE classes(
 	id SERIAL PRIMARY KEY,
 	class_name TEXT,
@@ -115,3 +117,5 @@ student_id INT NOT NULL,
 message_recipient VARCHAR (50) NOT NULL,
 FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
 FOREIGN KEY ("message_recipient") REFERENCES users("email") ON DELETE CASCADE);
+
+ALTER TABLE student_accounts ADD UNIQUE (student_email);

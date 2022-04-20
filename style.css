@@ -1,8 +1,22 @@
+h13{
+color: black;
+font-family: lucinda;
+font-style: italic;
+font-size: 18px;
+}
+
 h20{
 
 color: black;
 font-family: arial;
 font-size: 25px;}
+
+h46{
+color: black;
+font-family: lucinda;
+font-style: italic;
+font-size: 18px;
+}
 
 p{
 
@@ -74,4 +88,58 @@ font-size: 25px;}
 
 .alert {
    width:20%;
+}
+
+[data-title]:hover::before {
+  content: attr(data-title);
+  position: absolute;
+  bottom: -26px;
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 2px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+
+[data-title]:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 8px;
+  display: inline-block;
+  color: #fff;
+  border: 8px solid transparent;
+  border-bottom: 8px solid #000;
+}
+
+body {
+  font-family: sans-serif;
+  margin: 30px;
+}
+/*You can use [title] selector as well*/
+[data-title] {
+  font-size: 30px; /*optional styling*/
+
+  position: relative;
+  cursor: help;
+}
+
+input {
+  width: 100%;
+}
+
+#student_register_info{
+color: pink;
+font-family: arial;
+font-size: 30px;
+}
+
+h23{
+color: orange;
+font-family: lucinda;
+font-style: italic;
+font-size: 18px;
 }
