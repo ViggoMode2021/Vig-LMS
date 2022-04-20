@@ -22,63 +22,75 @@ body {
  <div class="container">
    <div class="row main">
     <div class="main-login main-center">
-    <h5>Register new teacher or login existing account</h5>
+<span data-title="To login to use VigLMS, you need to remember: your email, your username, your password.">Register new teacher or login existing account:</span>
      <form action="{{ url_for('register') }}" method="post" autocomplete="off">
       <div class="form-group">
-       <label for="name" class="cols-sm-2 control-label">Your Name</label>
+       <label for="name" class="cols-sm-2 control-label">Your Name:</label>
+       <br />
+       <h13>Your name doesn't have to be unique. What if there are two people with the name Bill Burr?</h13>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Enter your Name"/>
+         <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Enter your Name" maxlength="40"/>
         </div>
        </div>
       </div>
       <div class="form-group">
-       <label for="email" class="cols-sm-2 control-label">Your Email</label>
+       <label for="email" class="cols-sm-2 control-label">Your Email:</label>
+       <br />
+       <h13>Email must be unique.</h13>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="email" id="email"  placeholder="Enter your Email"/>
+         <input type="text" class="form-control" name="email" id="email"  placeholder="Enter your Email" maxlength="40"/>
         </div>
        </div>
       </div>
 
       <div class="form-group">
-       <label for="username" class="cols-sm-2 control-label">Username</label>
+       <label for="username" class="cols-sm-2 control-label">Username:</label>
+        <br />
+       <h13>Username must be unique.</h13>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="username" id="username" placeholder="Enter your Username" required>
+         <input type="text" class="form-control" name="username" id="username" placeholder="Enter your Username" required placeholder="Enter your Email" maxlength="30">
         </div>
        </div>
       </div>
 
       <div class="form-group">
-       <label for="password" class="cols-sm-2 control-label">Password</label>
+       <label for="password" class="cols-sm-2 control-label">Password:</label>
+       <br />
+       <h13>Password must: be between 6-10 characters, contain one numeral, one lowercase letter, and one uppercase letter.</h13>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-         <input type="password" class="form-control" name="password" placeholder="Password" id="password" required  placeholder="Enter your Password"/>
+         <input type="password" class="form-control" name="password" autocomplete="new-password" placeholder="Password" id="password" required  placeholder="Enter your Password" maxlength="30"/>
         </div>
        </div>
       </div>
 
       <div class="form-group">
-       <label for="class_name" class="cols-sm-2 control-label">Class name</label>
+       <label for="class_name" class="cols-sm-2 control-label">Class name:</label>
+       <br />
+       <h13>Your class name doesn't have to be unique. What if there are two 'History of Comedy' classes?</h13>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="class_name" placeholder="Class name" id="class_name" required  placeholder="Class name for LMS"/>
+         <input type="text" class="form-control" name="class_name" placeholder="Class name" id="class_name" required  placeholder="Class name for LMS" maxlength="20"/>
         </div>
        </div>
       </div>
 
        <div class="form-group">
-       <label for="class_name" class="cols-sm-2 control-label">Secret question: What is the name of the street you grew up on?</label>
+       <label for="class_name" class="cols-sm-2 control-label">Secret question: What is the name of the street you grew up on?:</label>
+           <br />
+       <h13>This doesn't have to be unique. There is probably more than one 'Main Street'. You will reset your password with this if need be.</h13>
        <div class="cols-sm-10">
         <div class="input-group">
          <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="secret_question" placeholder="Secret question answer" id="secret_question" required  placeholder="Street name"/>
+         <input type="text" class="form-control" name="secret_question" placeholder="Secret question answer" id="secret_question" required  maxlength="20" placeholder="Street name"/>
         </div>
        </div>
       </div>

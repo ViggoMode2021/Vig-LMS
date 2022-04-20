@@ -26,8 +26,8 @@ body {
         <label>Username:</label>
         <input type="text" class="form-control" style="width: 300px" name="username" placeholder="Username" id="username" required>
         <label>Password:</label>
-        <input type="password" class="form-control" style="width: 300px" name="password" placeholder="Password" id="password" required>
-        <input type="checkbox" value="checked"><b>Remember</b>
+        <input type="password" class="form-control" autocomplete="new-password" style="width: 300px" name="password" placeholder="Password" id="password" required>
+        <br />
         <input type="submit" value="Login" style="width: 150px" class="form-control btn btn-success " name="">
     </form>
 
@@ -57,7 +57,7 @@ body {
 
 <hr class="double">
 
- <h23>Delete teacher account below:</h23>
+ <h46>Delete teacher account below:</h46>
 
 <form class="form-group" action="{{ url_for('delete_account') }}" method="POST">
         <label>Email:</label>
@@ -65,7 +65,8 @@ body {
         <label>Username:</label>
         <input type="text" class="form-control" style="width: 300px" name="delete_username" placeholder="Username" id="delete_username" required>
         <label>Password:</label>
-        <input type="password" class="form-control" style="width: 300px" name="delete_password" placeholder="Password" id="delete_password" required>
+        <input type="password" class="form-control" autocomplete="new-password" style="width: 300px" name="delete_password" placeholder="Password" id="delete_password" required>
+    <br />
         <input type="submit" value="Delete account" style="width: 150px" class="form-control btn btn-warning " name="">
     </form>
 

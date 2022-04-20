@@ -25,8 +25,8 @@ body {
         <label>Email:</label>
         <input type="text" class="form-control" style="width: 300px" name="student_email_2" placeholder="Email" id="student_email_2" required>
         <label>Password:</label>
-        <input type="password" class="form-control" style="width: 300px" name="student_password_2" placeholder="Password" id="student_password_2" required>
-        <input type="checkbox" value="checked"><b>Remember</b>
+        <input type="password" class="form-control" style="width: 300px" autocomplete="new-password" name="student_password_2" placeholder="Password" id="student_password_2" required>
+        <br />
         <input type="submit" value="Login" style="width: 150px" class="form-control btn btn-success " name="">
     </form>
 {% with messages = get_flashed_messages()  %}
@@ -61,7 +61,8 @@ body {
         <label>Email:</label>
         <input type="text" class="form-control" style="width: 300px" name="delete_student_email" placeholder="Email" id="delete_student_email" required>
         <label>Password:</label>
-        <input type="password" class="form-control" style="width: 300px" name="delete_student_password" placeholder="Password" id="delete_student_password" required>
+        <input type="password" class="form-control" style="width: 300px" name="delete_student_password" autocomplete="new-password" placeholder="Password" id="delete_student_password" required>
+    <br />
         <input type="submit" value="Delete account" style="width: 150px" class="form-control btn btn-warning " name="">
     </form>
 
