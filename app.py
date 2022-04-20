@@ -17,7 +17,7 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.#.us-east-1.rds.amazonaws.com"
+DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
 DB_PASS = "#"
@@ -65,9 +65,6 @@ def login():
         # Grab user information from classes table. The classes table contains information that the user submitted. This is student information and grades.
         cursor.execute('SELECT * FROM classes WHERE class_creator = %s;', (email,))
         account_2 = cursor.fetchone()
-        # Grab class name to be stored in session data
-        cursor.execute('SELECT class_name FROM classes WHERE class_creator = %s;', (email,))
-        class_name_print = cursor.fetchone()
 
         # If above information is adequate:
         if account and account_2:
@@ -183,6 +180,26 @@ def register():
             conn.close()
         elif not re.match(r'[A-Za-z0-9]+', username):
             flash('Username must contain only characters and numbers!')
+            cursor.close()
+            conn.close()
+        if len(password) < 5:
+            flash('Password must be longer than 5 characters.')
+            cursor.close()
+            conn.close()
+        elif len(password) > 10:
+            flash('Password must be shorter than 10 characters.')
+            cursor.close()
+            conn.close()
+        elif not any(char.isdigit() for char in password):
+            flash('Password should have at least one numeral.')
+            cursor.close()
+            conn.close()
+        elif not any(char.isupper() for char in password):
+            flash('Password should have at least one uppercase letter.')
+            cursor.close()
+            conn.close()
+        elif not any(char.islower() for char in password):
+            flash('Password should have at least one lowercase letter.')
             cursor.close()
             conn.close()
         elif not username or not password or not email:
@@ -1493,6 +1510,7 @@ def view_announcements_by_date():
 
          return render_template('view_announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']
                                 )
+
     return redirect(url_for('login'))
 
 @app.route('/delete_announcement/<string:id>', methods = ['DELETE', 'GET'])
@@ -1554,6 +1572,14 @@ def delete_assignment_score(id):
         account = cursor.fetchone()
 
         cursor.execute('DELETE FROM assignment_results WHERE id = {0};'.format(id))
+
+        conn.commit()
+
+        cursor.execute("""UPDATE classes 
+                        SET student_grade = (
+                        SELECT ROUND(AVG(score))
+                        FROM assignment_results WHERE student_id = %s)
+                        WHERE id = %s;""", (session['student_id'], session['student_id']))
 
         conn.commit()
 
@@ -1640,6 +1666,26 @@ def student_register():
             flash('Student account already exists!')
         elif not student_verify:
             flash('Student not enrolled in class!')
+        if len(student_password) < 5:
+            flash('Password must be longer than 5 characters.')
+            cursor.close()
+            conn.close()
+        elif len(student_password) > 10:
+            flash('Password must be shorter than 10 characters.')
+            cursor.close()
+            conn.close()
+        elif not any(char.isdigit() for char in student_password):
+            flash('Password should have at least one numeral.')
+            cursor.close()
+            conn.close()
+        elif not any(char.isupper() for char in student_password):
+            flash('Password should have at least one uppercase letter.')
+            cursor.close()
+            conn.close()
+        elif not any(char.islower() for char in student_password):
+            flash('Password should have at least one lowercase letter.')
+            cursor.close()
+            conn.close()
         elif not student_firstname or not student_lastname or not student_password:
             flash('Please fill out the form!')
         else:
