@@ -146,6 +146,19 @@ first before doing so.</p>
     <button type="submit" class="btn btn-success">Create assignment</button>
 </form>
 
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
 </form>
         </div>
         <div class="modal-footer">
@@ -157,6 +170,7 @@ first before doing so.</p>
   </div>
 
 </div>
+
 
  <hr style="width:66%;text-align:center;margin-left:0">
 
@@ -170,6 +184,7 @@ first before doing so.</p>
     <button type="submit" class="btn btn-success">View scores for all assignments and students</button>
 </form>
 
+
 <br /><br />
 
 <form action="/view_assignment_scores_by_student" method="POST">
@@ -181,18 +196,5 @@ first before doing so.</p>
 </form>
 
 </body>
-
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
 
 {% endblock %}
