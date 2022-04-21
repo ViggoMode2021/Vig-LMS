@@ -17,10 +17,10 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
@@ -383,6 +383,11 @@ def edit_individual_student_first_name():
 
          update_first_name = request.form.get('update_first_name')
 
+         cursor.execute("""SELECT student_first_name FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_first_name_original = cursor.fetchone()
+
          cursor.execute("""UPDATE classes 
             SET student_first_name = %s 
             WHERE id = %s;""", (update_first_name, session['student_id']))
@@ -392,7 +397,8 @@ def edit_individual_student_first_name():
          cursor.close()
          conn.close()
 
-         flash('First name updated successfully!')
+         for student in student_first_name_original:
+             flash(f'First name updated from {student} to {update_first_name} successfully!')
 
          return redirect(url_for('query'))
 
@@ -407,16 +413,22 @@ def edit_individual_student_last_name():
 
          update_last_name = request.form.get('update_last_name')
 
+         cursor.execute("""SELECT student_last_name FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_last_name_original = cursor.fetchone()
+
          cursor.execute("""UPDATE classes 
             SET student_last_name = %s 
             WHERE id = %s;""", (update_last_name, session['student_id']))
 
          conn.commit()
 
+         for student in student_last_name_original:
+             flash(f'Last name updated from {student} to {update_last_name} successfully!')
+
          cursor.close()
          conn.close()
-
-         flash('Last name updated successfully!')
 
          return redirect(url_for('query'))
 
@@ -431,16 +443,34 @@ def edit_individual_student_graduation_year():
 
          update_graduation_year = request.form.get('update_graduation_year')
 
+         cursor.execute("""SELECT student_graduation_year FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_graduation_year_original = cursor.fetchone()
+
+         cursor.execute("""SELECT student_first_name FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_first_name = cursor.fetchone()
+
+         cursor.execute("""SELECT student_last_name FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_last_name = cursor.fetchone()
+
          cursor.execute("""UPDATE classes 
             SET student_graduation_year = %s 
             WHERE id = %s;""", (update_graduation_year, session['student_id']))
 
          conn.commit()
 
+         for first_name, last_name, graduation_year in zip(student_first_name, student_last_name, student_graduation_year_original):
+             flash(f'Graduation year updated from {graduation_year} to {update_graduation_year} successfully for {first_name} {last_name}!')
+
+         conn.commit()
+
          cursor.close()
          conn.close()
-
-         flash('Graduation year updated successfully!')
 
          return redirect(url_for('query'))
 
