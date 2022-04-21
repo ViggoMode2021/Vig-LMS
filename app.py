@@ -20,7 +20,7 @@ app.secret_key = '#' #Secret key for sessions
 DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -79,6 +79,12 @@ def login():
                 session['name'] = account['fullname']
                 session['email'] = account_2['class_creator']
                 session['class_name'] = account_2['class_name']
+
+                cursor.execute('SELECT username FROM users WHERE username = %s;', [session['username']])
+                username_print = cursor.fetchone()
+
+                for user in username_print:
+                     flash(f'You have successfully logged in, {user}!')
 
                 cursor.close()
                 conn.close()
@@ -667,7 +673,6 @@ def delete_assignment_score_query_individual_student(id):
 
     return redirect(url_for('login'))
 
-
 @app.route('/alphabetically', methods=['GET'])
 def alphabetically():
 
@@ -951,7 +956,7 @@ def grade_DESC():
 @app.route('/delete_student', methods = ['DELETE', 'GET', 'POST'])
 def delete_student():
 
-    if 'loggedin' in session: # This removes a student from the class
+    if 'loggedin' in session: #This removes a student from the class
 
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -962,13 +967,33 @@ def delete_student():
         delete_last_name = request.form.get('delete_last_name')
         if not delete_first_name:
             flash('Please input student first name to delete.')
+            return redirect(url_for('query'))
         elif not delete_last_name:
             flash('Please input student last name to delete.')
+            return redirect(url_for('query'))
         elif not delete_first_name and delete_last_name:
             flash('Please input student names to delete.')
-        cursor.execute('DELETE FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;',(delete_first_name, delete_last_name, session['email']))
+            return redirect(url_for('query'))
+
+        cursor.execute('SELECT student_first_name FROM classes WHERE student_first_name = %s AND class_creator = %s;', (delete_first_name, session['email']))
+        first_name = cursor.fetchall()
+
+        cursor.execute('SELECT student_last_name FROM classes WHERE student_last_name = %s AND class_creator = %s;', (delete_last_name, session['email']))
+        last_name = cursor.fetchall()
+
+        cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;', (delete_first_name, delete_last_name, session['email']))
+        full_name = cursor.fetchone()
+
+        if not full_name:
+                flash(f'{delete_first_name} {delete_last_name} is not enrolled in the class!')
+                return redirect(url_for('query'))
+
+        for first, last in zip(first_name, last_name):
+            flash(f'{first} {last} has been removed from the class!')
+
+        cursor.execute('DELETE FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;', (delete_first_name, delete_last_name, session['email']))
         conn.commit()
-        flash('Student removed successfully.')
+
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
         records_2 = cursor.fetchall()
 
@@ -1173,8 +1198,9 @@ def view_teacher_direct_message_page(id):
         cursor.close()
         conn.close()
 
-        return render_template('view_teacher_direct_message_page.html', account=account,student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id = student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('view_teacher_direct_message_page.html', account=account, student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id = student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
                                )
+
     return redirect(url_for('login'))
 
 @app.route('/student_direct_message_page_submit', methods=['POST'])
@@ -1251,10 +1277,18 @@ def new_assignment():
             cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
             conn.commit()
 
+            cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
+            account = cursor.fetchone()
+
+            cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s ORDER BY due_date DESC;", [session['email']])
+            assignments = cursor.fetchall()
+
             cursor.close()
             conn.close()
 
-        return redirect(request.referrer)
+            flash('New assignment created!')
+
+        return render_template('assignment.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
