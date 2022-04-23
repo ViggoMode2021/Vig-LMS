@@ -11,6 +11,10 @@ format_code = '%m-%d-%Y'
 
 date_object = date.strftime(format_code)
 
+now = datetime.datetime.now()
+
+current_time = now.strftime("%I:%M %p")
+
 app = Flask(__name__)
 
 app.secret_key = '#' #Secret key for sessions
@@ -36,12 +40,21 @@ def home():
         cursor.execute('SELECT COUNT (assignment_name) FROM assignments WHERE assignment_creator = %s;', [session['email']])
         assignment_count = cursor.fetchone()
 
+        cursor.execute('SELECT account_creation_date FROM users WHERE email = %s;', [session['email']])
+        account_creation_date = cursor.fetchone()
+
+        cursor.execute('SELECT COUNT (id) FROM logins WHERE user_login = %s;', [session['email']])
+        login_count = cursor.fetchone()
+
+        cursor.execute('SELECT * FROM logins WHERE user_login = %s AND id = (SELECT MAX(id) FROM logins);', [session['email']])
+        login_info = cursor.fetchall()
+
         cursor.close()
         conn.close()
 
         # If user is logged in, they are directed to home page.
         return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name=session['name'],
-                               student_count=student_count, assignment_count=assignment_count)
+                               student_count=student_count, assignment_count=assignment_count, account_creation_date=account_creation_date, login_count=login_count, login_info=login_info)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
 
@@ -83,6 +96,10 @@ def login():
                 cursor.execute('SELECT username FROM users WHERE username = %s;', [session['username']])
                 username_print = cursor.fetchone()
 
+                cursor.execute("INSERT INTO logins (login_date, login_time, user_login) VALUES (%s, %s, %s);", (date_object, current_time, session['email']))
+
+                conn.commit()
+
                 for user in username_print:
                      flash(f'You have successfully logged in, {user}!')
 
@@ -102,7 +119,7 @@ def login():
             cursor.close()
             conn.close()
 
-    return render_template('login.html', user_count=user_count, date_object=date_object)
+    return render_template('login.html', user_count=user_count, date_object=date_object, current_time=current_time)
 
 @app.route('/delete_account', methods=['DELETE', 'GET', 'POST'])
 def delete_account():
@@ -130,10 +147,22 @@ def delete_account():
             delete_password_check = delete_account['password']
             if check_password_hash(delete_password_check, delete_password):
                 cursor.execute('DELETE FROM users WHERE username = %s AND email = %s;', (delete_username, delete_email))
+                cursor.execute('DELETE FROM logins WHERE user_login = %s;', (delete_email,))
+                cursor.execute('DELETE FROM classes WHERE class_creator = %s;', (delete_email,))
+                cursor.execute('DELETE FROM announcements WHERE announcement_creator = %s;', (delete_email,))
+                cursor.execute('DELETE FROM classes WHERE class_creator = %s;', (delete_email,))
+                cursor.execute('DELETE FROM assignments WHERE assignment_creator = %s;', (delete_email,))
+                cursor.execute('DELETE FROM student_direct_message WHERE message_sender = %s;', (delete_email,))
+                cursor.execute('DELETE FROM student_direct_message_teacher_copy WHERE message_sender = %s;', (delete_email,))
+                cursor.execute('DELETE FROM teacher_direct_message WHERE message_recipient = %s;', (delete_email,))
+                cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE message_recipient = %s;', (delete_email,))
+                cursor.execute('DELETE FROM student_accounts WHERE teacher_email = %s;', (delete_email,))
+
                 flash('Account successfully deleted.')
                 conn.commit()
                 cursor.close()
                 conn.close()
+                return redirect(url_for('login'))
             else:
                 flash('Incorrect password.')
                 cursor.close()
@@ -214,7 +243,7 @@ def register():
             conn.close()
         else:
             # Account doesn't exist and the form data is valid, new account is created in the users table with the below queries:
-            cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question) VALUES (%s,%s,%s,%s,%s,%s);", (fullname, username, _hashed_password, email, class_name, secret_question))
+            cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question, account_creation_date) VALUES (%s,%s,%s,%s,%s,%s,%s);", (fullname, username, _hashed_password, email, class_name, secret_question, date_object))
             conn.commit()
             cursor.execute("INSERT INTO classes (class_name, teacher, class_creator) VALUES (%s,%s, (SELECT email from users WHERE fullname = %s))", (class_name, fullname, fullname))
             conn.commit()
@@ -324,6 +353,7 @@ def query():
     if 'loggedin' in session: # Show user and student information from the db
          conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+         cursor.execute('DELETE FROM classes WHERE student_first_name IS NULL AND student_last_name IS NULL AND class_creator = %s', [session['email']])
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
          cursor.execute("SELECT * FROM classes WHERE class_creator = %s", [session['email']])
@@ -1211,12 +1241,26 @@ def student_direct_message_page_submit(): #This function routes the logged in us
     if 'loggedin' in session:
         message_subject = request.form.get("message_subject")
         student_direct_message_box = request.form.get("student_direct_message_box")
+
+        cursor.execute('SELECT student_first_name FROM classes WHERE id = %s;', (session['student_id'],))
+
+        student_direct_message_first_name = cursor.fetchone()
+
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = %s;', (session['student_id'],))
+
+        student_direct_message_last_name = cursor.fetchone()
+
         cursor.execute("INSERT INTO student_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
         cursor.execute("INSERT INTO student_direct_message_teacher_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_sender) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['class_name'], message_subject, student_direct_message_box, session['student_first_name'], session['student_last_name'], session['student_id'], session['email']))
         conn.commit()
         cursor.close()
         conn.close()
-        flash('Message sent!')
+
+        for first_name, last_name in zip(student_direct_message_first_name, student_direct_message_last_name):
+            flash(f'Message sent to {first_name} {last_name} successfully on {date_object}!. '
+                  f'Your subject was: "{student_direct_message_box}" and the \n'
+                  f' message was "{message_subject}".')
+
         return redirect(request.referrer)
 
     return redirect(url_for('login'))
@@ -1754,7 +1798,7 @@ def student_register():
             flash('Please fill out the form!')
         else:
             # Account doesn't exist and the form data is valid, now insert new account into users table
-            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, student_email, password, class, teacher_email, secret_question) VALUES (%s,%s,%s,%s,%s,%s,%s);", (student_firstname, student_lastname, student_email, _hashed_password_student, student_class_name, teacher_email, student_secret_question))
+            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, student_email, password, class, teacher_email, secret_question, account_creation_date) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (student_firstname, student_lastname, student_email, _hashed_password_student, student_class_name, teacher_email, student_secret_question, date_object))
             conn.commit()
             flash('You have successfully registered!')
             cursor.close()
@@ -1802,6 +1846,7 @@ def student_login():
                 session['id'] = student_account['id']
                 session['student_first_name'] = student_account['student_first_name']
                 session['student_last_name'] = student_account['student_last_name']
+                session['email'] = student_account['student_email']
 
                 cursor.execute("""SELECT
                 ci.id AS score_id,
@@ -1833,11 +1878,21 @@ def student_login():
 
                 search_attendance_query_student_login = cursor.fetchall()
 
+                cursor.execute("INSERT INTO student_logins (login_date, login_time, student_login) VALUES (%s, %s, %s);", (date_object, current_time, session['email']))
+
+                conn.commit()
+
                 cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;""", [session['student_first_name'], session['student_last_name'], session['class_creator']])
 
                 class_fetch = cursor.fetchone()
 
                 session['class_creator'] = class_fetch['class_creator']
+
+                session['first_name'] = class_fetch['student_first_name']
+
+                session['last_name'] = class_fetch['student_last_name']
+
+                session['class_name'] = class_fetch['class_name']
 
                 session['id'] = class_fetch['id']
 
@@ -1855,13 +1910,22 @@ def student_login():
 
                 view_teacher_direct_messages = cursor.fetchall()
 
+                cursor.execute('SELECT * FROM student_logins WHERE student_login = %s AND id = (SELECT MAX(id) FROM student_logins);', [session['email']])
+                student_login_info = cursor.fetchall()
+
+                cursor.execute('SELECT account_creation_date FROM student_accounts WHERE student_email = %s;', [session['email']])
+                account_creation_date = cursor.fetchone()
+
+                cursor.execute('SELECT COUNT (id) FROM student_logins WHERE student_login = %s;', [session['email']])
+                student_login_count = cursor.fetchone()
+
                 cursor.close()
                 conn.close()
 
                 # Redirect to home page
                 return render_template('student_home.html', student_class_info=student_class_info, student_assignments=student_assignments,
-                                       search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch,
-                                       view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages)
+                                       search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch=announcements_student_fetch,
+                                       view_student_direct_messages=view_student_direct_messages, first_name=session['first_name'], last_name=session['last_name'], class_name=session['class_name'], email=session['email'], student_login_count=student_login_count, account_creation_date=account_creation_date,  student_login_info=student_login_info, view_teacher_direct_messages=view_teacher_direct_messages)
             else:
                 # Account doesn't exist or username/password incorrect
                 flash('Incorrect credentials or account does not exist. Please check your spelling.')
@@ -1873,7 +1937,7 @@ def student_login():
             cursor.close()
             conn.close()
 
-    return render_template('student_login.html', student_count=student_count, date_object=date_object)
+    return render_template('student_login.html', student_count=student_count, date_object=date_object, current_time=current_time)
 
 @app.route('/teacher_direct_message_page_submit', methods=['POST', 'GET'])
 def teacher_direct_message_page_submit(): #This function routes the logged in user to the page to students
@@ -1949,15 +2013,24 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
         cursor.execute('SELECT * FROM teacher_direct_message_student_copy WHERE message_recipient = %s;', [session['class_creator']])
         view_teacher_direct_messages = cursor.fetchall()
 
+        cursor.execute('SELECT * FROM student_logins WHERE student_login = %s AND id = (SELECT MAX(id) FROM student_logins);', [session['email']])
+        student_login_info = cursor.fetchall()
+
+        cursor.execute('SELECT account_creation_date FROM student_accounts WHERE student_email = %s;', [session['email']])
+        account_creation_date = cursor.fetchone()
+
+        cursor.execute('SELECT COUNT (id) FROM student_logins WHERE student_login = %s;', [session['email']])
+        student_login_count = cursor.fetchone()
+
         flash('Message sent!')
 
         cursor.close()
         conn.close()
 
         # Redirect to home page
-        return render_template('student_home.html', student_assignments=student_assignments, student_class_info=student_class_info,
+        return render_template('student_home.html', student_assignments=student_assignments, account_creation_date=account_creation_date, student_login_info=student_login_info,  student_class_info=student_class_info,
                                search_attendance_query_student_login=search_attendance_query_student_login, announcements_student_fetch = announcements_student_fetch,
-                               view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages)
+                               view_student_direct_messages=view_student_direct_messages, student_login_count=student_login_count, view_teacher_direct_messages=view_teacher_direct_messages)
 
     return redirect(url_for('login'))
 
