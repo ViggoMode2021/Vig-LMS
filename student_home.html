@@ -233,13 +233,12 @@
                     <br /><br />
 
                     <h4>My account information:</h4>
-
-<h6>First Name: {{ first_name }}</h6>
-                    <h6>Last Name: {{ last_name }}</h6>
-<h6>Email: {{ email }}</h6>
-<h6>Class name: {{ class_name }}</h6>
+<h6>First Name: {% for name in first_name %} {{ name }} {% endfor %}</h6>
+                    <h6>Last Name: {% for name in last_name %} {{ name }} {% endfor %}</h6>
+<h6>Email: {% for email in email %} {{ email }} {% endfor %}</h6>
+<h6>Class name: {% for class in class_name %} {{ class }} {% endfor %}</h6>
 <h6>Account created on: {% for date in account_creation_date %} {{date}} {% endfor %}</h6>
-<h6>Number of logins: {% for count in login_count %} {{count}} {% endfor %}</h6>
+<h6>Number of logins: {% for count in student_login_count %} {{count}} {% endfor %}</h6>
 
 <br /><br />
 
