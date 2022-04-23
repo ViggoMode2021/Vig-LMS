@@ -9,7 +9,25 @@ CREATE TABLE users(
 	UNIQUE (email)
 );
 
-ALTER TABLE users ADD UNIQUE (email);
+ALTER TABLE users ADD UNIQUE (username);
+
+ALTER TABLE users
+ADD COLUMN
+account_creation_date TEXT;
+
+CREATE TABLE logins(
+id SERIAL,
+login_date TEXT,
+login_time TEXT,
+user_login TEXT,
+FOREIGN KEY ('user_login') REFERENCES users("email") ON DELETE CASCADE);
+
+CREATE TABLE student_logins(
+id SERIAL,
+login_date TEXT,
+login_time TEXT,
+user_login TEXT,
+FOREIGN KEY ('user_login') REFERENCES student_accounts("student_email") ON DELETE CASCADE);
 
 CREATE TABLE classes(
 	id SERIAL PRIMARY KEY,
@@ -119,3 +137,8 @@ FOREIGN KEY ("student_id") REFERENCES classes("id") ON DELETE CASCADE,
 FOREIGN KEY ("message_recipient") REFERENCES users("email") ON DELETE CASCADE);
 
 ALTER TABLE student_accounts ADD UNIQUE (student_email);
+
+ALTER TABLE student_accounts
+ADD COLUMN
+account_creation_date TEXT;
+

@@ -230,5 +230,40 @@
     {% endif %}
     {% endwith %}
 
+                    <br /><br />
+
+                    <h4>My account information:</h4>
+
+<h6>First Name: {{ first_name }}</h6>
+                    <h6>Last Name: {{ last_name }}</h6>
+<h6>Email: {{ email }}</h6>
+<h6>Class name: {{ class_name }}</h6>
+<h6>Account created on: {% for date in account_creation_date %} {{date}} {% endfor %}</h6>
+<h6>Number of logins: {% for count in login_count %} {{count}} {% endfor %}</h6>
+
+<br /><br />
+
+<h222>Table design credited to: <a href="https://github.com/pablorgarcia" target="_blank">Pablo García</a></h222>
+
+<table class="container">
+	<thead>
+		<tr>
+			<th><h111>Latest login date:</h111></th>
+			<th><h111>Latest login time:</h111></th>
+		</tr>
+	</thead>
+	<tbody>
+                 {% for row in student_login_info %}
+		<tr>
+			<td>{{row[1]}}</td>
+			<td>{{row[2]}}</td>
+		</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+</html>
+
+
 
 {% endblock %}

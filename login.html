@@ -53,7 +53,7 @@ body {
 <p>Register as a student <a href="{{ url_for('student_register') }}">Register</a></p>
 <p>Login as a student <a href="{{ url_for('student_login') }}">Login</a></p>
 
-           <h100>As of {{ date_object }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
+           <h100>As of {{ date_object }} at {{ current_time }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
 
 <hr class="double">
 

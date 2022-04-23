@@ -51,7 +51,7 @@ body {
  <p>Register as a teacher <a href="{{ url_for('register') }}">Register</a></p>
 <p>Login as a teacher <a href="{{ url_for('login') }}">Login</a></p>
 
-       <h101>As of {{ date_object }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h101>
+       <h101>As of {{ date_object }} at {{ current_time }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h101>
 
 <hr class="double">
 
@@ -66,4 +66,3 @@ body {
         <input type="submit" value="Delete account" style="width: 150px" class="form-control btn btn-warning " name="">
     </form>
 
-</html>
