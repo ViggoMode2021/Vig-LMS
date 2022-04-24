@@ -30,6 +30,8 @@ body {
 }
 </style>
 
+<h8>Enrolled on {% for date in enrollment_date %} {{date}}{% endfor %}</h8>
+
 <h4>Current student information as of {{ date_object }}:</h4>
 
 <h6>First name: {% for name in student_first_name %} {{name}} {% endfor %}</h6>
