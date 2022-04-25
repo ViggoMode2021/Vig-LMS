@@ -17,11 +17,11 @@ current_time = now.strftime("%I:%M %p")
 
 app = Flask(__name__)
 
-app.secret_key = '#' #Secret key for sessions
+app.secret_key = '' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
+DB_HOST = "..us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
 DB_PASS = "Carrotcake2021"
@@ -803,6 +803,12 @@ def take_attendance(id):
          cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
 
+         cursor.execute('SELECT student_first_name FROM classes WHERE id = %s;', (id,))
+         first_name = cursor.fetchone()
+
+         cursor.execute('SELECT student_last_name FROM classes WHERE id = %s;', (id,))
+         last_name = cursor.fetchone()
+
          attendance = request.form.get("attendance")
 
          cursor.execute('INSERT INTO attendance (date, attendance_status, student_id) VALUES (%s, %s, %s);'.format(id),
@@ -810,7 +816,8 @@ def take_attendance(id):
 
          conn.commit()
 
-         flash('Attendance recorded!')
+         for first, last in zip(first_name, last_name):
+            flash(f'Attendance recorded for {first} {last} as {attendance} on {date_object}!')
 
          cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
 
@@ -983,7 +990,7 @@ def update_attendance_record(id):
         cursor.close()
         conn.close()
 
-        return redirect(url_for('take_attendance_page'))
+        return redirect(request.referrer)
 
     return redirect(url_for('login'))
 
@@ -1072,8 +1079,6 @@ def update_grade(id):
 
         updated_grade = request.form.get("update grade")
 
-        cur = conn.cursor()
-
         if not updated_grade:
             flash("Please enter a new grade if you wish to update the student's grade.")
             cursor.close()
@@ -1085,11 +1090,19 @@ def update_grade(id):
             conn.close()
             return redirect(url_for('query'))
         else:
-            cur.execute("""UPDATE classes 
+            cursor.execute('SELECT student_first_name FROM classes WHERE id = %s;', (id,))
+            student_first_name = cursor.fetchone()
+            cursor.execute('SELECT student_last_name FROM classes WHERE id = %s;', (id,))
+            student_last_name = cursor.fetchone()
+            cursor.execute('SELECT student_grade FROM classes WHERE id = %s;', (id,))
+            student_grade = cursor.fetchone()
+
+            cursor.execute("""UPDATE classes 
             SET student_grade = %s 
             WHERE id = %s;""", (updated_grade, id))
 
-            flash("Grade updated successfully!")
+            for first_name, last_name, grade in zip(student_first_name, student_last_name, student_grade):
+                flash(f"Grade updated from {grade} to {updated_grade} for {first_name} {last_name}!")
 
             conn.commit()
 
@@ -1178,13 +1191,27 @@ def delete_direct_message_from_student(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+        cursor.execute('SELECT message_subject FROM teacher_direct_message WHERE id = {0};'.format(id))
+        message_subject = cursor.fetchone()
+
+        cursor.execute('SELECT message FROM teacher_direct_message WHERE id = {0};'.format(id))
+        message_body = cursor.fetchone()
+
+        cursor.execute('SELECT date FROM teacher_direct_message WHERE id = {0};'.format(id))
+        message_date = cursor.fetchone()
+
+        cursor.execute('SELECT time FROM teacher_direct_message WHERE id = {0};'.format(id))
+        message_time = cursor.fetchone()
+
         cursor.execute('DELETE FROM teacher_direct_message WHERE id = {0};'.format(id))
         conn.commit()
 
         cursor.close()
         conn.close()
 
-        flash('Message deleted!')
+        for subject, body, the_date, the_time in zip(message_subject, message_body, message_date, message_time):
+            flash(f'Message deleted! The message subject was "{subject}" and the message was "{body}". The message was'
+                  f' originally sent on {the_date} at {the_time}.')
 
         return redirect(request.referrer)
 
@@ -1247,7 +1274,7 @@ def view_teacher_direct_message_page(id):
         cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
         student_first_name_message = cursor.fetchone()
 
-        cursor.execute('SELECT student_first_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
+        cursor.execute('SELECT student_last_name FROM classes WHERE id = {0} AND class_creator = %s;'.format(id), (session['email'],))
         student_last_name_message = cursor.fetchone()
 
         cursor.close()
@@ -2013,11 +2040,14 @@ def teacher_direct_message_page_submit(): #This function routes the logged in us
 
         session['id'] = class_fetch['id']
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
-        cursor.execute("INSERT INTO teacher_direct_message(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
-        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
 
         conn.commit()
-        flash('Message sent!')
+
+        flash(f'Message sent successfully on {date_object} at {current_time}!. '
+                f'Your subject was: "{message_subject}" and the \n'
+                f' message was "{teacher_direct_message_box}".')
 
         cursor.close()
         conn.close()
