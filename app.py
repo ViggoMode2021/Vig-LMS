@@ -17,11 +17,11 @@ current_time = now.strftime("%I:%M %p")
 
 app = Flask(__name__)
 
-app.secret_key = '' #Secret key for sessions
+app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "..us-east-1.rds.amazonaws.com"
+DB_HOST = ".#.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
 DB_PASS = "Carrotcake2021"
@@ -158,7 +158,7 @@ def delete_account():
                 cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE message_recipient = %s;', (delete_email,))
                 cursor.execute('DELETE FROM student_accounts WHERE teacher_email = %s;', (delete_email,))
 
-                flash('Account successfully deleted.')
+                flash(f'Account successfully deleted for Username: {delete_username} and Email: {delete_email}.')
                 conn.commit()
                 cursor.close()
                 conn.close()
@@ -1897,6 +1897,9 @@ def student_home():
         cursor.execute('SELECT class FROM student_accounts WHERE student_email = %s;', [session['student_email']])
         class_name = cursor.fetchone()
 
+        cursor.execute('SELECT enrollment_date FROM classes WHERE student_email = %s;', [session['student_email']])
+        enrollment_date = cursor.fetchone()
+
         cursor.execute("""SELECT
         enrollment_date
         FROM classes 
@@ -1925,8 +1928,8 @@ def student_login():
         cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s;', (student_email_2,))
         student_account = cursor.fetchone()
         if not student_account:
-            flash('Account does not exist!')
-            return render_template('student_login.html', student_count=student_count, date_object=date_object)
+            flash(f'Account does not exist for {student_email_2}!')
+            return render_template('student_login.html', student_count=student_count, date_object=date_object, current_time=current_time)
 
         if student_account:
             password_student = student_account['password']
@@ -1966,6 +1969,7 @@ def student_assignments():
     if 'loggedin' in session: # Show user and student information from the db
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         cursor.execute("""SELECT
                 ci.id AS score_id,
                 s.student_first_name,
@@ -1979,6 +1983,7 @@ def student_assignments():
                 ON cu.id = ci.assignment_id
                 WHERE s.student_email = %s
                 ORDER BY cu.assignment_name ASC;""", [session['student_email']])
+
         student_assignments = cursor.fetchall()
 
         return render_template('student_assignments.html', student_assignments=student_assignments)
@@ -1991,6 +1996,10 @@ def student_attendance():
     if 'loggedin' in session: # Show user and student information from the db
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute("""SELECT id FROM classes WHERE student_email = %s""", [session['student_email']])
+        student_id_for_attendance = cursor.fetchone()[0]
+
         cursor.execute("""SELECT
                 a.id,
                 s.student_first_name,
@@ -2002,9 +2011,20 @@ def student_attendance():
                 INNER JOIN attendance AS a
                 ON a.student_id = s.id
                 WHERE s.student_email = %s;""", [session['student_email']])
+
         student_attendance = cursor.fetchall()
 
-        return render_template('student_attendance.html', student_attendance=student_attendance)
+        cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Tardy';", (student_id_for_attendance,))
+        student_tardy_count = cursor.fetchone()
+
+        cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Absent';", (student_id_for_attendance,))
+        student_absent_count = cursor.fetchone()
+
+        cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Present';", (student_id_for_attendance,))
+        student_present_count = cursor.fetchone()
+
+        return render_template('student_attendance.html', student_attendance=student_attendance, student_tardy_count=student_tardy_count,
+                               student_absent_count=student_absent_count, student_present_count=student_present_count )
 
     return redirect(url_for('login'))
 
@@ -2088,10 +2108,28 @@ def delete_direct_message_to_teacher(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+        cursor.execute('SELECT message_subject FROM teacher_direct_message_student_copy WHERE id = {0};'.format(id))
+
+        message_subject = cursor.fetchone()
+
+        cursor.execute('SELECT message FROM teacher_direct_message_student_copy WHERE id = {0};'.format(id))
+
+        message = cursor.fetchone()
+
+        cursor.execute('SELECT date FROM teacher_direct_message_student_copy WHERE id = {0};'.format(id))
+
+        message_date = cursor.fetchone()
+
+        cursor.execute('SELECT time FROM teacher_direct_message_student_copy WHERE id = {0};'.format(id))
+
+        message_time = cursor.fetchone()
+
         cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE id = {0};'.format(id))
         conn.commit()
 
-        flash('Message deleted!')
+        for subject, body, mes_date, time in zip(message_subject, message, message_date, message_time):
+            flash(f'Message deleted! The message subject was "{subject}" and the message was "{body}". The message'
+                  f' was sent at {time} on {mes_date}.')
 
         cursor.close()
         conn.close()
@@ -2109,8 +2147,28 @@ def delete_direct_message_from_teacher(id):
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+        cursor.execute('SELECT message_subject FROM student_direct_message WHERE id = {0};'.format(id))
+
+        message_subject = cursor.fetchone()
+
+        cursor.execute('SELECT message FROM student_direct_message WHERE id = {0};'.format(id))
+
+        message = cursor.fetchone()
+
+        cursor.execute('SELECT date FROM student_direct_message WHERE id = {0};'.format(id))
+
+        message_date = cursor.fetchone()
+
+        cursor.execute('SELECT time FROM student_direct_message WHERE id = {0};'.format(id))
+
+        message_time = cursor.fetchone()
+
         cursor.execute('DELETE FROM student_direct_message WHERE id = {0};'.format(id))
         conn.commit()
+
+        for subject, body, mes_date, time in zip(message_subject, message, message_date, message_time):
+            flash(f'Message deleted! The message subject was "{subject}" and the message was "{body}". The message'
+                  f' was sent at {time} on {mes_date}.')
 
         cursor.close()
         conn.close()
@@ -2186,7 +2244,7 @@ def delete_student_account():
             delete_student_password_check = delete_student_account_query['password']
             if check_password_hash(delete_student_password_check, delete_student_password):
                 cursor.execute('DELETE FROM student_accounts WHERE student_email = %s;', (delete_student_email,))
-                flash('Account successfully deleted.')
+                flash(f'Account successfully deleted for {delete_student_email}.')
                 conn.commit()
                 cursor.close()
                 conn.close()
