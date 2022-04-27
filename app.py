@@ -21,7 +21,7 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = ".#.us-east-1.rds.amazonaws.com"
+DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
 DB_PASS = "Carrotcake2021"
@@ -742,6 +742,8 @@ def alphabetically():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_first_name ASC;", [session['email']])
         records_2 = cursor.fetchall()
 
+        flash('You are viewing the students listed alphabetically by last name.')
+
         cursor.close()
         conn.close()
 
@@ -762,6 +764,8 @@ def grade_ASC():
 
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC;", [session['email']])
         records_2 = cursor.fetchall()
+
+        flash('You are viewing the student grades from lowest to highest.')
 
         cursor.close()
         conn.close()
@@ -1007,6 +1011,8 @@ def grade_DESC():
 
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade DESC;", [session['email']])
         records_2 = cursor.fetchall()
+
+        flash('You are viewing the student grades from highest to lowest.')
 
         cursor.close()
         conn.close()
