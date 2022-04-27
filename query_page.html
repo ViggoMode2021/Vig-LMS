@@ -20,7 +20,6 @@
   <button class="dropbtn">Sort by:</button>
   <div class="dropdown-content">
     <a href="/alphabetically">Last name</a>
-    <a href="/alphabetically">First name</a>
     <a href="/grade_ASC">Grade (low - high)</a>
       <a href="/grade_DESC">Grade (high - low)</a>
          <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
@@ -31,6 +30,19 @@
 </div>
 
 </div>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
 <h8>Your class gradebook for {{ class_name }}:</h8>
 <br />
@@ -55,6 +67,7 @@
     </div>
 </div>
 
+
 <div class="col-md-8">
     <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
@@ -66,6 +79,7 @@
                 <th>Student Last Name</th>
                 <th>Graduation Year</th>
                 <th>Grade</th>
+                <th>Enrolled on</th>
                 <th>Update grade</th>
                 <th>Student email</th>
                 <th>Send direct message</th>
@@ -86,6 +100,8 @@
                 <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
                 <td><a href="/edit_individual_student/{{row[0]}}">{{row[5]}}</a></td>
                 <td><a href="/query_individual_student/{{row[0]}}">{{row[6]}}</a></td>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[9]}}</a></td>
+
                 <td width="130">
        <form action="/update_grade/{{row[0]}}" method="POST">
                     <div class="form-group">
@@ -111,19 +127,6 @@
 </div>
 </div>
 </div>
-
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
 
 <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
