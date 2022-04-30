@@ -14,18 +14,15 @@
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 <link rel="stylesheet" href="static/css/query_page_2.css">
 
- <div class="topnav">
+<div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
-           <div class="dropdown">
-  <button class="dropbtn">Sort by:</button>
-  <div class="dropdown-content">
          <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
-              <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
-             <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
-               <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
-        <a href="{{url_for('logout')}}">Logout of {{username}}</a>
+        <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
+     <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
+          <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
+               <a href="{{url_for('upload_file_page')}}">Upload files for {{ class_name }}</a>
+  <a href="{{url_for('logout')}}">Logout of {{username}}</a>
   </div>
-</div>
 
 </div>
 

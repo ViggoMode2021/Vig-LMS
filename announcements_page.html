@@ -15,10 +15,12 @@
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
          <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
-             <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
-               <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
-               <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
+        <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
+     <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
+          <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
+               <a href="{{url_for('upload_file_page')}}">Upload files for {{ class_name }}</a>
   <a href="{{url_for('logout')}}">Logout of {{username}}</a>
+
 </div>
 
 <style>

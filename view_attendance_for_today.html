@@ -16,9 +16,6 @@
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
-           <div class="dropdown">
-  <button class="dropbtn">Sort by:</button>
-  <div class="dropdown-content">
          <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
               <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
            <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>

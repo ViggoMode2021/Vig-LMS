@@ -53,6 +53,96 @@
     </table>
 </div>
 
+<h8>Documents posted by your teacher:</h8>
+
+<a href="{{response_2}}">{{msg_3}}</a>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Document ID</th>
+                <th>Document name</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in student_assignments_originals %}
+            <tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+                <td width="110">
+                <a href="/student_assignment_originals_download/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Download File</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<form action="/student_documents_to_teacher" method="POST" enctype="multipart/form-data">
+     <p class="card-text">Choose a file to upload it to {{ class_name }}. The student portal will be able to access
+     these files as well. These can be: copies of homework assignments, notes, pictures, videos, etc. Students may also
+     upload their own files, so that the teacher can access their work. This particular functionality can be accessed via
+     the 'more information' link for said students on the class roster page.
+
+     This page serves as a main hub for your documents. Once a document is uploaded here, it can be downloaded via this page,
+     as well as the student portal for a particular student in this class who has a VigLMS student account.
+
+         <br /><br />
+
+     Here are the upload and download steps for this page:
+<br /><br />
+     1. Click the choose file button below.
+         <br /><br />
+     2. Select file from your computer's file directory.
+         <br /><br />
+     3. Attach said file.
+         <br /><br />
+     4. Click upload button.
+         <br /><br />
+     5. Go to file in table below (this table lists documents you uploaded to the teacher and student portals).
+         <br /><br />
+     6. Click 'download file' button.
+         <br /><br />
+     7. Click on the presigned url for the document that appears at the top of the table to download.</p>
+        <input type="file" name="file_2" value="file">
+        <hr>
+   <input type="submit" name="upload" value="Upload" class="btn btn-success">
+</form>
+{{msg}}
+
+<h8>Documents posted by you:</h8>
+
+<a href="{{response_3}}">{{msg_4}}</a>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Document ID</th>
+                <th>Document name</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in student_assignments_student_s3 %}
+            <tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+                <td width="110">
+                <a href="/download_uploads_student_account/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Download File</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
 
 </html>
 
