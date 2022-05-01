@@ -13,7 +13,7 @@ s3 = boto3.client('s3',
                     aws_secret_access_key= '#/qZC/#'
                      )
 
-BUCKET_NAME = 'viglmsdocuments'
+BUCKET_NAME = '#'
 
 date = datetime.date.today()
 
@@ -31,10 +31,10 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
+DB_HOST = "##.##.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
@@ -158,6 +158,35 @@ def upload():
         flash(f'{filename} has been uploaded to teacher and student portal for {class_name}.')
         return redirect(url_for("upload_file_page", account=account, username=session['username'], class_name=session['class_name']))
 
+
+@app.route('/delete_file/<string:id>',methods=['GET', 'POST'])
+def delete_file(id):
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
+    assignment_download_name = cursor.fetchone()
+    cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
+    account = cursor.fetchone()
+    for name in assignment_download_name:
+        flash(f'{name} deleted!')
+    response = s3.delete_objects(
+    Bucket=BUCKET_NAME,
+    Delete={
+        'Objects': [
+            {
+                'Key': str(assignment_download_name)
+            }
+        ]
+    }
+    )
+    cursor.execute('DELETE FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
+    conn.commit()
+    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
+    assignment_files = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template("upload_file_page.html", response=response, assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
+
 @app.route('/download/<string:id>',methods=['GET'])
 def download(id):
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -230,6 +259,7 @@ def delete_account():
                 cursor.execute('DELETE FROM teacher_direct_message WHERE message_recipient = %s;', (delete_email,))
                 cursor.execute('DELETE FROM teacher_direct_message_student_copy WHERE message_recipient = %s;', (delete_email,))
                 cursor.execute('DELETE FROM student_accounts WHERE teacher_email = %s;', (delete_email,))
+                cursor.execute('DELETE FROM assignment_files_teacher_s3 WHERE assignment_creator = %s', (delete_email,))
 
                 flash(f'Account successfully deleted for Username: {delete_username} and Email: {delete_email}.')
                 conn.commit()
@@ -850,8 +880,6 @@ def download_uploads_query_individual_student(id):
         cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', (student_email,))
         student_assignments_student_s3 = cursor.fetchall()
 
-        cursor.close()
-        conn.close()
         msg_5 = f"Click link to download {download_uploads_query_ind_student}"
         response_4 = s3.generate_presigned_url(
             'get_object',
@@ -861,7 +889,92 @@ def download_uploads_query_individual_student(id):
             },
             ExpiresIn=3600
         )
-    return redirect(url_for('query_individual_student', msg_5=msg_5, response_4=response_4, student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files))
+        cursor.execute("""SELECT
+         *
+         FROM classes 
+         WHERE id = %s AND class_creator = %s;""", [session['student_id'], session['email']])
+
+        cursor.execute("""SELECT
+        student_email
+        FROM classes 
+        WHERE id = %s AND class_creator = %s;""", [session['student_id'], session['email']])
+
+        student_email = cursor.fetchone()[0]
+
+        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
+        account = cursor.fetchone()
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s;", [session['email']])
+        records_2 = cursor.fetchall()
+
+        cursor.execute("""SELECT
+        ci.id AS score_id,
+        s.student_first_name,
+        s.student_last_name,
+        cu.assignment_name,
+        ci.score
+        FROM classes s
+        INNER JOIN assignment_results AS ci
+        ON ci.student_id = s.id
+        INNER JOIN assignments cu  
+        ON cu.id = ci.assignment_id
+        WHERE s.id = %s 
+        ORDER BY cu.assignment_name ASC;""", [session['student_id']])
+
+        student_assignment_scores = cursor.fetchall()
+
+        cursor.execute("""SELECT
+        student_first_name
+        FROM classes 
+        WHERE id = %s;""", [session['student_id']])
+
+        student_first_name = cursor.fetchone()
+
+        cursor.execute("""SELECT
+        student_last_name
+        FROM classes 
+        WHERE id = %s;""", [session['student_id']])
+
+        student_last_name = cursor.fetchone()
+
+        cursor.execute("""SELECT
+        a.id,
+        s.student_first_name,
+        s.student_last_name,
+        s.class_creator,
+        a.date,
+        a.attendance_status
+        FROM classes s
+        INNER JOIN attendance AS a
+        ON a.student_id = s.id
+        WHERE s.id = %s;""", [session['student_id']])
+
+        search_attendance_query_student_login = cursor.fetchall()
+
+        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', (student_email,))
+        student_uploads = cursor.fetchall()
+
+        cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Tardy';", [session['student_id']])
+        student_tardy_count = cursor.fetchone()
+
+        cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Absent';", [session['student_id']])
+        student_absent_count = cursor.fetchone()
+
+        cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Present';", [session['student_id']])
+        student_present_count = cursor.fetchone()
+
+        cursor.execute("""SELECT * FROM classes WHERE id = %s;""", [session['student_id']])
+
+        class_fetch = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template('query_individual_student.html', account=account, username=session['username'], class_name=session['class_name'], class_fetch=class_fetch, msg_5=msg_5, student_present_count=student_present_count,
+                               student_tardy_count=student_tardy_count, student_absent_count=student_absent_count, student_uploads=student_uploads,
+                               search_attendance_query_student_login=search_attendance_query_student_login, student_assignment_scores=student_assignment_scores,
+                               student_first_name=student_first_name, records_2=records_2, student_last_name=student_last_name, response_4=response_4, student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files)
+
+    return redirect(url_for('login'))
 
 @app.route('/alphabetically', methods=['GET'])
 def alphabetically():
@@ -2224,6 +2337,31 @@ def download_uploads_student_account(id):
     )
     return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, msg_4=msg_4, response_3=response_3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files)
 
+@app.route('/delete_student_upload/<string:id>',methods=['GET', 'POST'])
+def delete_student_upload(id):
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
+    assignment_delete_name = cursor.fetchone()
+    for name in assignment_delete_name:
+        flash(f'{name} deleted!')
+    s3.delete_objects(
+    Bucket=BUCKET_NAME,
+    Delete={
+        'Objects': [
+            {
+                'Key': str(assignment_delete_name)
+            }
+        ]
+    }
+    )
+    cursor.execute('DELETE FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+    return redirect(url_for('student_assignments'))
+
 @app.route('/student_documents_to_teacher',methods=['POST'])
 def student_documents_to_teacher():
     if request.method == 'POST':
@@ -2527,6 +2665,5 @@ def delete_student_account():
         conn.close()
     # Show registration form with message (if applicable)
     return render_template('student_login.html', student_count_2=student_count_2)
-
 if __name__ == "__main__":
     app.run(debug=True)
