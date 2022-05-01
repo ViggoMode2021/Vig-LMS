@@ -16,12 +16,12 @@
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
-           <div class="dropdown">
          <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
-              <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
-                  <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
-        <a href="{{url_for('logout')}}">Logout of {{username}}</a>
-  </div>
+        <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
+     <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
+          <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
+               <a href="{{url_for('upload_file_page')}}">Upload files for {{ class_name }}</a>
+  <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 </div>
 
 </div>
@@ -120,7 +120,7 @@
 </div>
 </div>
 
-<h8>Documents posted by the student:</h8>
+<h8>Documents posted by {% for row in student_first_name %} {{row}} {% endfor %}{% for row in student_last_name %} {{row}}: {% endfor %}:</h8>
 
 <a href="{{response_4}}">{{msg_5}}</a>
 
@@ -199,7 +199,5 @@
 <h60>Days absent: {% for row in student_absent_count %} {{row}} {% endfor %}</h60>
 <br /><br />
 <h60>Days tardy: {% for row in student_tardy_count %} {{row}} {% endfor %}</h60>
-
-
 
 {% endblock %}

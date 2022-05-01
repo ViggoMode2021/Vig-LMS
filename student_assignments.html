@@ -116,6 +116,19 @@
 
 <h8>Documents posted by you:</h8>
 
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
 <a href="{{response_3}}">{{msg_4}}</a>
 
 <div class="col-md-8">
@@ -134,6 +147,7 @@
                 <td>{{row[1]}}</td>
                 <td width="110">
                 <a href="/download_uploads_student_account/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Download File</a>
+                    <a href="/delete_student_upload/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete File</a>
                 </td>
             </tr>
             {% endfor %}

@@ -94,6 +94,7 @@
                 <td>{{row[1]}}</td>
                 <td width="110">
                 <a href="/download/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Download File</a>
+                    <a href="/delete_file/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete File</a>
                 </td>
             </tr>
             {% endfor %}
@@ -102,4 +103,5 @@
 </div>
 </div>
 </div>
+
 {% endblock %}
