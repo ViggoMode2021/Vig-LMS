@@ -27,11 +27,11 @@ current_time = now.strftime("%I:%M %p")
 
 app = Flask(__name__)
 
-app.secret_key = '#' #Secret key for sessions
+app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "##.##.us-east-1.rds.amazonaws.com"
+DB_HOST = "viglmsdatabase.#.us-east-1.#.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
 DB_PASS = "Carrotcake2021"
@@ -142,7 +142,7 @@ def upload():
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
                 cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
                 account = cursor.fetchone()
-                cursor.execute("INSERT INTO assignment_files_teacher_s3 (assignment_name, assignment_creator) VALUES (%s, %s);", (filename, session['email']))
+                cursor.execute("INSERT INTO assignment_files_teacher_s3 (assignment_name, assignment_creator, upload_date, upload_time) VALUES (%s, %s, %s, %s);", (filename, session['email'], date_object, current_time))
                 conn.commit()
                 cursor.close()
                 conn.close()
@@ -707,7 +707,7 @@ def update_individual_assignment_grade(id):
 
          conn.commit()
 
-         flash('Assignment grade updated successfully.')
+         flash('Assignment grade for  updated successfully.')
 
          cursor.close()
          conn.close()
@@ -2253,140 +2253,178 @@ def student_assignments():
 
 @app.route('/student_assignment_originals_download/<string:id>',methods=['GET'])
 def student_assignment_originals_download(id):
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['class_creator']])
-    assignment_download_name = cursor.fetchone()[0]
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
-    assignment_files = cursor.fetchall()
-    cursor.execute("""SELECT
-                ci.id AS score_id,
-                s.student_first_name,
-                s.student_last_name,
-                ci.score,
-                cu.assignment_name
-                FROM classes s
-                INNER JOIN assignment_results AS ci
-                ON ci.student_id = s.id
-                INNER JOIN assignments cu  
-                ON cu.id = ci.assignment_id
-                WHERE s.student_email = %s
-                ORDER BY cu.assignment_name ASC;""", [session['student_email']])
+    if 'loggedin' in session: # Show user and student information from the db
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    student_assignments = cursor.fetchall()
+        cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['class_creator']])
+        assignment_download_name = cursor.fetchone()[0]
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        assignment_files = cursor.fetchall()
+        cursor.execute("""SELECT
+                    ci.id AS score_id,
+                    s.student_first_name,
+                    s.student_last_name,
+                    ci.score,
+                    cu.assignment_name
+                    FROM classes s
+                    INNER JOIN assignment_results AS ci
+                    ON ci.student_id = s.id
+                    INNER JOIN assignments cu  
+                    ON cu.id = ci.assignment_id
+                    WHERE s.student_email = %s
+                    ORDER BY cu.assignment_name ASC;""", [session['student_email']])
 
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
-    student_assignments_originals = cursor.fetchall()
+        student_assignments = cursor.fetchall()
 
-    cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
-    student_assignments_student_s3 = cursor.fetchall()
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        student_assignments_originals = cursor.fetchall()
 
-    cursor.close()
-    conn.close()
-    msg_3 = f"Click link to download {assignment_download_name}"
-    response_2 = s3.generate_presigned_url(
-        'get_object',
-        Params={
-            'Bucket': BUCKET_NAME,
-            'Key': str(assignment_download_name)
-        },
-        ExpiresIn=3600
-    )
-    return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files, msg_3=msg_3, response_2=response_2)
+        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
+        student_assignments_student_s3 = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+        msg_3 = f"Click link to download {assignment_download_name}"
+        response_2 = s3.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': BUCKET_NAME,
+                'Key': str(assignment_download_name)
+            },
+            ExpiresIn=3600
+        )
+        return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files, msg_3=msg_3, response_2=response_2)
+
+    return redirect(url_for('student_login'))
 
 @app.route('/download_uploads_student_account/<string:id>',methods=['GET'])
 def download_uploads_student_account(id):
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
-    download_uploads_student_account_name = cursor.fetchone()[0]
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
-    assignment_files = cursor.fetchall()
-    cursor.execute("""SELECT
-                ci.id AS score_id,
-                s.student_first_name,
-                s.student_last_name,
-                ci.score,
-                cu.assignment_name
-                FROM classes s
-                INNER JOIN assignment_results AS ci
-                ON ci.student_id = s.id
-                INNER JOIN assignments cu  
-                ON cu.id = ci.assignment_id
-                WHERE s.student_email = %s
-                ORDER BY cu.assignment_name ASC;""", [session['student_email']])
+    if 'loggedin' in session: # Show user and student information from the db
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
+        download_uploads_student_account_name = cursor.fetchone()[0]
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        assignment_files = cursor.fetchall()
+        cursor.execute("""SELECT
+                    ci.id AS score_id,
+                    s.student_first_name,
+                    s.student_last_name,
+                    ci.score,
+                    cu.assignment_name
+                    FROM classes s
+                    INNER JOIN assignment_results AS ci
+                    ON ci.student_id = s.id
+                    INNER JOIN assignments cu  
+                    ON cu.id = ci.assignment_id
+                    WHERE s.student_email = %s
+                    ORDER BY cu.assignment_name ASC;""", [session['student_email']])
 
-    student_assignments = cursor.fetchall()
+        student_assignments = cursor.fetchall()
 
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
-    student_assignments_originals = cursor.fetchall()
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        student_assignments_originals = cursor.fetchall()
 
-    cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
-    student_assignments_student_s3 = cursor.fetchall()
+        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
+        student_assignments_student_s3 = cursor.fetchall()
 
-    cursor.close()
-    conn.close()
-    msg_4 = f"Click link to download {download_uploads_student_account_name}"
-    response_3 = s3.generate_presigned_url(
-        'get_object',
-        Params={
-            'Bucket': BUCKET_NAME,
-            'Key': str(download_uploads_student_account_name)
-        },
-        ExpiresIn=3600
-    )
-    return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, msg_4=msg_4, response_3=response_3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files)
+        cursor.close()
+        conn.close()
+        msg_4 = f"Click link to download {download_uploads_student_account_name}"
+        response_3 = s3.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': BUCKET_NAME,
+                'Key': str(download_uploads_student_account_name)
+            },
+            ExpiresIn=3600
+        )
+        return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, msg_4=msg_4, response_3=response_3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files)
+
+    return redirect(url_for('student_login'))
 
 @app.route('/delete_student_upload/<string:id>',methods=['GET', 'POST'])
 def delete_student_upload(id):
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
-    assignment_delete_name = cursor.fetchone()
-    for name in assignment_delete_name:
-        flash(f'{name} deleted!')
-    s3.delete_objects(
-    Bucket=BUCKET_NAME,
-    Delete={
-        'Objects': [
-            {
-                'Key': str(assignment_delete_name)
-            }
-        ]
-    }
-    )
-    cursor.execute('DELETE FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
-    conn.commit()
+    if 'loggedin' in session: # Show user and student information from the db
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
+        assignment_delete_name = cursor.fetchone()
+        for name in assignment_delete_name:
+            flash(f'{name} deleted!')
+        s3.delete_objects(
+        Bucket=BUCKET_NAME,
+        Delete={
+            'Objects': [
+                {
+                    'Key': str(assignment_delete_name)
+                }
+            ]
+        }
+        )
+        cursor.execute('DELETE FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
+        conn.commit()
 
-    cursor.close()
-    conn.close()
-    return redirect(url_for('student_assignments'))
+        cursor.close()
+        conn.close()
+        return redirect(url_for('student_assignments'))
+
+    return redirect(url_for('student_login'))
 
 @app.route('/student_documents_to_teacher',methods=['POST'])
 def student_documents_to_teacher():
-    if request.method == 'POST':
-        img_2 = request.files['file_2']
-        if img_2:
-                filename = secure_filename(img_2.filename)
-                img_2.save(filename)
-                conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-                cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-                cursor.execute("INSERT INTO assignment_files_student_s3 (file_name, student_email) VALUES (%s, %s);", (filename, session['student_email']))
-                conn.commit()
-                cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
-                student_assignments_student_s3 = cursor.fetchall()
-                cursor.close()
-                conn.close()
-                s3.upload_file(
-                    Bucket=BUCKET_NAME,
-                    Filename=filename,
-                    Key=filename
-                )
-        else:
-            flash('No file has been selected to upload. Please click "Choose File button".')
-            return redirect(url_for("upload_file_page", username=session['username']))
-        flash(f'{filename} has been uploaded to teacher and student portal for your class.')
-        return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3)
+
+    if 'loggedin' in session: # Show user and student information from the db
+
+        if request.method == 'POST':
+            img_2 = request.files['file_2']
+            if img_2:
+                    filename = secure_filename(img_2.filename)
+                    img_2.save(filename)
+                    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+                    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                    cursor.execute("INSERT INTO assignment_files_student_s3 (file_name, student_email, upload_date, upload_time) VALUES (%s, %s, %s, %s);", (filename, session['student_email'], date_object, current_time))
+                    conn.commit()
+                    s3.upload_file(
+                        Bucket=BUCKET_NAME,
+                        Filename=filename,
+                        Key=filename
+                    )
+                    flash(f'{filename} has been uploaded to teacher and student portal for your class.')
+
+                    cursor.execute("""SELECT
+                    ci.id AS score_id,
+                    s.student_first_name,
+                    s.student_last_name,
+                    ci.score,
+                    cu.assignment_name
+                    FROM classes s
+                    INNER JOIN assignment_results AS ci
+                    ON ci.student_id = s.id
+                    INNER JOIN assignments cu  
+                    ON cu.id = ci.assignment_id
+                    WHERE s.student_email = %s
+                    ORDER BY cu.assignment_name ASC;""", [session['student_email']])
+
+                    student_assignments = cursor.fetchall()
+
+                    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+                    student_assignments_originals = cursor.fetchall()
+
+                    cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
+                    student_assignments_student_s3 = cursor.fetchall()
+
+                    cursor.close()
+                    conn.close()
+
+            else:
+                flash('No file has been selected to upload. Please click "Choose File button".')
+                return redirect(url_for("student_assignments"))
+            return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments,
+                                   student_assignments_originals=student_assignments_originals)
+
+    return redirect(url_for('student_login'))
 
 @app.route('/student_attendance', methods=['GET'])
 def student_attendance():
@@ -2665,5 +2703,6 @@ def delete_student_account():
         conn.close()
     # Show registration form with message (if applicable)
     return render_template('student_login.html', student_count_2=student_count_2)
+
 if __name__ == "__main__":
     app.run(debug=True)
