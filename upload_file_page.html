@@ -84,7 +84,9 @@
             <tr>
                 <th>Document ID</th>
                 <th>Document name</th>
-                <th>Download</th>
+                <th>Upload date</th>
+                <th>Upload time</th>
+                <th>Download/Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -92,6 +94,8 @@
             <tr>
                 <td>{{row[0]}}</td>
                 <td>{{row[1]}}</td>
+                <td>{{row[3]}}</td>
+                <td>{{row[4]}}</td>
                 <td width="110">
                 <a href="/download/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Download File</a>
                     <a href="/delete_file/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete File</a>
