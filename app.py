@@ -10,7 +10,7 @@ import boto3
 
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/#'
+                    aws_secret_access_key= '#/qZC/ew5R13vch7kgrD'
                      )
 
 BUCKET_NAME = '#'
@@ -31,10 +31,10 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.#.us-east-1.#.amazonaws.com"
+DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -208,6 +208,7 @@ def download(id):
         },
         ExpiresIn=3600
     )
+    flash(f"Please check your browser's download folder for the file name {assignment_download_name} after clicking link below.")
     return render_template("upload_file_page.html", assignment_files=assignment_files, msg_2=msg_2, response=response, account=account, username=session['username'], class_name=session['class_name'])
 
 @app.route('/upload_file_page',methods=['GET'])
@@ -676,8 +677,6 @@ def delete_attendance_record_query_individual_student(id):
 
         cursor.execute('DELETE FROM attendance WHERE id = {0};'.format(id))
         conn.commit()
-
-        flash('Attendance record deleted successfully!')
 
         cursor.close()
         conn.close()
@@ -2159,7 +2158,7 @@ def student_home():
 
         enrollment_date = cursor.fetchone()
 
-        return render_template('student_home.html', first_name=first_name,last_name=last_name,email=email,class_name=class_name, student_class_info=student_class_info,student_login_count=student_login_count,
+        return render_template('student_home.html', first_name=first_name, last_name=last_name, email=email,class_name=class_name, student_class_info=student_class_info,student_login_count=student_login_count,
                                student_login_info=student_login_info, account_creation_date=account_creation_date, enrollment_date=enrollment_date)
 
     return redirect(url_for('login'))
