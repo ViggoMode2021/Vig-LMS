@@ -6,11 +6,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
 
+# VigLMS uses boto3 for users to upload and download files across accounts.
 import boto3
 
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/ew5R13vch7kgrD'
+                    aws_secret_access_key= '#/qZC/#'
                      )
 
 BUCKET_NAME = '#'
@@ -32,8 +33,8 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 #Database info below:
 
 DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
-DB_NAME = "VIG_LMS"
-DB_USER = "postgres"
+DB_NAME = "#"
+DB_USER = "#"
 DB_PASS = "#"
 
 @app.route('/')
@@ -132,7 +133,7 @@ def login():
     return render_template('login.html', user_count=user_count, date_object=date_object, current_time=current_time)
 
 @app.route('/upload',methods=['POST'])
-def upload():
+def upload(): # Upload file to S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
     if request.method == 'POST':
         img = request.files['file']
         if img:
@@ -158,9 +159,8 @@ def upload():
         flash(f'{filename} has been uploaded to teacher and student portal for {class_name}.')
         return redirect(url_for("upload_file_page", account=account, username=session['username'], class_name=session['class_name']))
 
-
-@app.route('/delete_file/<string:id>',methods=['GET', 'POST'])
-def delete_file(id):
+@app.route('/delete_file/<string:id>', methods=['GET', 'POST'])
+def delete_file(id): # Delete file from S3 bucket from teacher account.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
@@ -188,7 +188,7 @@ def delete_file(id):
     return render_template("upload_file_page.html", response=response, assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
 
 @app.route('/download/<string:id>',methods=['GET'])
-def download(id):
+def download(id): # Download file from S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
