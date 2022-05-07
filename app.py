@@ -10,11 +10,11 @@ import datetime
 import boto3
 
 s3 = boto3.client('s3',
-                    aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/#'
+                    aws_access_key_id='AKIAYP2BDSGMGAEJUP6C',
+                    aws_secret_access_key= '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'
                      )
 
-BUCKET_NAME = '#'
+BUCKET_NAME = 'viglmsdocuments'
 
 date = datetime.date.today()
 
@@ -32,10 +32,10 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
-DB_NAME = "#"
-DB_USER = "#"
-DB_PASS = "#"
+DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_NAME = "VIG_LMS"
+DB_USER = "postgres"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
