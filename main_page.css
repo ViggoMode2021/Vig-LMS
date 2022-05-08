@@ -1,7 +1,5 @@
 body{
-    background: #FC354C;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #6dd5ed, #2193b0);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #6dd5ed, #2193b0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background-color: white;
 }
 
 h1{
@@ -31,13 +29,14 @@ h4{
 }
 
 h6{
-    color: black;
+    color: white;
     font-family: courier;
     font-size: 25px;
 }
 
 p{
-    color: purple;
+    color: white;
+    font-weight: bold;
     font-family: calibri;
     font-size: 20px;
 }
@@ -102,7 +101,7 @@ h222 {
   display: block;
   line-height:1em;
   padding-bottom: 2em;
-  color: black;
+  color: yellow;
 }
 
 h222 a {
@@ -156,7 +155,7 @@ h222 a {
 }
 
 .container th {
-	  background-color: #1F2739;
+	  background-color: black;
 }
 
 .container td:first-child { color: #FB667A; }
