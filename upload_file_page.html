@@ -10,7 +10,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/query_page_2.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/query_page_5.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
@@ -26,6 +26,8 @@
 </div>
 
 </div>
+
+<h30>Upload and download files for {{ class_name}}</h30>
 
 <form action="/upload" method="POST" enctype="multipart/form-data">
      <p class="card-text">Choose a file to upload it to {{ class_name }}. The student portal will be able to access
@@ -55,7 +57,8 @@
      7. Click on the presigned url for the document that appears at the top of the table to download.</p>
         <input type="file" name="file" value="file">
         <hr>
-   <input type="submit" name="upload" value="Upload" class="btn btn-success">
+
+<button class="custom-btn btn-3" name="upload" id="upload"><span>Upload</span></button>
 </form>
 {{msg}}
 
