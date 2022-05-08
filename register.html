@@ -3,7 +3,7 @@
  <head>
   <meta charset="utf-8">
   <title>Register</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_register.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
        <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -14,16 +14,31 @@
   <link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
  </head>
- <style>
-body {
-  background-image: url('/static/images/Sky.jpg');
+     <style>
+    body{
+    background-color: black;
 }
-</style>
- <div class="container">
-   <div class="row main">
-    <div class="main-login main-center">
-<span data-title="To login to use VigLMS, you need to remember: your email, your username, your password.">Register new teacher or login existing account:</span>
-     <form action="{{ url_for('register') }}" method="post" autocomplete="off">
+     </style>
+ <div id="Log_in_message">
+        <h44>To log in and use VigLMS, you need to remember: your email, your username, your password.</h44>
+     </div>
+ {% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+       <div class="login">
+  <div class="login-triangle"></div>
+  <h2 class="login-header">Register teacher account below</h2>
+  <form class="login-container" action="{{ url_for('register') }}" method="POST">
+<span data-title="To login to use VigLMS, you need to remember: your email, your username, your password."></span>
       <div class="form-group">
        <label for="name" class="cols-sm-2 control-label">Your Name:</label>
        <br />
@@ -97,12 +112,12 @@ body {
 
       <div class="form-group ">
        <input type="submit" value="Register" class="form-control btn btn-primary " name="">
+               </form>
        <p style="padding:5px;">
        <a href="{{ url_for('login') }}" class="btn btn-dark ">Login</a></p>
 
       </div>
 
-     </form>
     </div>
    </div>
   </div>
@@ -110,16 +125,3 @@ body {
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
  </body>
 </html>
-
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}

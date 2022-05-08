@@ -2,7 +2,14 @@
 <html>
  <head>
   <meta charset="utf-8">
-  <h21>Welcome to the Teacher login page for Vig LMS!</h21>
+     <style>
+#Title {
+  text-align: center;
+}
+</style>
+     <div id="Title">
+  <h22>Welcome to the Teacher login page for Vig LMS!</h22>
+         </div>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
      <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
@@ -12,24 +19,23 @@
  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-     <style>
-body {
-  background-image: url('/static/images/Sky.jpg');
-}
-</style>
-  <div class="login-box" >
-  <div class="login-body">
     <p>Please enter your credentials below:</p>
-    <form class="form-group" action="{{ url_for('login') }}" method="post">
-        <label>Email:</label>
-        <input type="text" class="form-control" style="width: 300px" name="email" placeholder="Email" id="email" required>
-        <label>Username:</label>
-        <input type="text" class="form-control" style="width: 300px" name="username" placeholder="Username" id="username" required>
-        <label>Password:</label>
-        <input type="password" class="form-control" autocomplete="new-password" style="width: 300px" name="password" placeholder="Password" id="password" required>
-        <br />
-        <input type="submit" value="Login" style="width: 150px" class="form-control btn btn-success " name="">
-    </form>
+     <style>
+    body{
+    background-color: black;
+}
+     </style>
+
+      <div class="login">
+  <div class="login-triangle"></div>
+  <h2 class="login-header">Welcome back</h2>
+  <form class="login-container" action="{{ url_for('login') }}" method="post">
+    <p><input type="email" name="email" placeholder="Email"></p>
+            <p><input type="text" name="username" placeholder="Username"></p>
+    <p><input type="password" name="password" placeholder="Password"></p>
+    <p><input type="submit" value="Log in"></p>
+  </form>
+</div>
 
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
@@ -52,25 +58,32 @@ body {
  </body>
 <p>Register as a student <a href="{{ url_for('student_register') }}">Register</a></p>
 <p>Login as a student <a href="{{ url_for('student_login') }}">Login</a></p>
-
+<div id="Title">
            <h100>As of {{ date_object }} at {{ current_time }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
-
+         </div>
 <hr class="double">
 
  <h46>Delete teacher account below:</h46>
 
-<form class="form-group" action="{{ url_for('delete_account') }}" method="POST">
-        <label>Email:</label>
-        <input type="text" class="form-control" style="width: 300px" name="delete_email" placeholder="Email" id="delete_email" required>
-        <label>Username:</label>
-        <input type="text" class="form-control" style="width: 300px" name="delete_username" placeholder="Username" id="delete_username" required>
-        <label>Password:</label>
-        <input type="password" class="form-control" autocomplete="new-password" style="width: 300px" name="delete_password" placeholder="Password" id="delete_password" required>
-    <br />
-        <input type="submit" value="Delete account" style="width: 150px" class="form-control btn btn-warning " name="">
-    </form>
-
+      <div class="login">
+                    <div id="Delete_Teacher_Account">
+  <h2 class="login-header">Delete teacher account</h2>
+                                  </div>
+          <div id="Delete_Teacher_Account_Container">
+  <form class="login-container" action="{{ url_for('delete_account') }}" method="post">
+    <p><input type="email" name="delete_email" placeholder="Email"></p>
+            <p><input type="text" name="delete_username" placeholder="Username"></p>
+    <p><input type="password" name="delete_password" placeholder="Password"></p>
+    <p><input type="submit" value="Delete my account"></p>
+  </form>
+</div>
+          </div>
 <a href = "mailto:ryansviglione@gmail.com?subject = Feedback&body = Message">
 Email the creator: ryansviglione@gmail.com</a>
+
+     <br /><br />
+
+     <a href = "https://codepen.io/miroot/pen/AYJGJO = Feedback&body = Message">
+CodePen for forms created by Miro Karilahti</a>
 
 </html>

@@ -29,7 +29,8 @@ p{
 color: white;
 font-family: lucinda;
 font-size: 25px;
-text-align: center;}
+text-align: center;
+}
 
 label{
 
@@ -62,9 +63,17 @@ font-style: italic;
 }
 
 h101{
-color: white;
-font-family: times;
+color: orange;
+font-family: calibri;
 font-size: 22px;
+font-style: italic;
+}
+
+#Title{
+color: pink;
+font-family: lucinda;
+font-size: 25px;
+text-align: center;
 }
 
 h21{
@@ -75,7 +84,7 @@ font-size: 25px;}
 
 h22{
 
-color: yellow;
+color: pink;
 font-family: calibri;
 text-align: center;
 font-size: 38px;

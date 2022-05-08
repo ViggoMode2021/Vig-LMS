@@ -2,11 +2,11 @@
 <html>
  <head>
   <meta charset="utf-8">
-  <h20>Welcome to the student login page for Vig LMS!</h20>
+     <div id="Title">
+  <h22>Welcome to the Student login page for Vig LMS!</h22>
+     </div>
      <br />
-       <h25>As of 4/23/2022 - The student portal of Vig LMS will be under construction for the next two weeks approximately. We are anticipating some
-       optimization and changes in the UI and logic going forward. We appreciate your patience - Thank you!</h25>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/student_style.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
      <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -24,14 +24,15 @@ body {
   <div class="login-box" >
   <div class="login-body">
     <p>Please enter your credentials below:</p>
-    <form class="form-group" action="{{ url_for('student_login') }}" method="post">
-        <label>Email:</label>
-        <input type="text" class="form-control" style="width: 300px" name="student_email_2" placeholder="Email" id="student_email_2" required>
-        <label>Password:</label>
-        <input type="password" class="form-control" style="width: 300px" autocomplete="new-password" name="student_password_2" placeholder="Password" id="student_password_2" required>
-        <br />
-        <input type="submit" value="Login" style="width: 150px" class="form-control btn btn-success " name="">
-    </form>
+          <div class="login">
+  <div class="login-triangle"></div>
+  <h2 class="login-header">Welcome back student!</h2>
+  <form class="login-container" action="{{ url_for('student_login') }}" method="post">
+    <p><input type="email" name="student_email_2" placeholder="Email"></p>
+    <p><input type="password" name="student_password_2" placeholder="Password"></p>
+    <p><input type="submit" value="Log in"></p>
+  </form>
+</div>
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}
@@ -54,18 +55,21 @@ body {
  <p>Register as a teacher <a href="{{ url_for('register') }}">Register</a></p>
 <p>Login as a teacher <a href="{{ url_for('login') }}">Login</a></p>
 
+<div id="Title">
        <h101>As of {{ date_object }} at {{ current_time }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h101>
-
+</div>
 <hr class="double">
 
- <h25>Delete student account below:</h25>
-
-<form class="form-group" action="{{ url_for('delete_student_account') }}" method="POST">
-        <label>Email:</label>
-        <input type="text" class="form-control" style="width: 300px" name="delete_student_email" placeholder="Email" id="delete_student_email" required>
-        <label>Password:</label>
-        <input type="password" class="form-control" style="width: 300px" name="delete_student_password" autocomplete="new-password" placeholder="Password" id="delete_student_password" required>
-    <br />
-        <input type="submit" value="Delete account" style="width: 150px" class="form-control btn btn-warning " name="">
-    </form>
+      <div class="login">
+                    <div id="Delete_Teacher_Account">
+  <h2 class="login-header">Delete student account</h2>
+                                  </div>
+          <div id="Delete_Teacher_Account_Container">
+  <form class="login-container" action="{{ url_for('delete_student_account') }}" method="POST">
+    <p><input type="email" name="delete_student_email" placeholder="Email"></p>
+    <p><input type="password" name="delete_student_password" placeholder="Password"></p>
+    <p><input type="submit" value="Delete my student account"></p>
+  </form>
+</div>
+          </div>
 

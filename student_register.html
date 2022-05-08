@@ -2,8 +2,8 @@
 <html>
  <head>
   <meta charset="utf-8">
-  <span id = 'student_register_info' data-title="To login to use VigLMS, you need to remember: your email, your username, your password.">Register your student account:</span>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <span id = 'student_register_info' data-title="To login to use VigLMS, you need to remember: your email, your username, your password."></span>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_student_register.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
      <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -19,11 +19,14 @@ body {
   background-image: url('/static/images/space.jpg');
 }
 </style>
- <div class="container">
-   <div class="row main">
-    <div class="main-login main-center">
-     <form action="{{ url_for('student_register') }}" method="post" autocomplete="off">
-
+<div id="Log_in_message">
+        <h44>To log in and use your VigLMS student account, you need to remember: your email and your password. You also need to be enrolled
+        into the class that your teacher has a VigLMS account with.</h44>
+ <div class="login">
+  <div class="login-triangle"></div>
+  <h2 class="login-header">Register student account below</h2>
+  <form class="login-container" action="{{ url_for('student_register') }}" method="POST">
+<span data-title="To login to use VigLMS, you need to remember: your email, your username, your password."></span>
       <div class="form-group">
        <label for="name" class="cols-sm-2 control-label">Your first name:</label>
           <br />

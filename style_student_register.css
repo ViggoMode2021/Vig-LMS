@@ -1,7 +1,7 @@
 h13{
 color: black;
 font-family: lucinda;
-font-style: italic;
+font-style: italic; bold;
 font-size: 18px;
 }
 
@@ -10,12 +10,6 @@ h20{
 color: black;
 font-family: arial;
 font-size: 25px;}
-
-h44{
-
-color: white;
-font-family: calibri;
-font-size: 20px;}
 
 h46{
 color: black;
@@ -33,8 +27,9 @@ text-align: center;}
 
 label{
 
-color:green;
-font-family: times new roman;
+color:blue;
+font-family: calibri;
+font-style: italic; bold;
 font-size: 20px; }
 
 hr.double {
@@ -86,15 +81,6 @@ h55{
 color: white;
 font-family: arial;
 font-size: 20px;}
-
-h23{
-
-color: black;
-font-family: times;
-font-size: 20px;
-text-decoration: underline;
-
-}
 
 h25{
 
@@ -154,7 +140,7 @@ font-size: 30px;
 }
 
 h23{
-color: orange;
+color: black;
 font-family: lucinda;
 font-style: italic;
 font-size: 18px;
@@ -259,6 +245,11 @@ body {
   border-color: #05a;
 }
 
+#Log_in_message {
+  text-align: center;
+  color: white;
+}
+
 #Delete_Teacher_Account {
   background-color: red;
   padding: 20px;
@@ -273,3 +264,5 @@ body {
   background-color: red;
   padding: 12px;
 }
+
+
