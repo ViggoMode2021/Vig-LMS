@@ -10,11 +10,11 @@ import datetime
 import boto3
 
 s3 = boto3.client('s3',
-                    aws_access_key_id='AKIAYP2BDSGMGAEJUP6C',
-                    aws_secret_access_key= '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'
+                    aws_access_key_id='#',
+                    aws_secret_access_key= '#/qZC/ew5R13vch7kgrD'
                      )
 
-BUCKET_NAME = 'viglmsdocuments'
+BUCKET_NAME = '#'
 
 date = datetime.date.today()
 
@@ -32,10 +32,10 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
-DB_NAME = "VIG_LMS"
+DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_NAME = "#"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -68,6 +68,10 @@ def home():
                                student_count=student_count, assignment_count=assignment_count, account_creation_date=account_creation_date, login_count=login_count, login_info=login_info)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
+
+@app.route('/faq_page', methods=['GET'])
+def faq_page():
+    return render_template("faq_page.html")
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -132,7 +136,7 @@ def login():
 
     return render_template('login.html', user_count=user_count, date_object=date_object, current_time=current_time)
 
-@app.route('/upload',methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload(): # Upload file to S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
     if request.method == 'POST':
         img = request.files['file']
@@ -187,7 +191,7 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
     conn.close()
     return render_template("upload_file_page.html", response=response, assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
 
-@app.route('/download/<string:id>',methods=['GET'])
+@app.route('/download/<string:id>', methods=['GET'])
 def download(id): # Download file from S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -211,7 +215,7 @@ def download(id): # Download file from S3 bucket from teacher account. Files are
     flash(f"Please check your browser's download folder for the file name {assignment_download_name} after clicking link below.")
     return render_template("upload_file_page.html", assignment_files=assignment_files, msg_2=msg_2, response=response, account=account, username=session['username'], class_name=session['class_name'])
 
-@app.route('/upload_file_page',methods=['GET'])
+@app.route('/upload_file_page', methods=['GET'])
 def upload_file_page():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -841,7 +845,7 @@ def delete_assignment_score_query_individual_student(id):
 
     return redirect(url_for('login'))
 
-@app.route('/download_uploads_query_individual_student/<string:id>',methods=['GET'])
+@app.route('/download_uploads_query_individual_student/<string:id>', methods=['GET'])
 def download_uploads_query_individual_student(id):
     if 'loggedin' in session:
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -1682,7 +1686,7 @@ def edit_assignment_grade(id):
 
     return redirect(url_for('login'))
 
-@app.route('/update_assignment_name/<string:id>', methods=['POST','GET'])
+@app.route('/update_assignment_name/<string:id>', methods=['POST', 'GET'])
 def update_assignment_name(id):
 
     if 'loggedin' in session: # This routes the user to the edit assignment grade page.
@@ -1707,7 +1711,7 @@ def update_assignment_name(id):
 
     return redirect(url_for('login'))
 
-@app.route('/update_assignment_due_date/<string:id>', methods=['POST','GET'])
+@app.route('/update_assignment_due_date/<string:id>', methods=['POST', 'GET'])
 def update_assignment_due_date(id):
 
     if 'loggedin' in session: # This routes the user to the edit assignment grade page.
@@ -2250,7 +2254,7 @@ def student_assignments():
 
     return redirect(url_for('student_login'))
 
-@app.route('/student_assignment_originals_download/<string:id>',methods=['GET'])
+@app.route('/student_assignment_originals_download/<string:id>', methods=['GET'])
 def student_assignment_originals_download(id):
     if 'loggedin' in session: # Show user and student information from the db
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -2297,7 +2301,7 @@ def student_assignment_originals_download(id):
 
     return redirect(url_for('student_login'))
 
-@app.route('/download_uploads_student_account/<string:id>',methods=['GET'])
+@app.route('/download_uploads_student_account/<string:id>', methods=['GET'])
 def download_uploads_student_account(id):
     if 'loggedin' in session: # Show user and student information from the db
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -2343,7 +2347,7 @@ def download_uploads_student_account(id):
 
     return redirect(url_for('student_login'))
 
-@app.route('/delete_student_upload/<string:id>',methods=['GET', 'POST'])
+@app.route('/delete_student_upload/<string:id>', methods=['GET', 'POST'])
 def delete_student_upload(id):
     if 'loggedin' in session: # Show user and student information from the db
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
@@ -2371,7 +2375,7 @@ def delete_student_upload(id):
 
     return redirect(url_for('student_login'))
 
-@app.route('/student_documents_to_teacher',methods=['POST'])
+@app.route('/student_documents_to_teacher', methods=['POST'])
 def student_documents_to_teacher():
 
     if 'loggedin' in session: # Show user and student information from the db
