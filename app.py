@@ -32,8 +32,8 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
-DB_NAME = "#"
+DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
+DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
 DB_PASS = "#"
 
@@ -1183,6 +1183,12 @@ def search_attendance_by_student():
 
          search_attendance_query_student = cursor.fetchall()
 
+         cursor.execute("SELECT student_first_name FROM classes WHERE id = %s;", (search_attendance_by_student,))
+         student_first_name = cursor.fetchone()
+
+         cursor.execute("SELECT student_last_name FROM classes WHERE id = %s;", (search_attendance_by_student,))
+         student_last_name = cursor.fetchone()
+
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Tardy';", (search_attendance_by_student,))
          student_tardy_count = cursor.fetchone()
 
@@ -1202,7 +1208,7 @@ def search_attendance_by_student():
          conn.close()
 
          return render_template('search_attendance_by_student.html', search_attendance_query_student=search_attendance_query_student, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
-                                search_attendance_by_date=search_attendance_by_date, student_tardy_count=student_tardy_count, student_present_count=student_present_count, student_absent_count=student_absent_count)
+                                search_attendance_by_date=search_attendance_by_date, student_first_name=student_first_name, student_last_name = student_last_name, student_tardy_count=student_tardy_count, student_present_count=student_present_count, student_absent_count=student_absent_count)
 
     return redirect(url_for('login'))
 
@@ -2155,12 +2161,13 @@ def student_home():
         cursor.execute('SELECT enrollment_date FROM classes WHERE student_email = %s;', [session['student_email']])
         enrollment_date = cursor.fetchone()
 
+        for first, last in zip(first_name, last_name):
+            flash(f'You have successfully logged in {first} {last}!')
+
         cursor.execute("""SELECT
         enrollment_date
         FROM classes 
         WHERE student_email = %s;""", [session['student_email']])
-
-        enrollment_date = cursor.fetchone()
 
         return render_template('student_home.html', first_name=first_name, last_name=last_name, email=email,class_name=class_name, student_class_info=student_class_info,student_login_count=student_login_count,
                                student_login_info=student_login_info, account_creation_date=account_creation_date, enrollment_date=enrollment_date)
@@ -2247,10 +2254,14 @@ def student_assignments():
         cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
         student_assignments_student_s3 = cursor.fetchall()
 
+        first_name = session['student_first_name']
+
+        last_name = session['student_last_name']
+
         cursor.close()
         conn.close()
 
-        return render_template('student_assignments.html', student_assignments=student_assignments, student_assignments_student_s3=student_assignments_student_s3, student_assignments_originals=student_assignments_originals)
+        return render_template('student_assignments.html', first_name=first_name, last_name=last_name, student_assignments=student_assignments, student_assignments_student_s3=student_assignments_student_s3, student_assignments_originals=student_assignments_originals)
 
     return redirect(url_for('student_login'))
 
@@ -2532,10 +2543,14 @@ def student_messages():
 
         view_teacher_direct_messages = cursor.fetchall()
 
+        first_name = session['student_first_name']
+        last_name = session['student_last_name']
+
         cursor.close()
         conn.close()
 
-        return render_template('student_messages.html', view_student_direct_messages=view_student_direct_messages,view_teacher_direct_messages=view_teacher_direct_messages)
+        return render_template('student_messages.html', view_student_direct_messages=view_student_direct_messages,view_teacher_direct_messages=view_teacher_direct_messages,
+                               first_name=first_name, last_name=last_name)
 
     return redirect(url_for('login'))
 
