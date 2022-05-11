@@ -9,7 +9,7 @@
 <link rel="manifest" href="/site.webmanifest">
 </head>
 
-<title>VigLMS | Assignments</title>
+<title>VigLMS | Assignments for {{ class_name }}</title>
 
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -173,5 +173,20 @@ first before doing so.</p>
 </form>
 
 </body>
+
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
 
 {% endblock %}

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<title>VigLMS | Student Home</title>
+<title>VigLMS | Student Home For {% for row in first_name %} {{row}} {% endfor %}{% for row in last_name %} {{row}} {% endfor %}</title>
 
 <head>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
@@ -24,6 +24,19 @@
           <a href="{{url_for('student_announcements')}}">View announcements</a>
   <a href="{{url_for('student_logout')}}">Logout</a>
 </div>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
 <h8>Your grade:</h8>
 
