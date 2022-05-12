@@ -62,7 +62,12 @@
 <div id="Title">
            <h100>As of {{ date_object }} at {{ current_time }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
          </div>
+
+          <a href="{{url_for('faq_page')}}"><img src="/static/images/faq.png" alt="HTML tutorial" style="width:42px;height:42px;">Link to FAQ (frequently asked questions)</a>
+
 <hr class="double">
+
+
 
  <h46>Delete teacher account below:</h46>
 
@@ -79,11 +84,6 @@
   </form>
 </div>
           </div>
-
-         <img src="static/images/postgresql.png" width="150">
-     <a href = "{{url_for('faq_page')}}">
-Link to FAQ (frequently asked questions)</a>
-
 
           <br /><br />
 

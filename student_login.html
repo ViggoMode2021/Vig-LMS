@@ -59,6 +59,9 @@ body {
 <div id="Title">
        <h101>As of {{ date_object }} at {{ current_time }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h101>
 </div>
+
+       <a href="{{url_for('faq_page')}}"><img src="/static/images/faq.png" alt="HTML tutorial" style="width:42px;height:42px;">Link to FAQ (frequently asked questions)</a>
+
 <hr class="double">
 
       <div class="login">
