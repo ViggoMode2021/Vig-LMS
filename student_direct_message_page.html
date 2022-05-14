@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<html>
+
 <head>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -14,7 +16,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/query_page_2.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teacher_account_message_page.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
@@ -30,28 +32,27 @@
 
 </div>
 
+<div id ="Send">
 <h8>Send direct message for {% for row in student_direct_message_first_name %} {{row}} {% endfor %} {% for row in student_direct_message_last_name %} {{row}} {% endfor %} </h8>
-
-<div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style="width:100%">
-        <thead>
-            <tr>
-                <td></td>
-                <td></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Message</td>
-                <td width="130">
-                    <form action="/student_direct_message_page_submit" method="POST">
-                        <input type="text" class="form-control" style="width: 300px" name="message_subject" placeholder="Subject" id="message_subject">
-        <div class="form-group">
-        <textarea name="student_direct_message_box" cols="30" rows="10"></textarea>
-    </div>
-                         <button type="submit" class="btn btn-warning">Send</button>
+</div>
 
 </form>
+        <div id="form-main">
+  <div id="form-div">
+     <form action="/student_direct_message_page_submit" method="POST">
+
+      <p class="name">
+        <input type="text" type="text" name="message_subject" class="validate[required,custom[onlyLetter],length[0,100]] feedback-input" placeholder="Subject" id="name" />
+      </p>
+
+         <textarea name="student_direct_message_box" placeholder = "Message" cols="30" rows="10"></textarea>
+
+      <div class="submit">
+        <input type="submit" value="Send" id="button-blue"/>
+        <div class="ease"></div>
+      </div>
+    </form>
+  </div>
                         </div>
                 </td>
             </tr>
@@ -60,6 +61,7 @@
 </div>
 </div>
 </div>
+
 
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
@@ -75,3 +77,5 @@
     {% endwith %}
 
 {% endblock %}
+
+</html>
