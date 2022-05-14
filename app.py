@@ -10,11 +10,11 @@ import datetime
 import boto3
 
 s3 = boto3.client('s3',
-                    aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/ew5R13vch7kgrD'
+                    aws_access_key_id='AKIAYP2BDSGMGAEJUP6C',
+                    aws_secret_access_key= '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'
                      )
 
-BUCKET_NAME = '#'
+BUCKET_NAME = 'viglmsdocuments'
 
 date = datetime.date.today()
 
@@ -32,10 +32,10 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
+DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
@@ -167,7 +167,8 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
 def delete_file(id): # Delete file from S3 bucket from teacher account.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
+    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s ORDER BY upload_date'
+                   'ASC;'.format(id), [session['email']])
     assignment_download_name = cursor.fetchone()
     cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
     account = cursor.fetchone()
@@ -185,7 +186,8 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
     )
     cursor.execute('DELETE FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
     conn.commit()
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
+    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date'
+                   'DESC;', [session['email']])
     assignment_files = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -195,7 +197,8 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
 def download(id): # Download file from S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
+    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s ORDER BY upload_date'
+                   'DESC;'.format(id), [session['email']])
     assignment_download_name = cursor.fetchone()[0]
     cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
     assignment_files = cursor.fetchall()
@@ -219,7 +222,7 @@ def download(id): # Download file from S3 bucket from teacher account. Files are
 def upload_file_page():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
+    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date DESC;', [session['email']])
     assignment_files = cursor.fetchall()
     cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
     account = cursor.fetchone()
@@ -791,7 +794,7 @@ def query_individual_student(id):
 
          search_attendance_query_student_login = cursor.fetchall()
 
-         cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', (student_email,))
+         cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s ORDER BY upload_date ASC;', (student_email,))
          student_uploads = cursor.fetchall()
 
          cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = {0} AND attendance_status = 'Tardy';".format(id))
@@ -877,10 +880,10 @@ def download_uploads_query_individual_student(id):
 
         student_assignments = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date ASC;;', [session['email']])
         student_assignments_originals = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', (student_email,))
+        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s ORDER BY upload_date ASC;;', (student_email,))
         student_assignments_student_s3 = cursor.fetchall()
 
         msg_5 = f"Click link to download {download_uploads_query_ind_student}"
@@ -1297,10 +1300,10 @@ def delete_student():
             return redirect(url_for('query'))
 
         cursor.execute('SELECT student_first_name FROM classes WHERE student_first_name = %s AND class_creator = %s;', (delete_first_name, session['email']))
-        first_name = cursor.fetchall()
+        first_name = cursor.fetchone()
 
         cursor.execute('SELECT student_last_name FROM classes WHERE student_last_name = %s AND class_creator = %s;', (delete_last_name, session['email']))
-        last_name = cursor.fetchall()
+        last_name = cursor.fetchone()
 
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_creator = %s;', (delete_first_name, delete_last_name, session['email']))
         full_name = cursor.fetchone()
@@ -2473,8 +2476,11 @@ def student_attendance():
         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Present';", (student_id_for_attendance,))
         student_present_count = cursor.fetchone()
 
+        first_name = session['student_first_name']
+        last_name = session['student_last_name']
+
         return render_template('student_attendance.html', student_attendance=student_attendance, student_tardy_count=student_tardy_count,
-                               student_absent_count=student_absent_count, student_present_count=student_present_count )
+                               student_absent_count=student_absent_count, first_name=first_name, last_name=last_name, student_present_count=student_present_count )
 
     return redirect(url_for('login'))
 
@@ -2488,7 +2494,9 @@ def student_announcements():
 
         announcements_student_fetch = cursor.fetchall()
 
-        return render_template('student_announcements.html', announcements_student_fetch=announcements_student_fetch,student_attendance=student_attendance)
+        class_name = session['student_class_name']
+
+        return render_template('student_announcements.html', class_name=class_name, announcements_student_fetch=announcements_student_fetch,student_attendance=student_attendance)
 
     return redirect(url_for('login'))
 
