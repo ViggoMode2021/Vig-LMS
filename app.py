@@ -10,11 +10,11 @@ import datetime
 import boto3
 
 s3 = boto3.client('s3',
-                    aws_access_key_id='AKIAYP2BDSGMGAEJUP6C',
-                    aws_secret_access_key= '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'
+                    aws_access_key_id='#',
+                    aws_secret_access_key= '#/qZC/#'
                      )
 
-BUCKET_NAME = 'viglmsdocuments'
+BUCKET_NAME = '#'
 
 date = datetime.date.today()
 
@@ -32,10 +32,10 @@ app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -57,6 +57,9 @@ def home():
         cursor.execute('SELECT COUNT (id) FROM logins WHERE user_login = %s;', [session['email']])
         login_count = cursor.fetchone()
 
+        cursor.execute('SELECT COUNT (id) FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
+        teacher_document_count = cursor.fetchone()
+
         cursor.execute('SELECT * FROM logins WHERE user_login = %s AND id = (SELECT MAX(id) FROM logins);', [session['email']])
         login_info = cursor.fetchall()
 
@@ -65,7 +68,7 @@ def home():
 
         # If user is logged in, they are directed to home page.
         return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name=session['name'],
-                               student_count=student_count, assignment_count=assignment_count, account_creation_date=account_creation_date, login_count=login_count, login_info=login_info)
+                               student_count=student_count, assignment_count=assignment_count, account_creation_date=account_creation_date, login_count=login_count, teacher_document_count=teacher_document_count, login_info=login_info)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
 
@@ -197,8 +200,7 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
 def download(id): # Download file from S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s ORDER BY upload_date'
-                   'DESC;'.format(id), [session['email']])
+    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s ORDER BY upload_date DESC;'.format(id), [session['email']])
     assignment_download_name = cursor.fetchone()[0]
     cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['email']])
     assignment_files = cursor.fetchall()
@@ -361,7 +363,7 @@ def register():
             cursor.execute("INSERT INTO classes (student_first_name, student_last_name, class_name, teacher, class_creator) VALUES (%s,%s,%s,%s, (SELECT email from users WHERE fullname = %s))", (example, student, class_name, fullname, fullname))
             conn.commit()
             flash(f'You have successfully registered as "{username}"! Your email is "{email}", your username is "{username}" and your class name is'
-                  f'"{class_name}".')
+                  f'" {class_name}".')
             cursor.close()
             conn.close()
     elif request.method == 'POST':
@@ -1891,7 +1893,7 @@ def announcements_page():
         account = cursor.fetchone()
         cursor.close()
         conn.close()
-        return render_template('announcements_page.html', account=account, username=session['username'], class_name=session['class_name'])
+        return render_template('announcements_page.html', account=account, date_object=date_object, current_time=current_time, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -2164,6 +2166,12 @@ def student_home():
         cursor.execute('SELECT enrollment_date FROM classes WHERE student_email = %s;', [session['student_email']])
         enrollment_date = cursor.fetchone()
 
+        cursor.execute('SELECT COUNT (id) FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        teacher_document_count = cursor.fetchone()
+
+        cursor.execute('SELECT COUNT (id) FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
+        student_document_count = cursor.fetchone()
+
         for first, last in zip(first_name, last_name):
             flash(f'You have successfully logged in {first} {last}!')
 
@@ -2173,7 +2181,8 @@ def student_home():
         WHERE student_email = %s;""", [session['student_email']])
 
         return render_template('student_home.html', first_name=first_name, last_name=last_name, email=email,class_name=class_name, student_class_info=student_class_info,student_login_count=student_login_count,
-                               student_login_info=student_login_info, account_creation_date=account_creation_date, enrollment_date=enrollment_date)
+                               student_login_info=student_login_info, account_creation_date=account_creation_date, enrollment_date=enrollment_date, teacher_document_count=teacher_document_count, student_document_count=student_document_count
+                               )
 
     return redirect(url_for('login'))
 
