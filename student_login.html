@@ -27,13 +27,14 @@ body {
     <p>Please enter your credentials below:</p>
           <div class="login">
   <div class="login-triangle"></div>
-  <h2 class="login-header">Welcome back student!</h2>
-  <form class="login-container" action="{{ url_for('student_login') }}" method="post">
+  <h2 class="login-header">Welcome back, student!</h2>
+  <form class="login-container" action="{{ url_for('student_login') }}" method="POST">
     <p><input type="email" name="student_email_2" placeholder="Email"></p>
     <p><input type="password" name="student_password_2" placeholder="Password"></p>
     <p><input type="submit" value="Log in"></p>
   </form>
 </div>
+
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}

@@ -2,8 +2,6 @@
 
 {% block content %}
 
-<title>VigLMS | Take Attendance</title>
-
 <head>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -26,7 +24,7 @@
   <a href="{{url_for('logout')}}">Logout of {{username}}</a>
   </div>
 
-<title>VigLMS | Take Attendance</title>
+<title>VigLMS | Take Attendance For {{ class_name }} On {{ date_object }}</title>
 
 </div>
 
@@ -97,7 +95,7 @@
 <form action="/search_attendance_by_date" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Search" name='search_attendance_by_date' style="width: 200px;">
+            placeholder="Date" name='search_attendance_by_date' style="width: 200px;">
     </div>
         <button type="submit" class="btn btn-success">Search attendance by date.</button>
 </form>
@@ -110,7 +108,7 @@ of the table above.</h45>
 <form action="/search_attendance_by_student" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Search" name='search_attendance_by_student' style="width: 200px;">
+            placeholder="Student ID" name='search_attendance_by_student' style="width: 200px;">
     </div>
         <button type="submit" class="btn btn-success">Search attendance by student.</button>
 </form>

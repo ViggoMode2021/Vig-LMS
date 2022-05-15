@@ -73,15 +73,16 @@
 </div>
 </div>
 
-
                     <br /><br />
 
-                    <h4>My account information:</h4>
+<h4>My account information:</h4>
 <h6>First Name: {% for name in first_name %} {{ name }} {% endfor %}</h6>
-                    <h6>Last Name: {% for name in last_name %} {{ name }} {% endfor %}</h6>
+<h6>Last Name: {% for name in last_name %} {{ name }} {% endfor %}</h6>
 <h6>Email: {% for email in email %} {{ email }} {% endfor %}</h6>
 <h6>Class name: {% for class in class_name %} {{ class }} {% endfor %}</h6>
 <h6>Enrolled on: {% for date in enrollment_date %} {{date}} {% endfor %}</h6>
+<h6>Number of documents uploaded by your teacher:{% for document in teacher_document_count %} {{document}} {% endfor %}</h6>
+<h6>Number of documents uploaded by you: {% for document in student_document_count %} {{document}} {% endfor %}</h6>
 <h6>Account created on: {% for date in account_creation_date %} {{date}} {% endfor %}</h6>
 <h6>Number of logins: {% for count in student_login_count %} {{count}} {% endfor %}</h6>
 
