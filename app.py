@@ -28,12 +28,12 @@ current_time = now.strftime("%I:%M %p")
 
 app = Flask(__name__)
 
-app.secret_key = 'ryanv203' #Secret key for sessions
+app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
 DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
-DB_NAME = "VIG_LMS"
+DB_NAME = "#"
 DB_USER = "postgres"
 DB_PASS = "#"
 
@@ -304,6 +304,7 @@ def register():
 
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+
         # Create variables to reference for below queries
         fullname = request.form['fullname']
         username = request.form['username']
@@ -315,22 +316,28 @@ def register():
         _hashed_password = generate_password_hash(password)
 
         # Check if account exists:
-        cursor.execute('SELECT * FROM users WHERE username = %s;', (username,))
+        cursor.execute('SELECT username FROM users WHERE username = %s;', (username,))
         account = cursor.fetchone()
+
+        cursor.execute('SELECT email FROM users WHERE email = %s;', (email,))
+        email = cursor.fetchone()
+
         # If account exists show error and validation checks
         if account:
-            flash('Account already exists!')
-            cursor.close()
-            conn.close()
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            flash('Invalid email address!')
-            cursor.close()
-            conn.close()
+            for a in account:
+                flash(f'Account already exists for {a}!')
+                cursor.close()
+                conn.close()
+        elif email:
+            for e in email:
+                flash(f'Account already exists for {e}!')
+                cursor.close()
+                conn.close()
         elif not re.match(r'[A-Za-z0-9]+', username):
             flash('Username must contain only characters and numbers!')
             cursor.close()
             conn.close()
-        if len(password) < 5:
+        elif len(password) < 5:
             flash('Password must be longer than 5 characters.')
             cursor.close()
             conn.close()
@@ -367,11 +374,11 @@ def register():
             cursor.close()
             conn.close()
     elif request.method == 'POST':
-        # Form is empty
+    # Form is empty
         flash('Please fill out the form!')
         cursor.close()
         conn.close()
-    # Show registration form with message (if applicable)
+        # Show registration form with message (if applicable)
     return render_template('register.html')
 
 @app.route('/logout')
