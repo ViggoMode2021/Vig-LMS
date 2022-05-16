@@ -33,7 +33,7 @@ app.secret_key = '#' #Secret key for sessions
 #Database info below:
 
 DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
-DB_NAME = "#"
+DB_NAME = "VIG_L#MS"
 DB_USER = "postgres"
 DB_PASS = "#"
 
@@ -668,13 +668,20 @@ def update_attendance_record_query_individual_student(id):
 
         attendance = request.form.get('attendance')
 
+        cursor.execute("""SELECT attendance_status FROM attendance WHERE id = %s;""", (id,))
+        attendance_status = cursor.fetchone()
+
+        cursor.execute("""SELECT date FROM attendance WHERE id = %s;""", (id,))
+        attendance_date = cursor.fetchone()
+
         cursor.execute("""UPDATE attendance 
             SET attendance_status = %s 
             WHERE id = %s;""", (attendance, id))
 
         conn.commit()
 
-        flash('Attendance updated successfully!')
+        for attendance_stat, date in zip(attendance_status, attendance_date):
+            flash(f'Attendance updated successfully from {attendance_stat} to {attendance} on {date}!')
 
         cursor.close()
         conn.close()
@@ -710,9 +717,24 @@ def update_individual_assignment_grade(id):
 
          update_assignment_grade = request.form.get('update_assignment_grade')
 
+         cursor.execute("""SELECT score FROM assignment_results WHERE id = {0};""".format(id))
+         original_score = cursor.fetchone()
+
+         cursor.execute("""SELECT assignment_id FROM assignment_results WHERE id = {0};""".format(id))
+         assignment_id = cursor.fetchone()[0]
+
+         cursor.execute("""SELECT assignment_name FROM assignments WHERE id = %s;""", (assignment_id,))
+         assignment_name = cursor.fetchone()
+
          cursor.execute("""UPDATE assignment_results 
             SET score = %s 
             WHERE id = %s;""".format(id), (update_assignment_grade, id))
+
+         cursor.execute("""SELECT student_first_name FROM classes WHERE id = %s""", [session['student_id']],)
+         first_name = cursor.fetchone()
+
+         cursor.execute("""SELECT student_first_name FROM classes WHERE id = %s""", [session['student_id']],)
+         last_name = cursor.fetchone()
 
          cursor.execute("""UPDATE classes 
                         SET student_grade = (
@@ -722,7 +744,9 @@ def update_individual_assignment_grade(id):
 
          conn.commit()
 
-         flash('Assignment grade for  updated successfully.')
+         for first, last, original, assignment in zip(first_name,last_name, original_score, assignment_name):
+            flash(f'Assignment grade for {first} {last} updated successfully from {original} to {update_assignment_grade} for'
+                  f' assignment titled "{assignment}".')
 
          cursor.close()
          conn.close()
@@ -746,6 +770,10 @@ def query_individual_student(id):
          student_id_for_edit = cursor.fetchone()
 
          session['student_id'] = student_id_for_edit['id']
+
+         session['student_first_name'] = student_id_for_edit['student_first_name']
+
+         session['student_last_name'] = student_id_for_edit['student_last_name']
 
          cursor.execute("""SELECT
          student_email
