@@ -11,10 +11,10 @@ import boto3
 
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/#'
+                    aws_secret_access_key= '#/qZC/ew5R13vch7kgrD'
                      )
 
-BUCKET_NAME = '#'
+BUCKET_NAME = 'viglmsdocuments'
 
 date = datetime.date.today()
 
@@ -32,10 +32,10 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
-DB_NAME = "VIG_L#MS"
-DB_USER = "postgres"
-DB_PASS = "#"
+DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_NAME = "#"
+DB_USER = "#"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
@@ -307,9 +307,9 @@ def register():
 
         # Create variables to reference for below queries
         fullname = request.form['fullname']
+        email = request.form['email']
         username = request.form['username']
         password = request.form['password']
-        email = request.form['email']
         class_name = request.form['class_name']
         secret_question = request.form['secret_question']
 
@@ -320,7 +320,7 @@ def register():
         account = cursor.fetchone()
 
         cursor.execute('SELECT email FROM users WHERE email = %s;', (email,))
-        email = cursor.fetchone()
+        email_confirm = cursor.fetchone()
 
         # If account exists show error and validation checks
         if account:
@@ -328,8 +328,8 @@ def register():
                 flash(f'Account already exists for {a}!')
                 cursor.close()
                 conn.close()
-        elif email:
-            for e in email:
+        elif email_confirm:
+            for e in email_confirm:
                 flash(f'Account already exists for {e}!')
                 cursor.close()
                 conn.close()
@@ -357,10 +357,6 @@ def register():
             flash('Password should have at least one lowercase letter.')
             cursor.close()
             conn.close()
-        elif not username or not password or not email:
-            flash('Please fill out the form!')
-            cursor.close()
-            conn.close()
         else:
             # Account doesn't exist and the form data is valid, new account is created in the users table with the below queries:
             cursor.execute("INSERT INTO users (fullname, username, password, email, class, secret_question, account_creation_date) VALUES (%s,%s,%s,%s,%s,%s,%s);", (fullname, username, _hashed_password, email, class_name, secret_question, date_object))
@@ -373,11 +369,6 @@ def register():
                   f'" {class_name}".')
             cursor.close()
             conn.close()
-    elif request.method == 'POST':
-    # Form is empty
-        flash('Please fill out the form!')
-        cursor.close()
-        conn.close()
         # Show registration form with message (if applicable)
     return render_template('register.html')
 
@@ -2775,4 +2766,4 @@ def delete_student_account():
     return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
