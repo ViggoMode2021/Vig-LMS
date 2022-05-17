@@ -11,7 +11,7 @@ import boto3
 
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/ew5R13vch7kgrD'
+                    aws_secret_access_key= '#/qZC/#'
                      )
 
 BUCKET_NAME = 'viglmsdocuments'
@@ -32,10 +32,10 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
 DB_NAME = "#"
 DB_USER = "#"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -144,7 +144,8 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
     if request.method == 'POST':
         img = request.files['file']
         if img:
-                filename = secure_filename(img.filename)
+                email = [session['email']]
+                filename = secure_filename(img.filename + str(email))
                 img.save(filename)
                 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -170,8 +171,7 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
 def delete_file(id): # Delete file from S3 bucket from teacher account.
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s ORDER BY upload_date'
-                   'ASC;'.format(id), [session['email']])
+    cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s ORDER BY upload_date ASC;'.format(id), [session['email']])
     assignment_download_name = cursor.fetchone()
     cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
     account = cursor.fetchone()
@@ -189,8 +189,7 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
     )
     cursor.execute('DELETE FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['email']])
     conn.commit()
-    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date'
-                   'DESC;', [session['email']])
+    cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date DESC;', [session['email']])
     assignment_files = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -2286,10 +2285,10 @@ def student_assignments():
 
         student_assignments = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date DESC;', [session['class_creator']])
         student_assignments_originals = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
+        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s ORDER BY upload_date DESC;', [session['student_email']])
         student_assignments_student_s3 = cursor.fetchall()
 
         first_name = session['student_first_name']
@@ -2311,7 +2310,7 @@ def student_assignment_originals_download(id):
 
         cursor.execute('SELECT assignment_name FROM assignment_files_teacher_s3 WHERE id = {0} AND assignment_creator = %s;'.format(id), [session['class_creator']])
         assignment_download_name = cursor.fetchone()[0]
-        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date DESC;', [session['class_creator']])
         assignment_files = cursor.fetchall()
         cursor.execute("""SELECT
                     ci.id AS score_id,
@@ -2329,10 +2328,10 @@ def student_assignment_originals_download(id):
 
         student_assignments = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s;', [session['class_creator']])
+        cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date DESC;', [session['class_creator']])
         student_assignments_originals = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
+        cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s ORDER BY upload_date DESC;', [session['student_email']])
         student_assignments_student_s3 = cursor.fetchall()
 
         cursor.close()
@@ -2401,7 +2400,7 @@ def delete_student_upload(id):
     if 'loggedin' in session: # Show user and student information from the db
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s;'.format(id), [session['student_email']])
+        cursor.execute('SELECT file_name FROM assignment_files_student_s3 WHERE id = {0} AND student_email = %s ORDER BY upload_date DESC;'.format(id), [session['student_email']])
         assignment_delete_name = cursor.fetchone()
         for name in assignment_delete_name:
             flash(f'{name} deleted!')
@@ -2432,7 +2431,8 @@ def student_documents_to_teacher():
         if request.method == 'POST':
             img_2 = request.files['file_2']
             if img_2:
-                    filename = secure_filename(img_2.filename)
+                    email = [session['student_email']]
+                    filename = secure_filename(img_2.filename + str(email))
                     img_2.save(filename)
                     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -2766,4 +2766,4 @@ def delete_student_account():
     return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
