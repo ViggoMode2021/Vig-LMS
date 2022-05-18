@@ -9,6 +9,8 @@ import datetime
 # VigLMS uses boto3 for users to upload and download files across accounts.
 import boto3
 
+#Access keys below
+
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
                     aws_secret_access_key= '#/qZC/#'
