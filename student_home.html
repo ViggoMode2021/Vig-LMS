@@ -14,7 +14,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/student_portal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student_home.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('student_home')}}">Main</a>
@@ -76,15 +76,25 @@
                     <br /><br />
 
 <h4>My account information:</h4>
-<h6>First Name: {% for name in first_name %} {{ name }} {% endfor %}</h6>
-<h6>Last Name: {% for name in last_name %} {{ name }} {% endfor %}</h6>
-<h6>Email: {% for email in email %} {{ email }} {% endfor %}</h6>
-<h6>Class name: {% for class in class_name %} {{ class }} {% endfor %}</h6>
-<h6>Enrolled on: {% for date in enrollment_date %} {{date}} {% endfor %}</h6>
-<h6>Number of documents uploaded by your teacher:{% for document in teacher_document_count %} {{document}} {% endfor %}</h6>
-<h6>Number of documents uploaded by you: {% for document in student_document_count %} {{document}} {% endfor %}</h6>
-<h6>Account created on: {% for date in account_creation_date %} {{date}} {% endfor %}</h6>
-<h6>Number of logins: {% for count in student_login_count %} {{count}} {% endfor %}</h6>
+<br />
+<h6>First Name:</h6>
+<h7>{% for name in first_name %} {{ name }} {% endfor %}</h7>
+<h6>Last Name:</h6>
+<h7>{% for name in last_name %} {{ name }} {% endfor %}</h7>
+<h6>Email:</h6>
+<h7>{% for email in email %} {{ email }} {% endfor %}</h7>
+<h6>Class name:</h6>
+<h7>{% for class in class_name %} {{ class }} {% endfor %}</h7>
+<h6>Enrolled on:</h6>
+<h7>{% for date in enrollment_date %} {{date}} {% endfor %}</h7>
+<h6>Number of documents uploaded by your teacher:</h6>
+<h7>{% for document in teacher_document_count %} {{document}} {% endfor %}</h7>
+<h6>Number of documents uploaded by you:</h6>
+<h7>{% for document in student_document_count %} {{document}} {% endfor %}</h7>
+<h6>Account created on:</h6>
+<h7>{% for date in account_creation_date %} {{date}} {% endfor %}</h7>
+<h6>Number of logins:</h6>
+<h7>{% for count in student_login_count %} {{count}} {% endfor %}</h7>
 
 <br /><br />
 
