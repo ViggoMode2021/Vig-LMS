@@ -39,6 +39,16 @@
 
 <h44>{% for row in due_date %}{{row[0]}} {% endfor %}</h44>
 
+<br /><br />
+
+<h43>Upload file for assignment:</h43>
+
+<input type="file" name="file_3" value="file">
+<button class="custom-btn btn-3" name="upload" id="upload"><span>Upload</span></button>
+<form action="/upload_assignment" method="POST" enctype="multipart/form-data"Upload assignment</a>
+</form>
+
+<h43>Download file for assignment:</h43>
 
 <br /><br />
 
@@ -98,6 +108,5 @@
 </div>
 
   </div>
-
 
 {% endblock %}

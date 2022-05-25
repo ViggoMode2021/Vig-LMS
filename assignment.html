@@ -66,8 +66,7 @@ first before doing so.</p>
                 <td width="110">
                     <a href="/edit_assignment_grade/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Add/update student grades</a>
                     <form action="/edit_assignment_grade/{{row[0]}}" method="POST">
-</form>
-
+                        </form>
                 </td>
             </tr>
             {% endfor %}
@@ -148,7 +147,6 @@ first before doing so.</p>
 
 </div>
 
-
  <hr style="width:66%;text-align:center;margin-left:0">
 
     <form action="/assignment" method="GET">
@@ -160,7 +158,6 @@ first before doing so.</p>
     <form action="/view_assignment_scores" method="GET">
     <button type="submit" class="btn btn-success">View scores for all assignments and students</button>
 </form>
-
 
 <br /><br />
 
@@ -174,7 +171,6 @@ first before doing so.</p>
 
 </body>
 
-
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}
@@ -187,6 +183,5 @@ first before doing so.</p>
     {% endfor %}
     {% endif %}
     {% endwith %}
-
 
 {% endblock %}
