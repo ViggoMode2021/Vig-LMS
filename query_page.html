@@ -9,7 +9,7 @@
 <link rel="manifest" href="/site.webmanifest">
 </head>
 
-<title>VigLMS | Class Roster</title>
+<title>VigLMS | Class Roster For {{ class_name }}</title>
 
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -49,11 +49,12 @@
     {% endif %}
     {% endwith %}
 
-<h8>Your class roster for {{ class_name }}:</h8>
-<br />
+<h8>Your class roster for {{ class_name }}</h8>
+<br /><br />
 <h7>Click on the respective student's ID or grade in the table below to see a full breakdown of his or her grades and attendance.</h7>
-<br />
+<br /><br />
 <h7>Click on the respective student's first name, last name, or graduation year in the table below to edit said information.</h7>
+<br /><br />
 
     <form action="/enroll_page" method="GET">
     <button type="submit" class="btn btn-success">Enroll new student</button>
@@ -72,9 +73,8 @@
     </div>
 </div>
 
-
 <div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style="width:100%">
+    <table id="example" class="table table-striped table-bordered" style=background-color:#ffffff;">
         <thead>
             <tr>
                 <th>ID <br /> (click to view more information)</th>

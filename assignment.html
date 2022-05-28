@@ -14,7 +14,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="static/css/query_page_2.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('home')}}">Main</a>
@@ -38,7 +38,7 @@ Click 'add new assignment' to add a new assignment. Please be sure to click 'upd
 first before doing so.</p>
 
 <div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style="width:100%">
+    <table id="example" class="table table-striped table-bordered" style="width:100%" style=background-color:#ffffff;>
         <thead>
             <tr>
                 <th>ID:</th>
@@ -69,6 +69,7 @@ first before doing so.</p>
                         </form>
                 </td>
             </tr>
+                     </thead>
             {% endfor %}
         </tbody>
     </table>
@@ -92,7 +93,6 @@ first before doing so.</p>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
 
 <div class="container">
   <!-- Trigger the modal with a button -->
@@ -131,11 +131,9 @@ first before doing so.</p>
             placeholder="Max points" name='max points' style="width: 200px;">
     </div>
 
-
     <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-success">Create assignment</button>
 </form>
-
 
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -168,6 +166,15 @@ first before doing so.</p>
     </div>
         <button type="submit" class="btn btn-success">View scores and assignments for a particular student (search by last name).</button>
 </form>
+
+    <html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Table Style</title>
+	<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+</head>
+
+  </body>
 
 </body>
 
