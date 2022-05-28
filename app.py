@@ -145,7 +145,8 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
         img = request.files['file']
         if img:
                 email = [session['email']]
-                filename = secure_filename(img.filename + str(email))
+                email_save = "  email  " + str(email)
+                filename = secure_filename(img.filename + email_save)
                 img.save(filename)
                 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -192,7 +193,7 @@ def upload_assignment(): # Upload file to S3 bucket from teacher account. Files 
                 )
         else:
             flash('No file has been selected to upload. Please click "Choose File button".')
-            return redirect(url_for("assignment", username=session['username'], class_name=session['class_name']))
+            return request.referrer()
 
         flash(f'{filename_3} has been uploaded to teacher and student portal for {class_name}.')
         return redirect(url_for("assignment", username=session['username'], class_name=session['class_name']))
@@ -2479,7 +2480,7 @@ def student_documents_to_teacher():
             img_2 = request.files['file_2']
             if img_2:
                     email = [session['student_email']]
-                    filename = secure_filename(img_2.filename + str(email))
+                    filename = secure_filename(img_2.filename + "  email  " + str(email))
                     img_2.save(filename)
                     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
