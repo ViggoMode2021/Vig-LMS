@@ -1,100 +1,227 @@
-{% block content %}
-
-<head>
-         <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-</head>
-
-<title>VigLMS | Teacher Home for {{ username }}</title>
-
-    <h1 style="text-align:center;">¡Welcome to your Vig LMS gradebook, {{ username }}!</h1>
-
+<!DOCTYPE html>
+<html>
 <style>
-    body{
-    background-color: white;
+ /*
+    Colors : #FFB700 , #4A4A4A
+*/
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* Start Main Css */
+
+nav
+{
+  width: 80%;
+  margin-left: 10%;
+  height: 80px;
+}
+nav .logo
+{
+  float: left;
+  width: 30%;
+  background: #0000FF;
+  height: 100%;
+  text-align: center;
+  padding-top: 9px;
+  box-sizing: border-box;
+}
+nav .mainnav
+{
+  width: 70%;
+  float: left;
+  background: #4A4A4A;
+  height: 100%;
+}
+nav .mainnav ul
+{
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+nav .mainnav ul li
+{
+  list-style-type: none;
+  width: 20%;
+  float: left;
+  text-align: center;
+  height: 100%;
+  line-height: 80px;
+}
+nav .mainnav ul li a
+{
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+body {background-color: black;}
+
+h1{
+color: white;
+}
+
+h3{
+color: red;
+}
+
+h4{
+color: yellow;
+font-family: courier;
+font-size: 30px;
+
+}
+
+#address_link_text{
+color: white;
+text-decoration: none;
+font-family: lucinda;
+font-size: 20px;
+}
+
+#address_link_position{
+text-align: center;
+}
+
+#div_position_misc{
+text-align: center;
+}
+
+p{
+color: white;
+font-family: arial;
+font-size: 20px;
+
+}
+
+p2{
+color: white;
+font-family: arial;
+font-size: 20px;
+
+}
+
+p3{
+color: white;
+font-family: arial;
+font-size: 20px;
+
+}
+
+#services_list{
+color: white;
+font-family: times;
+font-size: 25px;
+}
+
+footer {
+  text-align: center;
+  padding: 3px;
+  background-color: DarkSalmon;
+  color: white;
 }
 </style>
-<h1 class="h2">Home</h1>
-<p>Welcome back, {{ username }}! Your class title is {{ class_name }}.</p>
+</head>
+<body>
+</style>
+  <head>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Viglione Investigations - Home</title>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <h1>Viglione Investigations</h1>
+      </div>
+      <div class="mainnav">
+        <ul class="mainul">
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-services' %}">PI Services</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-testimonials' %}">Testimonials</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-references' %}">References</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-contact_us' %}">Contact Us</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </body>
 
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="static/css/main_page.css">
-
- <div class="topnav">
-   <a class="active" href="{{url_for('home')}}">Main</a>
-         <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
-        <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
-     <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
-          <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
-     <a href="{{url_for('upload_file_page')}}">Upload files for {{ class_name }}</a>
-  <a href="{{url_for('logout')}}">Logout of {{username}}</a>
-
+<div id = "div_position_misc">
+<h3>Private investigator located in Branford, Connecticut. We serve all of Connecticut!</h3>
 </div>
 
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+<br>
+<div id = "address_link_position">
+<a id="address_link_text" href="https://www.google.com/maps/place/40+E+Industrial+Rd,+Branford,+CT+06405/@41.299105,-72.755853,17z/data=!3m1!4b1!4m5!3m4!1s0x89e7d4f5460fc6d1:0xc94b72d3a0d204b2!8m2!3d41.299105!4d-72.755853">
+ Address: 40 North East Industrial Road, Floor #2, Branford, Connecticut, 06405
+</a>
+ </div>
 
-<br /><br />
-
-</div class="container">
-
-                        <p>This app was created with Python/Flask, as well as PostgreSQL/psycopg2. It is a gradebook
-                        that reinforces CRUD (Create, Read, Update, Delete). The 'create' allows students to be enrolled, 'read'
-                        allows the user to see the class roster, 'update' allows the user to update a student's grade, and 'delete'
-                        allows the user to remove a student from a class. Please use the navbar above to navigate through the app! Thank
-                        you! - Ryan Viglione</p>
-
-                        <div class="col align-self-center">
-         <img src="static/images/postgresql.png" width="150">
+<div id = "div_position_misc">
+<h4>About:</h4>
     </div>
 
-<br /><br />
+<p>
+ Viglione Investigations is your preferred private investigator serving all CT. Sal Viglione is a retired police officer with the New Haven police department who oversees and assist clients to win their cases. As licensed investigators, we respect your need for a private investigator and handle your case with the utmost care and discretion.  With over 25 years of experience,
+ Salvatore Viglione has the insight for what happens in proceedings and what effects sloppy police work can have on a falsely accused perpetrator.
+</p>
 
-<h4>My account information:</h4>
+<p2>
+ Viglione Investigations specializes in criminal defense cases specializing in habeas corpus, indigent, court appointed,
+ conflict and ex parte cases. Salvatore Viglione is a vendor for the Connecticut Public Defenders office.
+ We also handle all types of business and personal fraud and litigation services,
+ but we are well suited to handle any type of investigation from simple surveillance investigations
+ to more complex fraud and embezzlement cases.</p2>
 
-<h6>Name: {{ name }}</h6>
-<h6>Username: {{ username }}</h6>
-<h6>Email: {{ email }}</h6>
-<h6>Class name: {{ class_name }}</h6>
-<h6>Account created on: {% for date in account_creation_date %} {{date}} {% endfor %}</h6>
-<h6>Number of students enrolled in {{class_name}}: {% for number in student_count %} {{number}} {% endfor %}</h6>
-<h6>Number of assignments created in {{class_name}}: {% for assignment_number in assignment_count %} {{assignment_number}} {% endfor %}</h6>
-<h6>Number of documents uploaded to {{class_name}}: {% for document in teacher_document_count %} {{document}} {% endfor %}</h6>
-<h6>Number of logins: {% for count in login_count %} {{count}} {% endfor %}</h6>
+<br><br>
 
-<br /><br />
+<p3>
+ We are very meticulous with all our services and if the client qualifies, the state may pay for their services and pay the fees of the attorney and the investigator (although private cases require a retainer). Expert witness statements, photographs, and videos can be taken to help solidify and win your case!
+</p3>
 
-<h222>Table design credited to: <a href="https://github.com/pablorgarcia" target="_blank">Pablo García</a></h222>
+<br><br>
 
-<table class="container">
-	<thead>
-		<tr>
-			<th><h111>Latest login date:</h111></th>
-			<th><h111>Latest login time:</h111></th>
-		</tr>
-	</thead>
-	<tbody>
-                 {% for row in login_info %}
-		<tr>
-			<td>{{row[1]}}</td>
-			<td>{{row[2]}}</td>
-		</tr>
-{% endfor %}
-	</tbody>
-</table>
+<img src="static/images/Fueled.jpg"
+width="1600"
+     height="500"/>
 
-{% endblock %}
+<div id = "div_position_misc">
+<h4>Our Services Include:</h4>
+        </div>
+
+<ul id = "services_list">
+  <li>Complete compressive background reports</li>
+  <li>Infidelity cases</li>
+  <li>Divorce cases and disputes</li>
+    <li>Child custody and visitation cases</li>
+    <li>Surveillance and tailing cases</li>
+    <li>Locates</li>
+    <li>Missing persons</li>
+    <li>Property & asset checks</li>
+    <li>Worker Compensation cases</li>
+    <li>Slip & fall cases</li>
+    <li>Conflict & Ex parte cases</li>
+    <li>Vendor for the CT Chief Public Defenders Dept. Vendor # 145377</li>
+    <li>Hablamos español</li>
+</ul>
+
+<footer>
+  <p>Send email:<br>
+  <a href="viglioneinvestigations@yahoo.com">viglioneinvestigations@yahoo.com</a></p>
+      <p>Call now:<br>
+    <a href="tel:203-871-9742"><img src="static/images/phone.png" style="width:42px;height:42px;"></a>
+</footer>
+
+
+</html>
