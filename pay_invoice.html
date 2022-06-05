@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<style>
+ /*
+    Colors : #FFB700 , #4A4A4A
+*/
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: vazir;
+  background: #132a13;
+}
+
+/* Start Main Css */
+
+nav
+{
+  width: 80%;
+  margin-left: 10%;
+  height: 80px;
+}
+nav .logo
+{
+  float: left;
+  width: 30%;
+  background: #0000FF;
+  height: 100%;
+  text-align: center;
+  padding-top: 9px;
+  box-sizing: border-box;
+}
+nav .mainnav
+{
+  width: 70%;
+  float: left;
+  background: #4A4A4A;
+  height: 100%;
+}
+nav .mainnav ul
+{
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+nav .mainnav ul li
+{
+  list-style-type: none;
+  width: 20%;
+  float: left;
+  text-align: center;
+  height: 100%;
+  line-height: 80px;
+}
+nav .mainnav ul li a
+{
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  font-family: arial;
+}
+
+body {background-color: black;}
+
+h1{
+color: white;
+font-family: arial;
+}
+
+h3{
+color: red;
+}
+
+h4{
+color: yellow;
+font-family: courier;
+font-size: 30px;
+}
+
+#address_link_text{
+color: white;
+text-decoration: none;
+font-family: lucinda;
+font-size: 20px;
+}
+
+#address_link_position{
+text-align: center;
+}
+
+#div_position_misc{
+text-align: center;
+}
+
+p{
+color: white;
+font-family: arial;
+font-size: 20px;
+}
+
+.container
+{
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 60em;
+  *zoom: 1
+}
+
+footer {
+  text-align: center;
+  padding: 3px;
+  background-color: DarkSalmon;
+  color: white;
+}
+
+</style>
+
+ <head>
+    <link rel="stylesheet" href="R">
+    <title>Viglione Investigations - Testimonials</title>
+  </head>
+    <nav>
+      <div class="logo">
+        <h1>Viglione Investigations</h1>
+      </div>
+      <div class="mainnav">
+        <ul class="mainul">
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-testimonials' %}">Testimonials</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-references' %}">References</a>
+          </li>
+          <li>
+            <a href="{% url 'blog-pay_invoice' %}">Pay Invoice</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+<div id = "div_position_misc">
+<h4>Pay Invoice:</h4>
+
+    <img src="/static/images/paypal.png" style="width:42px;height:42px;">
+
+  <footer>
+  <i>Services available 24/7!</i><br>
+  <img src="/static/images/clock.png" style="width:42px;height:42px;">
+  <p>Send email:<br>
+  <a href="viglioneinvestigations@yahoo.com">viglioneinvestigations@yahoo.com</a></p>
+    <p>Call now (203) 871-9742:<br></p>
+    <a href="tel:203-871-9742"><img src="/static/images/phone.png" style="width:42px;height:42px;"></a>
+    <p>Fax # (203) 481-1668:<br></p>
+    <a href="Fax # (203) 481-1668"><img src="/static/images/fax.png" style="width:42px;height:42px;"></a><br>
+    <p>Facebook page:<br></p>
+    <a href="https://www.facebook.com/Private-criminal-defense-investigations-1134345970053033/"><img src="/static/images/facebook.png" style="width:42px;height:42px;"></a>
+</footer>
+
+
+    </div>

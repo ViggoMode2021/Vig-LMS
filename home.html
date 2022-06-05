@@ -23,6 +23,11 @@ p {
   padding: 10px;
 }
 
+i{
+  color: black;
+  font-size: 20px;
+}
+
 a::after {
   content: "";
   width: 56px;
@@ -136,6 +141,7 @@ body {background-color: black;}
 
 h1{
 color: white;
+font-family: arial;
 }
 
 h3{
@@ -219,7 +225,7 @@ footer {
             <a href="{% url 'blog-references' %}">References</a>
           </li>
           <li>
-            <a href="{% url 'blog-contact_us' %}">Contact Us</a>
+            <a href="{% url 'blog-pay_invoice' %}">Pay Invoice</a>
           </li>
         </ul>
       </div>
@@ -886,11 +892,16 @@ width="1600"
 <br>
 
 <footer>
+  <i>Services available 24/7!</i><br>
+  <img src="/static/images/clock.png" style="width:42px;height:42px;">
   <p>Send email:<br>
   <a href="viglioneinvestigations@yahoo.com">viglioneinvestigations@yahoo.com</a></p>
-      <p>Call now (203) 871-9742:<br>
-    <a href="tel:203-871-9742"><img src="static/images/phone.png" style="width:42px;height:42px;"></a>
+    <p>Call now (203) 871-9742:<br></p>
+    <a href="tel:203-871-9742"><img src="/static/images/phone.png" style="width:42px;height:42px;"></a>
+    <p>Fax # (203) 481-1668:<br></p>
+    <a href="Fax # (203) 481-1668"><img src="/static/images/fax.png" style="width:42px;height:42px;"></a><br>
+    <p>Facebook page:<br></p>
+    <a href="https://www.facebook.com/Private-criminal-defense-investigations-1134345970053033/"><img src="/static/images/facebook.png" style="width:42px;height:42px;"></a>
 </footer>
-
 
 </html>
