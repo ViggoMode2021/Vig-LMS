@@ -10,6 +10,80 @@ body {
   font-family: sans-serif;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: vazir;
+  background: #132a13;
+}
+
+p {
+  margin-bottom: 1.25rem;
+  color: #fff;
+  padding: 10px;
+}
+
+a::after {
+  content: "";
+  width: 56px;
+  height: 2px;
+  position: absolute;
+  background-color: #ecf39e;
+  bottom: 0;
+}
+
+.section-center {
+  width: 90vw;
+  margin: 50px auto 0;
+  max-width: 620px;
+}
+.question {
+  background: #31572c;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 2px;
+}
+.question-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+}
+
+.question-title p {
+  color: #ffffff;
+  font-weight: bolder;
+}
+.question-btn {
+  font-size: 1.5rem;
+  background: transparent;
+  border-color: transparent;
+  cursor: pointer;
+  color: #fff;
+}
+
+.question-text {
+  padding: 1rem 0 1.5rem 0;
+  border-top: 5px solid #4f772d;
+}
+
+/* hide text */
+.question-text {
+  display: none;
+}
+.show-text .question-text {
+  display: block;
+}
+.minus-icon {
+  display: none;
+}
+.show-text .minus-icon {
+  display: inline;
+}
+.show-text .plus-icon {
+  display: none;
+}
+
 /* Start Main Css */
 
 nav
@@ -55,6 +129,7 @@ nav .mainnav ul li a
   color: white;
   text-decoration: none;
   font-size: 18px;
+  font-family: arial;
 }
 
 body {background-color: black;}
@@ -71,7 +146,6 @@ h4{
 color: yellow;
 font-family: courier;
 font-size: 30px;
-
 }
 
 #address_link_text{
@@ -93,21 +167,18 @@ p{
 color: white;
 font-family: arial;
 font-size: 20px;
-
 }
 
 p2{
 color: white;
 font-family: arial;
 font-size: 20px;
-
 }
 
 p3{
 color: white;
 font-family: arial;
 font-size: 20px;
-
 }
 
 #services_list{
@@ -122,9 +193,10 @@ footer {
   background-color: DarkSalmon;
   color: white;
 }
+
 </style>
 </head>
-<body>
+
 </style>
   <head>
     <link rel="stylesheet" href="css/style.css">
@@ -139,9 +211,6 @@ footer {
         <ul class="mainul">
           <li>
             <a href="/">Home</a>
-          </li>
-          <li>
-            <a href="{% url 'blog-services' %}">PI Services</a>
           </li>
           <li>
             <a href="{% url 'blog-testimonials' %}">Testimonials</a>
@@ -216,10 +285,610 @@ width="1600"
     <li>Hablamos español</li>
 </ul>
 
+<br>
+
+<div id = "div_position_misc">
+<h4>Timeline of merits:</h4>
+        </div>
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <!-- font-awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- cdn font vazir -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/font-face.css">
+<!-- style  -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+      <section class="questions">
+        <!-- questions -->
+        <div class="section-center">
+          <!-- single question -->
+          <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>1.) 1983-1987</p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+            (4 years) University Of New Haven. Studied criminal justice and awarded Certificate Of Achievement in Security Management on May 8,1987.
+              </p>
+              <a href="#"></a>
+            </div>
+          </article>
+          <!-- end of single question -->
+          <!-- single question -->
+          <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  2.) Jan 19,1984
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Awarded martial arts 1st degree black belt and instructor certificate in Tae-Kwon-Do.
+              </p>
+              <a href="#">
+              </a>
+            </div>
+          </article>
+          <!-- end of single question -->
+          <!-- single question -->
+          <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>3.) 1989</p>
+              <!-- button -->
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Authored book "In Search of Biblical Gods". Published by Vantage Press, Inc. Library of Congress # 88-090150
+              </p>
+              <a href="#"></a>
+            </div>
+          </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  4.) Jan 6,1986
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                   Accepted into New Haven Police Academy and graduated on June 19, 1986
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  5.) March 21, 1986
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Awarded Marksman Certificate from New Haven Police Academy
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  6.) March 31,1987
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received letter of recognition from the Crime Prevention Unit at New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  7.) Oct.7, 1987
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Chief's Award of Merit at New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  8.) June 6, 1988
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Certificate of Commendation for Effective Police Work from New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  9.) April 25, 1989
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Chief's Award of Merit at New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  10.) May 11, 1989
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Chief's Award of Merit at New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  11.)  October 30, 1989
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                   Received letter of recognition from Awards Committee at New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  12.) April 12, 1990
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Certificate of Commendation from Patrol Division at New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  13.) August 26, 1991
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+            Received letter of recognition and appreciation from business owner of flea market
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  14.) May 6, 1992
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received letter of recognition of helping maintain peace and security from New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  15.) July 1, 1992
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+            Received letter of recognition from New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  16.) April 12, 1993
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Division Training Certificate for review & evaluation accomplishments from New Haven Police Department
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                 </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  17.) July 6, 1994
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received letter of recognition from New Haven Police Department regarding fireworks display on July 4, 1994.
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  18.) July 20, 1994
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+        Received letter of recognition from New Haven Police Department for CT Motorcycle Run
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  19.) September 28, 1994
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+        Letter of merit from Board of Police Commissioners at New Haven Police Department regarding the apprehension of two armed suspects (robbery).
+                  Award emphasizes sound judgement and proper utilization of police tactics.
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  20.) November 4, 1994
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+        Chief's Award of Merit for outstanding accomplishment of improved operations contributing to a more effective police service.
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  21.) October 8th, 1994
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+            Chief's Award of Merit
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  22.) September 17, 1996
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Unit Citation Certificate for Field Training Officer Program
+              </p>
+              <a href="#">
+              </a>
+            </div>
+                </article>
+          <!-- end of single question -->
+            <article class="question">
+            <!-- question title -->
+            <div class="question-title">
+              <p>
+                  23.) November 6, 1996
+              </p>
+              <button type="button" class="question-btn">
+                <span class="plus-icon">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
+                <span class="minus-icon">
+                  <i class="fa-solid fa-minus"></i>
+                </span>
+              </button>
+            </div>
+            <!-- question text -->
+            <div class="question-text">
+              <p>
+                  Received Chief's Award of Merit
+              </p>
+              </a>
+            </div>
+      </section>
+    </main>
+    <!-- javascript -->
+    <script src="static/js/accordion.js"></script>
+  </body>
+<br>
+
 <footer>
   <p>Send email:<br>
   <a href="viglioneinvestigations@yahoo.com">viglioneinvestigations@yahoo.com</a></p>
-      <p>Call now:<br>
+      <p>Call now (203) 871-9742:<br>
     <a href="tel:203-871-9742"><img src="static/images/phone.png" style="width:42px;height:42px;"></a>
 </footer>
 
