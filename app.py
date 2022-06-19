@@ -11,7 +11,7 @@ import boto3
 
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/#'
+                    aws_secret_access_key= '#'
                      )
 
 BUCKET_NAME = '#'
@@ -28,7 +28,7 @@ current_time = now.strftime("%I:%M %p")
 
 app = Flask(__name__)
 
-app.secret_key = 'ryanv203' #Secret key for sessions
+app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
@@ -2593,16 +2593,13 @@ def teacher_direct_message_page_submit():
         cursor.execute('SELECT * FROM student_accounts WHERE student_first_name = %s AND student_last_name = %s;', [session['student_first_name'], session['student_last_name']])
         student_account = cursor.fetchone()
         session['student_class_name'] = student_account['class']
-        cursor.execute("""SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s;""", [session['student_first_name'], session['student_last_name']])
 
-        class_fetch = cursor.fetchone()
+        cursor.execute('SELECT id FROM classes WHERE student_email = %s;', [session['student_email']])
+        student_id = cursor.fetchone()[0]
 
-        session['class_creator'] = class_fetch['class_creator']
-
-        session['id'] = class_fetch['id']
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
-        cursor.execute("INSERT INTO teacher_direct_message(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
-        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], session['id'], session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], student_id, session['class_creator']))
+        cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], student_id, session['class_creator']))
 
         conn.commit()
 
