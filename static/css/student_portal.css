@@ -1,27 +1,9 @@
-table, th {
+table, th, td {
     border: 2px solid black;
   }
 
-td {
-  background-color: #1F2739;
-  padding:20px;
-  text-align:left;
-  vertical-align:middle;
-  font-weight:300;
-  font-size:18px;
-  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-  border-right: 1px solid #C1C3D1;
-}
-
-body {
-  font-family: 'Open Sans', sans-serif;
-  font-weight: 300;
-  line-height: 1.42em;
-  background-color:#1F2739;
-}
-
 .topnav {
-  background-color: #333;
+  background-color: blue;
   overflow: hidden;
 }
 
@@ -40,7 +22,7 @@ body {
 }
 
 .topnav a.active {
-  background-color: #04AA6D;
+  background-color: red;
   color: white;
 }
 
@@ -49,6 +31,7 @@ h8{
 color: green;
 font-family: lucinda;
 font-size: 25px;}
+
 
 .dropdown {
   float: left;
@@ -72,7 +55,7 @@ font-size: 25px;}
 
 h7{
 
-color: white;
+color: blue;
 font-family: calibri;
 font-size: 18px;
 }
@@ -173,22 +156,18 @@ font-size: 18px;
   overflow: auto;
 }
 
-p{
+h30{
 
-color: black;
-font-family: courier;
-font-weight: bold;
-font-size: 15px;
-}
+color: blue;
+font-family: calibri;
+font-size: 30px;
+font-weight: bold;}
 
 /*
 	Side Navigation Menu V2, RWD
 	===================
 	Author: https://github.com/pablorgarcia
  */
-
-@charset "UTF-8";
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
 
 h111 {
   font-size:2em;
@@ -288,4 +267,12 @@ h222 a {
 @media (max-width: 800px) {
 .container td:nth-child(4),
 .container th:nth-child(4) { display: none; }
+}
+
+p{
+
+color: black;
+font-family: courier;
+font-weight: bold;
+font-size: 15px;
 }

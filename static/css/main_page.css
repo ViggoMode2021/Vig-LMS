@@ -1,23 +1,44 @@
-table, th {
-    border: 2px solid black;
-  }
-
-td {
-  background-color: #1F2739;
-  padding:20px;
-  text-align:left;
-  vertical-align:middle;
-  font-weight:300;
-  font-size:18px;
-  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-  border-right: 1px solid #C1C3D1;
+body{
+    background-color: white;
 }
 
-body {
-  font-family: 'Open Sans', sans-serif;
-  font-weight: 300;
-  line-height: 1.42em;
-  background-color:#1F2739;
+h1{
+    color: yellow;
+    font-family: courier;
+    font-size: 40px;
+}
+
+h5{
+    color: green;
+    font-family: courier;
+    font-size: 25px;
+}
+
+h3{
+    color: green;
+    font-family: courier;
+    font-size: 25px;
+}
+
+h4{
+    color: red;
+    font-family: arial;
+    font-size: 25px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+h6{
+    color: white;
+    font-family: courier;
+    font-size: 25px;
+}
+
+p{
+    color: white;
+    font-weight: bold;
+    font-family: calibri;
+    font-size: 20px;
 }
 
 .topnav {
@@ -44,141 +65,8 @@ body {
   color: white;
 }
 
-h8{
-
-color: green;
-font-family: lucinda;
-font-size: 25px;}
-
-.dropdown {
-  float: left;
-  overflow: hidden;
-}
-
-.dropdown .dropbtn {
-  font-size: 16px;
-  border: none;
-  outline: none;
-  color: white;
-  padding: 14px 16px;
-  background-color: inherit;
-  font-family: inherit;
-  margin: 0;
-}
-
-.dropdown:hover .dropbtn {
-  background-color: red;
-}
-
-h7{
-
-color: white;
-font-family: calibri;
-font-size: 18px;
-}
-
-h43{
-
-color: red;
-font-family: arial;
-font-size: 23px;}
-
-h44{
-
-color: black;
-font-family: arial;
-font-size: 18px;
-}
-
-h45{
-
-color: red;
-font-family: arial;
-font-size: 23px;}
-
-h46{
-
-color: black;
-font-family: arial;
-font-size: 18px;
-}
-
-h60{
-
-color: blue;
-font-family: calibri;
-font-size: 18px;
-}
-
 .alert {
    width:20%;
-}
-
-.button {
-  padding: 3px;
-  color: white;
-  background: red;
-  text-decoration: none;
-  font-size: 17px;
-  cursor: pointer;
-  transition: all 0.3s ease-out;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  transition: opacity 500ms;
-  visibility: hidden;
-  opacity: 0;
-}
-.overlay:target {
-  visibility: visible;
-  opacity: 1;
-}
-
-.popup {
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 5px;
-  width: 30%;
-  position: relative;
-  transition: all 5s ease-in-out;
-}
-
-.popup h2 {
-  margin-top: 0;
-  color: #333;
-  font-family: Tahoma, Arial, sans-serif;
-}
-.popup .close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  transition: all 200ms;
-  font-size: 30px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
-}
-.popup .close:hover {
-  color: #06D85F;
-}
-.popup .content {
-  max-height: 30%;
-  overflow: auto;
-}
-
-p{
-
-color: black;
-font-family: courier;
-font-weight: bold;
-font-size: 15px;
 }
 
 /*
@@ -189,6 +77,14 @@ font-size: 15px;
 
 @charset "UTF-8";
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.42em;
+  color:#A7A1AE;
+  background-color:#1F2739;
+}
 
 h111 {
   font-size:2em;
@@ -205,7 +101,7 @@ h222 {
   display: block;
   line-height:1em;
   padding-bottom: 2em;
-  color: black;
+  color: yellow;
 }
 
 h222 a {
@@ -259,7 +155,7 @@ h222 a {
 }
 
 .container th {
-	  background-color: #1F2739;
+	  background-color: black;
 }
 
 .container td:first-child { color: #FB667A; }
