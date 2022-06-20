@@ -1,0 +1,140 @@
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+
+<title>VigLMS | Class Roster For {{ class_name }}</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="static/css/query_page_2.css">
+
+ <div class="topnav">
+   <a class="active" href="{{url_for('home')}}">Main</a>
+           <div class="dropdown">
+  <button class="dropbtn">Sort by:</button>
+  <div class="dropdown-content">
+    <a href="/alphabetically">Last name</a>
+    <a href="/grade_ASC">Grade (low - high)</a>
+      <a href="/grade_DESC">Grade (high - low)</a>
+         <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
+        <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
+     <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
+          <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
+               <a href="{{url_for('upload_file_page')}}">Upload files for {{ class_name }}</a>
+  <a href="{{url_for('logout')}}">Logout of {{username}}</a>
+  </div>
+
+</div>
+
+</div>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<h8>Your class roster for {{ class_name }}</h8>
+<br /><br />
+<h7>Click on the respective student's ID or grade in the table below to see a full breakdown of his or her grades and attendance.</h7>
+<br /><br />
+<h7>Click on the respective student's first name, last name, or graduation year in the table below to edit said information.</h7>
+<br /><br />
+
+    <form action="/enroll_page" method="GET">
+    <button type="submit" class="btn btn-success">Enroll new student</button>
+</form>
+
+<div class="box">
+    <p>Input fields below to remove student:</p>
+            <form action="delete_student" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="First name" name='delete_first_name' style="width: 200px;">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Last name" name='delete_last_name' style="width: 200px;">
+            <button type="submit" class="btn btn-danger">Remove student</button>
+        </form>
+    </div>
+</div>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style=background-color:#ffffff;">
+        <thead>
+            <tr>
+                <th>ID <br /> (click to view more information)</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th>Student First Name</th>
+                <th>Student Last Name</th>
+                <th>Graduation Year</th>
+                <th>Grade</th>
+                <th>Enrolled on</th>
+                <th>Update grade</th>
+                <th>Student email</th>
+                <th>Send direct message</th>
+                <th>View direct messages (Outbox)</th>
+                <th>View direct messages (Inbox)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in records_2 %}
+            <tr>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[0]}}</a></td>
+	</div>
+</div>
+             </a></td>
+                <td>{{row[1]}}</td>
+                <td>{{row[2]}}</td>
+                <td><a href="/edit_individual_student/{{row[0]}}">{{row[3]}}</a></td>
+                <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
+                <td><a href="/edit_individual_student/{{row[0]}}">{{row[5]}}</a></td>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[6]}}</a></td>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[9]}}</a></td>
+
+                <td width="130">
+       <form action="/update_grade/{{row[0]}}" method="POST">
+                    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="width: 75px"
+            placeholder="update" name='update grade' style="width: 200px;" maxlength="3">
+                         <button type="submit" class="btn btn-warning">update</button>
+
+</form>
+                        </div>
+</div>
+<td><a href="/query_individual_student/{{row[0]}}">{{row[8]}}</a></td
+
+                </td>
+<td> <a href="/student_direct_message_page/{{row[0]}}" class="btn btn-info btn-delete btn-sm">Send direct message</a>
+</td>
+<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages (Outbox)</a>
+</td>
+<td> <a href="/view_teacher_direct_message_page/{{row[0]}}" class="btn btn-primary btn-delete btn-sm">View direct messages (Inbox)</a>
+</td>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<form action="/assignment" method="GET">
+    <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
+</form>
+
+{% endblock %}

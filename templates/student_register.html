@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+ <head>
+
+     <title>VigLMS | Student Register</title>
+
+  <meta charset="utf-8">
+  <span id = 'student_register_info' data-title="To login to use VigLMS, you need to remember: your email, your username, your password."></span>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_student_register.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+  <!-- Google Fonts -->
+  <link href='https://fonts.googleapis.com/css?family=Passion+One' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+ </head>
+ <style>
+body {
+  background-image: url('/static/images/space.jpg');
+}
+</style>
+<div id="Log_in_message">
+        <h44>To log in and use your VigLMS student account, you need to remember: your email and your password. You also need to be enrolled
+        into the class that your teacher has a VigLMS account with.</h44>
+ <div class="login">
+  <div class="login-triangle"></div>
+  <h2 class="login-header">Register student account below</h2>
+  <form class="login-container" action="{{ url_for('student_register') }}" method="POST">
+<span data-title="To login to use VigLMS, you need to remember: your email, your username, your password."></span>
+      <div class="form-group">
+       <label for="name" class="cols-sm-2 control-label">Your first name:</label>
+          <br />
+          <h23>Your first name doesn't have to be unique. What if there are two people with the name Shakira?</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+         <input type="text" class="form-control" name="student_firstname" id="student_firstname" placeholder="Enter your first name"/>
+        </div>
+
+        <div class="form-group">
+       <label for="name" class="cols-sm-2 control-label">Your last name:</label>
+            <br />
+            <h23>Your last name doesn't have to be unique. What if there are two people with the last name Mebarak?</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+         <input type="text" class="form-control" name="student_lastname" id="student_lastname" placeholder="Enter your last name"/>
+        </div>
+       </div>
+      </div>
+
+        <div class="form-group">
+       <label for="name" class="cols-sm-2 control-label">Your email:</label>
+            <br />
+            <h23>Your email must be unique.</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+         <input type="text" class="form-control" name="student_email" id="student_email" placeholder="Enter your email"/>
+        </div>
+       </div>
+      </div>
+
+      <div class="form-group">
+       <label for="password" class="cols-sm-2 control-label">Password:</label>
+          <br />
+            <h23>Password must: be between 6-10 characters, contain one numeral, one lowercase letter, and one uppercase letter.</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+         <input type="password" class="form-control" name="student_password" autocomplete="new-password" placeholder="Password" id="student_password" required  placeholder="Enter your password"/>
+        </div>
+       </div>
+      </div>
+
+      <div class="form-group">
+       <label for="class_name" class="cols-sm-2 control-label">Class name:</label>
+          <br />
+            <h23>Your class name is the class that you are enrolled in.</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+         <input type="text" class="form-control" name="student_class_name" placeholder="Class name" id="student_class_name" required  placeholder="Class you are enrolled in"/>
+        </div>
+       </div>
+      </div>
+
+        <div class="form-group">
+       <label for="name" class="cols-sm-2 control-label">Your teacher's email:</label>
+            <br />
+            <h23>You need your teacher's email in order to confirm and register.</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+         <input type="text" class="form-control" name="teacher_email" id="teacher_email" placeholder="Enter your teacher's email"/>
+        </div>
+       </div>
+      </div>
+
+       <div class="form-group">
+       <label for="secret_question" class="cols-sm-2 control-label">Secret question: What is the name of the street you grew up on?:</label>
+           <br />
+           <h23>This doesn't have to be unique. There is probably more than one 'Stuart Avenue'. You will reset your password with this if need be.</h23>
+       <div class="cols-sm-10">
+        <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+         <input type="text" class="form-control" name="student_secret_question" placeholder="Secret question" id="student_secret_question" required  placeholder="Street name"/>
+        </div>
+       </div>
+      </div>
+      <div class="form-group ">
+
+       <input type="submit" value="Register" class="form-control btn btn-primary " name="">
+       <p style="padding:5px;">
+       <a href="{{ url_for('student_login') }}" class="btn btn-dark ">Login as a student</a></p>
+
+      </div>
+
+     </form>
+
+    </div>
+   </div>
+  </div>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ </body>
+</html>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
