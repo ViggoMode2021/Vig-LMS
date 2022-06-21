@@ -11,7 +11,7 @@ import boto3
 
 s3 = boto3.client('s3',
                     aws_access_key_id='#',
-                    aws_secret_access_key= '#'
+                    aws_secret_access_key= '#/qZC/#'
                      )
 
 BUCKET_NAME = '#'
@@ -32,10 +32,10 @@ app.secret_key = '#' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
+DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "#"
+DB_PASS = "Carrotcake2021"
 
 @app.route('/')
 def home():
@@ -83,6 +83,16 @@ def login():
 
     cursor.execute('SELECT COUNT (username) FROM users;')
     user_count = cursor.fetchone() #This shows the number of users using the application
+
+    date = datetime.date.today()
+
+    format_code = '%m-%d-%Y'
+
+    date_object = date.strftime(format_code)
+
+    now = datetime.datetime.now()
+
+    current_time = now.strftime("%I:%M %p")
 
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
@@ -2266,6 +2276,16 @@ def student_login():
 
     cursor.execute('SELECT COUNT (student_first_name) FROM student_accounts;')
     student_count = cursor.fetchone()
+
+    date = datetime.date.today()
+
+    format_code = '%m-%d-%Y'
+
+    date_object = date.strftime(format_code)
+
+    now = datetime.datetime.now()
+
+    current_time = now.strftime("%I:%M %p")
 
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'student_email_2' in request.form and 'student_password_2' in request.form:
