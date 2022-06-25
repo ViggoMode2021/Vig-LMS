@@ -28,14 +28,14 @@ current_time = now.strftime("%I:%M %p")
 
 app = Flask(__name__)
 
-app.secret_key = '#' #Secret key for sessions
+app.secret_key = 'ryanv203' #Secret key for sessions
 
 #Database info below:
 
-DB_HOST = "viglmsdatabase.cg5kocdwgcwg.us-east-1.rds.amazonaws.com"
+DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
 DB_NAME = "VIG_LMS"
 DB_USER = "postgres"
-DB_PASS = "Carrotcake2021"
+DB_PASS = "#"
 
 @app.route('/')
 def home():
@@ -1118,6 +1118,8 @@ def take_attendance_page():
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+         attendance_date_object = date.strftime(format_code)
+
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
 
@@ -1128,7 +1130,7 @@ def take_attendance_page():
          cursor.close()
          conn.close()
 
-         return render_template('take_attendance_page.html', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('take_attendance_page.html', attendance_date_object=attendance_date_object, take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1139,6 +1141,8 @@ def take_attendance(id):
          conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         attendance_date_object = date.strftime(format_code)
 
          cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
@@ -1152,7 +1156,7 @@ def take_attendance(id):
          attendance = request.form.get("attendance")
 
          cursor.execute('INSERT INTO attendance (date, attendance_status, student_id) VALUES (%s, %s, %s);'.format(id),
-                        (date_object, attendance, id))
+                        (attendance_date_object, attendance, id))
 
          conn.commit()
 
@@ -1166,7 +1170,7 @@ def take_attendance(id):
          cursor.close()
          conn.close()
 
-         return redirect(url_for('take_attendance_page', take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
+         return redirect(url_for('take_attendance_page', attendance_date_object=attendance_date_object,take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -1181,6 +1185,8 @@ def view_attendance_for_today():
          cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
 
+         attendance_date_object = date.strftime(format_code)
+
          cursor.execute("""SELECT
             a.id,
             s.student_first_name,
@@ -1191,14 +1197,14 @@ def view_attendance_for_today():
             FROM classes s
             INNER JOIN attendance AS a
             ON a.student_id = s.id
-            WHERE a.date = %s AND s.class_creator = %s;""", (date_object, session['email']))
+            WHERE a.date = %s AND s.class_creator = %s;""", (attendance_date_object, session['email']))
 
          search_attendance_query = cursor.fetchall()
 
          cursor.close()
          conn.close()
 
-         return render_template('view_attendance_for_today.html', search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('view_attendance_for_today.html', attendance_date_object=attendance_date_object,search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -2831,4 +2837,4 @@ def delete_student_account():
     return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
