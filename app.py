@@ -5,16 +5,28 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
+import boto3
+import os
+
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env_vig_lms")
+load_dotenv(dotenv_path)
+
+app = Flask(__name__)
+
+app.secret_key = os.getenv("SECRET_KEY")
 
 # VigLMS uses boto3 for users to upload and download files across accounts.
-import boto3
 
 s3 = boto3.client('s3',
-                    aws_access_key_id='#',
-                    aws_secret_access_key= '#/qZC/#'
+                    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
                      )
 
-BUCKET_NAME = '#'
+BUCKET_NAME = 'viglmsdocuments'
 
 date = datetime.date.today()
 
@@ -26,16 +38,12 @@ now = datetime.datetime.now()
 
 current_time = now.strftime("%I:%M %p")
 
-app = Flask(__name__)
-
-app.secret_key = 'ryanv203' #Secret key for sessions
-
 #Database info below:
 
-DB_HOST = "#.#.us-east-1.rds.amazonaws.com"
-DB_NAME = "VIG_LMS"
-DB_USER = "postgres"
-DB_PASS = "#"
+DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv('DB_USER')
+DB_PASS = os.getenv('DB_PASS')
 
 @app.route('/')
 def home():
@@ -2837,4 +2845,4 @@ def delete_student_account():
     return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
