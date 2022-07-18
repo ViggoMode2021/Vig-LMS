@@ -5,6 +5,8 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
+import pytz
+#US/Eastern
 import boto3
 import os
 
@@ -27,16 +29,6 @@ s3 = boto3.client('s3',
                      )
 
 BUCKET_NAME = 'viglmsdocuments'
-
-date = datetime.date.today()
-
-format_code = '%m-%d-%Y'
-
-date_object = date.strftime(format_code)
-
-now = datetime.datetime.now()
-
-current_time = now.strftime("%I:%M %p")
 
 #Database info below:
 
@@ -98,8 +90,8 @@ def login():
 
     date_object = date.strftime(format_code)
 
-    now = datetime.datetime.now()
-
+    timezone = pytz.timezone('US/Eastern')
+    now = datetime.datetime.now(tz=timezone)
     current_time = now.strftime("%I:%M %p")
 
     # Check if "username" and "password" POST requests exist (user submitted form)
@@ -162,6 +154,15 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
     if request.method == 'POST':
         img = request.files['file']
         if img:
+                date = datetime.date.today()
+
+                format_code = '%m-%d-%Y'
+
+                date_object = date.strftime(format_code)
+
+                timezone = pytz.timezone('US/Eastern')
+                now = datetime.datetime.now(tz=timezone)
+                current_time = now.strftime("%I:%M %p")
                 email = [session['email']]
                 email_save = "  email  " + str(email)
                 filename = secure_filename(img.filename + email_save)
@@ -191,6 +192,15 @@ def upload_assignment(): # Upload file to S3 bucket from teacher account. Files 
     if request.method == 'POST':
         img_3 = request.files['file_3']
         if img_3:
+                date = datetime.date.today()
+
+                format_code = '%m-%d-%Y'
+
+                date_object = date.strftime(format_code)
+
+                timezone = pytz.timezone('US/Eastern')
+                now = datetime.datetime.now(tz=timezone)
+                current_time = now.strftime("%I:%M %p")
                 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
                 email = [session['email']]
@@ -386,6 +396,14 @@ def register():
         cursor.execute('SELECT email FROM users WHERE email = %s;', (email,))
         email_confirm = cursor.fetchone()
 
+        date = datetime.date.today()
+
+        format_code = '%m-%d-%Y'
+
+        date_object = date.strftime(format_code)
+
+        timezone = pytz.timezone('US/Eastern')
+
         # If account exists show error and validation checks
         if account:
             for a in account:
@@ -495,6 +513,14 @@ def enroll_page_submit():
     cursor.execute('SELECT * FROM classes WHERE student_email = %s;', (student_email,))
     student_email_fetch = cursor.fetchone()
 
+    date = datetime.date.today()
+
+    format_code = '%m-%d-%Y'
+
+    date_object = date.strftime(format_code)
+
+    timezone = pytz.timezone('US/Eastern')
+
     if not first_name:
         flash('Please enter a first name.')
         cursor.close()
@@ -566,6 +592,12 @@ def edit_individual_student(id):
     if 'loggedin' in session: # Show user and student information from the db
          conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
 
          cursor.execute("""SELECT
          *
@@ -1126,6 +1158,12 @@ def take_attendance_page():
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
+
          attendance_date_object = date.strftime(format_code)
 
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
@@ -1138,7 +1176,7 @@ def take_attendance_page():
          cursor.close()
          conn.close()
 
-         return render_template('take_attendance_page.html', attendance_date_object=attendance_date_object, take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('take_attendance_page.html', attendance_date_object=attendance_date_object, take_attendance_query=take_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1149,6 +1187,12 @@ def take_attendance(id):
          conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
          cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
 
          attendance_date_object = date.strftime(format_code)
 
@@ -1178,7 +1222,7 @@ def take_attendance(id):
          cursor.close()
          conn.close()
 
-         return redirect(url_for('take_attendance_page', attendance_date_object=attendance_date_object,take_attendance_query=take_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']))
+         return redirect(url_for('take_attendance_page', attendance_date_object=attendance_date_object,take_attendance_query=take_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
 
@@ -1192,6 +1236,12 @@ def view_attendance_for_today():
 
          cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
+
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
 
          attendance_date_object = date.strftime(format_code)
 
@@ -1212,7 +1262,7 @@ def view_attendance_for_today():
          cursor.close()
          conn.close()
 
-         return render_template('view_attendance_for_today.html', attendance_date_object=attendance_date_object,search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('view_attendance_for_today.html', attendance_date_object=attendance_date_object,search_attendance_query=search_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1226,6 +1276,12 @@ def search_attendance_by_date():
 
          cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
          account = cursor.fetchone()
+
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
 
          search_attendance_by_date = request.form['search_attendance_by_date']
 
@@ -1252,7 +1308,7 @@ def search_attendance_by_date():
          cursor.close()
          conn.close()
 
-         return render_template('search_attendance_by_date.html', search_attendance_query=search_attendance_query, date_object = date_object, account=account, username=session['username'], class_name=session['class_name'],
+         return render_template('search_attendance_by_date.html', search_attendance_query=search_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
                                 search_attendance_by_date=search_attendance_by_date)
 
     return redirect(url_for('login'))
@@ -1269,6 +1325,14 @@ def search_attendance_by_student():
          account = cursor.fetchone()
 
          search_attendance_by_student= request.form['search_attendance_by_student']
+
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
+
+         timezone = pytz.timezone('US/Eastern')
 
          cursor.execute("""SELECT
             a.id,
@@ -1309,7 +1373,7 @@ def search_attendance_by_student():
          conn.close()
 
          return render_template('search_attendance_by_student.html', search_attendance_query_student=search_attendance_query_student, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
-                                search_attendance_by_date=search_attendance_by_date, student_first_name=student_first_name, student_last_name = student_last_name, student_tardy_count=student_tardy_count, student_present_count=student_present_count, student_absent_count=student_absent_count)
+                                search_attendance_by_date=search_attendance_by_date, student_first_name=student_first_name, student_last_name=student_last_name, student_tardy_count=student_tardy_count, student_present_count=student_present_count, student_absent_count=student_absent_count)
 
     return redirect(url_for('login'))
 
@@ -1640,7 +1704,7 @@ def view_teacher_direct_message_page(id):
         cursor.close()
         conn.close()
 
-        return render_template('view_teacher_direct_message_page.html', account=account, student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id = student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('view_teacher_direct_message_page.html', account=account, student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id=student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
                                )
 
     return redirect(url_for('login'))
@@ -1651,6 +1715,15 @@ def student_direct_message_page_submit(): #This function routes the logged in us
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if 'loggedin' in session:
+        date = datetime.date.today()
+
+        format_code = '%m-%d-%Y'
+
+        date_object = date.strftime(format_code)
+
+        timezone = pytz.timezone('US/Eastern')
+        now = datetime.datetime.now(tz=timezone)
+        current_time = now.strftime("%I:%M %p")
         message_subject = request.form.get("message_subject")
         student_direct_message_box = request.form.get("student_direct_message_box")
 
@@ -1986,6 +2059,15 @@ def announcements_page():
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if 'loggedin' in session:
+        date = datetime.date.today()
+
+        format_code = '%m-%d-%Y'
+
+        date_object = date.strftime(format_code)
+
+        timezone = pytz.timezone('US/Eastern')
+        now = datetime.datetime.now(tz=timezone)
+        current_time = now.strftime("%I:%M %p")
         cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
         account = cursor.fetchone()
         cursor.close()
@@ -2000,6 +2082,15 @@ def announcements_page_submit():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if 'loggedin' in session:
+        date = datetime.date.today()
+
+        format_code = '%m-%d-%Y'
+
+        date_object = date.strftime(format_code)
+
+        timezone = pytz.timezone('US/Eastern')
+        now = datetime.datetime.now(tz=timezone)
+        current_time = now.strftime("%I:%M %p")
         announcement_box = request.form.get("announcement_box")
         cursor.execute("INSERT INTO announcements(announcement_date, announcement_time, class, announcement, announcement_creator) VALUES (%s,%s,%s,%s,%s);", (date_object, current_time, session['class_name'], announcement_box, session['email']))
         conn.commit()
@@ -2019,6 +2110,12 @@ def view_announcements_by_date():
          cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
          account = cursor.fetchone()
 
+         date = datetime.date.today()
+
+         format_code = '%m-%d-%Y'
+
+         date_object = date.strftime(format_code)
+
          search_announcements_by_date = request.form.get("search_announcements_by_date")
 
          cursor.execute("""SELECT
@@ -2035,7 +2132,7 @@ def view_announcements_by_date():
          cursor.close()
          conn.close()
 
-         return render_template('view_announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object = date_object, account=account, username=session['username'], class_name=session['class_name']
+         return render_template('view_announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object=date_object, account=account, username=session['username'], class_name=session['class_name']
                                 )
 
     return redirect(url_for('login'))
@@ -2189,6 +2286,12 @@ def student_register():
         cursor.execute('SELECT * FROM classes WHERE student_first_name = %s AND student_last_name = %s AND class_name = %s AND class_creator = %s;', (student_firstname, student_lastname, student_class_name, teacher_email))
         student_verify = cursor.fetchone()
 
+        date = datetime.date.today()
+
+        format_code = '%m-%d-%Y'
+
+        date_object = date.strftime(format_code)
+
         if student_account:
             flash('Student account already exists!')
         elif not student_verify:
@@ -2297,8 +2400,8 @@ def student_login():
 
     date_object = date.strftime(format_code)
 
-    now = datetime.datetime.now()
-
+    timezone = pytz.timezone('US/Eastern')
+    now = datetime.datetime.now(tz=timezone)
     current_time = now.strftime("%I:%M %p")
 
     # Check if "username" and "password" POST requests exist (user submitted form)
@@ -2513,6 +2616,15 @@ def student_documents_to_teacher():
         if request.method == 'POST':
             img_2 = request.files['file_2']
             if img_2:
+                    date = datetime.date.today()
+
+                    format_code = '%m-%d-%Y'
+
+                    date_object = date.strftime(format_code)
+
+                    timezone = pytz.timezone('US/Eastern')
+                    now = datetime.datetime.now(tz=timezone)
+                    current_time = now.strftime("%I:%M %p")
                     email = [session['student_email']]
                     filename = secure_filename(img_2.filename + "  email  " + str(email))
                     img_2.save(filename)
@@ -2631,6 +2743,16 @@ def teacher_direct_message_page_submit():
         cursor.execute('SELECT id FROM classes WHERE student_email = %s;', [session['student_email']])
         student_id = cursor.fetchone()[0]
 
+        date = datetime.date.today()
+
+        format_code = '%m-%d-%Y'
+
+        date_object = date.strftime(format_code)
+
+        timezone = pytz.timezone('US/Eastern')
+        now = datetime.datetime.now(tz=timezone)
+        current_time = now.strftime("%I:%M %p")
+
         teacher_direct_message_box = request.form.get("teacher_direct_message_box")
         cursor.execute("INSERT INTO teacher_direct_message(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], student_id, session['class_creator']))
         cursor.execute("INSERT INTO teacher_direct_message_student_copy(date, time, class, message_subject, message, student_first_name, student_last_name, student_id, message_recipient) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);", (date_object, current_time, session['student_class_name'], message_subject, teacher_direct_message_box, session['student_first_name'], session['student_last_name'], student_id, session['class_creator']))
@@ -2671,7 +2793,7 @@ def student_messages():
         cursor.close()
         conn.close()
 
-        return render_template('student_messages.html', view_student_direct_messages=view_student_direct_messages,view_teacher_direct_messages=view_teacher_direct_messages,
+        return render_template('student_messages.html', view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages,
                                first_name=first_name, last_name=last_name)
 
     return redirect(url_for('login'))
@@ -2845,4 +2967,4 @@ def delete_student_account():
     return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
