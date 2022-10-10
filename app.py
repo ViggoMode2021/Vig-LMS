@@ -10,6 +10,10 @@ import pytz
 import boto3
 import os
 
+# To do: Get new s3 private s3 bucket and new AWS credentials
+
+# Change 'debug' to False
+
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -28,7 +32,7 @@ s3 = boto3.client('s3',
                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
                      )
 
-BUCKET_NAME = 'viglmsdocuments'
+BUCKET_NAME = os.getenv('BUCKET_NAME_VAR') # Set as environment variable
 
 #Database info below:
 
@@ -181,6 +185,7 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
                     Filename=filename,
                     Key=filename
                 )
+                os.remove(filename)
         else:
             flash('No file has been selected to upload. Please click "Choose File button".')
             return redirect(url_for("upload_file_page", username=session['username'], class_name=session['class_name']))
@@ -219,6 +224,7 @@ def upload_assignment(): # Upload file to S3 bucket from teacher account. Files 
                     Filename=filename_3,
                     Key=filename_3
                 )
+                os.remove(filename_3)
         else:
             flash('No file has been selected to upload. Please click "Choose File button".')
             return request.referrer()
@@ -234,8 +240,8 @@ def download_assignment(): # Download file from S3 bucket from teacher account. 
     assignment_download_name = cursor.fetchone()
     s3.download_file(
         BUCKET_NAME,
-        Filename = str(assignment_download_name),
-        Key= str(assignment_download_name)
+        Filename=str(assignment_download_name),
+        Key=str(assignment_download_name)
     )
     cursor.close()
     conn.close()
@@ -1673,8 +1679,9 @@ def view_student_direct_message_page(id):
         cursor.close()
         conn.close()
 
-        return render_template('view_student_direct_message_page.html', student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('view_student_direct_message_page.html', student_first_name_message=student_first_name_message, student_last_name_message=student_last_name_message, account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
                                )
+
     return redirect(url_for('login'))
 
 @app.route('/view_teacher_direct_message_page/<string:id>', methods=['GET'])
@@ -2589,7 +2596,7 @@ def delete_student_upload(id):
         assignment_delete_name = cursor.fetchone()
         for name in assignment_delete_name:
             flash(f'{name} deleted!')
-        s3.delete_objects(
+        s3.delete_object(
         Bucket=BUCKET_NAME,
         Delete={
             'Objects': [
