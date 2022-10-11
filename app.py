@@ -499,7 +499,7 @@ def enroll_page(): #This function routes the logged in user to the page to enrol
         account = cursor.fetchone()
         cursor.close()
         conn.close()
-        return render_template('enroll_page.html', account=account, username=session['username'], class_name=session['class_name'])
+        return render_template('enroll_student.html', account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login')) #User is redirected to the log in page if there is no session data
 
@@ -588,7 +588,7 @@ def query():
          cursor.close()
          conn.close()
 
-         return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1129,7 +1129,7 @@ def alphabetically():
         cursor.close()
         conn.close()
 
-        return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
+        return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1152,7 +1152,7 @@ def grade_ASC():
         cursor.close()
         conn.close()
 
-        return render_template('query_page.html', records_2=records_2, account = account, username=session['username'], class_name = session['class_name'])
+        return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name = session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1441,7 +1441,7 @@ def grade_DESC():
         cursor.close()
         conn.close()
 
-        return render_template('query_page.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
+        return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1778,7 +1778,7 @@ def assignment():
         cursor.close()
         conn.close()
 
-        return render_template('assignment.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
+        return render_template('assignment_list.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1802,17 +1802,17 @@ def new_assignment():
             flash('Please enter a category.')
             cursor.close()
             conn.close()
-            return render_template('assignment.html')
+            return render_template('assignment_list.html')
         if not due_date:
-            flash('Please enter an due date.')
+            flash('Please enter a due date.')
             cursor.close()
             conn.close()
-            return render_template('assignment.html')
+            return render_template('assignment_list.html')
         if not overall_points:
             flash('Please enter an overall point amount.')
             cursor.close()
             conn.close()
-            return render_template('assignment.html')
+            return render_template('assignment_list.html')
         else:
             cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
             conn.commit()
@@ -1828,7 +1828,7 @@ def new_assignment():
 
             flash('New assignment created!')
 
-        return render_template('assignment.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
+        return render_template('assignment_list.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -2974,4 +2974,4 @@ def delete_student_account():
     return render_template('student_login.html', student_count_2=student_count_2)
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
