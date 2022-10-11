@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
 
 <head>
-<title>VigLMS | View today's attendance {{ date_object }}</title>
+<title>VigLMS | Class Roster For {{ class_name }}</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -75,7 +75,8 @@
     <div class="welcome">
       <div class="content rounded-3 p-3">
         <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">View attendance for {{ class_name }} today {{ date_object }}</p>
+        <p class="mb-0">Post announcements for {{ class_name }} on {{date_object}} at {{current_time}}<br><br>
+        Announcements posted here will be posted to the student portal</p>
       </div>
     </div>
 
@@ -98,83 +99,51 @@
 
 <br>
 
-<br>
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
 
-<div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style=background-color:#ffffff;">
-        <thead>
-            <tr>
-                <th>ID <br /> (click to view more information)</th>
-                <th>Subject</th>
-                <th>Teacher</th>
-                <th>Student First Name</th>
-                <th>Student Last Name</th>
-                <th>Graduation Year</th>
-                <th>Grade</th>
-                <th>Enrolled on</th>
-                <th>Update grade</th>
-                <th>Student email</th>
-                <th>Send direct message</th>
-                <th>View direct messages (Outbox)</th>
-                <th>View direct messages (Inbox)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in records_2 %}
-            <tr>
-                <td><a href="/query_individual_student/{{row[0]}}">{{row[0]}}</a></td>
-	</div>
-</div>
-             </a></td>
-                <td>{{row[1]}}</td>
-                <td>{{row[2]}}</td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[3]}}</a></td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
-                <td>{{row[5]}}</a></td>
-                <td>{{row[6]}}</a></td>
-                <td>{{row[9]}}</a></td>
+<title>VigLMS | Post Announcements For {{ class_name }}</title>
 
-                <td width="130">
-       <form action="/update_grade/{{row[0]}}" method="POST">
-                    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="width: 75px"
-            placeholder="" name='update grade' style="width: 200px;" maxlength="3">
-                         <button type="submit" class="btn btn-warning">update</button>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="/static/css/announcements.css">
+
+<form action="/announcements_page_submit" method="POST">
+
+    <div class="form-group">
+        <textarea name="announcement_box" cols="30" rows="10" required=""></textarea>
+
+    </div>
+
+    <br>
+
+    <button type="submit" class="btn btn-warning">Post announcement for today, {{date_object}} at {{current_time}}</button>
+
+    <br>
 
 </form>
-                        </div>
-</div>
-<td><a href="/query_individual_student/{{row[0]}}">{{row[8]}}</a></td
 
-                </td>
-<td> <a href="/student_direct_message_page/{{row[0]}}" class="btn btn-info btn-delete btn-sm">Send direct message</a>
-</td>
-<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages (Outbox)</a>
-</td>
-<td> <a href="/view_teacher_direct_message_page/{{row[0]}}" class="btn btn-primary btn-delete btn-sm">View direct messages (Inbox)</a>
-</td>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
+<br>
 
-    <h2>Input fields below to remove student:</h2>
-<div class="box">
-            <form action="delete_student" method="POST">
+<h1>Search announcements by date. Please type in the format: month-day-year, such as: 03-30-2022 (March 30, 2022).</h1>
+<h1>Upon search, you can also update announcement records.</h1>
+
+<br>
+
+<form action="/view_announcements_by_date" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="First name" name='delete_first_name' style="width: 200px;">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Last name" name='delete_last_name' style="width: 200px;">
-            <button type="submit" class="btn btn-danger">Remove student</button>
-        </form>
+            placeholder="Search" name='search_announcements_by_date' style="width: 200px;" required="">
     </div>
-</div>
-
-<br>
-
-<form action="/assignment" method="GET">
-    <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
+    <br>
+        <button type="submit" class="btn btn-success">Search announcements by date</button>
 </form>
+
+ </body>
+
+</html>

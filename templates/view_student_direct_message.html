@@ -1,9 +1,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/send_student_direct_message.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
 
 <head>
-<title>VigLMS | Send direct message for {% for row in student_direct_message_first_name %} {{row}} {% endfor %} {% for row in student_direct_message_last_name %} {{row}} {% endfor %} </title>
+<title>VigLMS | Send Message</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -79,13 +79,11 @@
       </div>
     </div>
 
+<br>
+
     <script type="text/javascript" src="{{ url_for('static', filename='js/class_roster.js') }}"></script>
 
-  </body>
-
 </form>
-
-<br>
         <div id="form-main">
   <div id="form-div">
      <form action="/student_direct_message_page_submit" method="POST">
@@ -99,7 +97,7 @@
          <br><br>
 
       <div class="submit">
-        <input type="submit" value="Send" id="button-blue" class="btn btn-success"/>
+        <input type="submit" value="Send" class="btn btn-success"/>
         <div class="ease"></div>
       </div>
     </form>

@@ -1,9 +1,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_scores.css') }}">
 
 <head>
-<title>VigLMS | View today's attendance {{ date_object }}</title>
+<title>VigLMS | Edit Assignment Grades</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -75,7 +75,7 @@
     <div class="welcome">
       <div class="content rounded-3 p-3">
         <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">View attendance for {{ class_name }} today {{ date_object }}</p>
+        <p class="mb-0">Assignment scores for students in {{ class_name }}</p>
       </div>
     </div>
 
@@ -98,83 +98,56 @@
 
 <br>
 
-<br>
+<h2>Assignment ID: {% for record in records_4 %} {{record}} {% endfor %}</h2>
+
+<br />
+
+<h2>Category: {% for row in category %}{{row[0]}} {% endfor %}</h2>
+
+<br />
+
+<h2>Due date: {% for row in due_date %}{{row[0]}} {% endfor %}</h2>
+
+<br />
+
+<br />
+
+<h3>Assignment name: {% for row in records_2 %}{{row[0]}} {% endfor %}</h3>
 
 <div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style=background-color:#ffffff;">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>
-                <th>ID <br /> (click to view more information)</th>
-                <th>Subject</th>
+                <th>Student ID</th>
+                <th>Class</th>
                 <th>Teacher</th>
                 <th>Student First Name</th>
                 <th>Student Last Name</th>
-                <th>Graduation Year</th>
-                <th>Grade</th>
-                <th>Enrolled on</th>
-                <th>Update grade</th>
-                <th>Student email</th>
-                <th>Send direct message</th>
-                <th>View direct messages (Outbox)</th>
-                <th>View direct messages (Inbox)</th>
-            </tr>
+                <th>Assignment Grade</th></tr>
         </thead>
         <tbody>
-            {% for row in records_2 %}
+            {% for row in records_3 %}
             <tr>
-                <td><a href="/query_individual_student/{{row[0]}}">{{row[0]}}</a></td>
-	</div>
-</div>
-             </a></td>
+                <td>{{row[0]}}</td>
                 <td>{{row[1]}}</td>
                 <td>{{row[2]}}</td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[3]}}</a></td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
-                <td>{{row[5]}}</a></td>
-                <td>{{row[6]}}</a></td>
-                <td>{{row[9]}}</a></td>
-
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[3]}}</a></td>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[4]}}</a></td>
                 <td width="130">
-       <form action="/update_grade/{{row[0]}}" method="POST">
                     <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="width: 75px"
-            placeholder="" name='update grade' style="width: 200px;" maxlength="3">
-                         <button type="submit" class="btn btn-warning">update</button>
-
+                <form action="/edit_assignment_grade_2" method="POST">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="grade" name='grade_assignment' maxlength="3" size="3" style="width: 130px;">
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="student id" name='student_id' maxlength="3" style="width: 130px;">
+                         <button type="submit" class="btn btn-warning">update grade</button>
 </form>
                         </div>
-</div>
-<td><a href="/query_individual_student/{{row[0]}}">{{row[8]}}</a></td
-
                 </td>
-<td> <a href="/student_direct_message_page/{{row[0]}}" class="btn btn-info btn-delete btn-sm">Send direct message</a>
-</td>
-<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages (Outbox)</a>
-</td>
-<td> <a href="/view_teacher_direct_message_page/{{row[0]}}" class="btn btn-primary btn-delete btn-sm">View direct messages (Inbox)</a>
-</td>
-            {% endfor %}
-        </tbody>
+            </tr>
+                                                  {% endfor %}
+            </tbody>
     </table>
 </div>
-</div>
-</div>
 
-    <h2>Input fields below to remove student:</h2>
-<div class="box">
-            <form action="delete_student" method="POST">
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="First name" name='delete_first_name' style="width: 200px;">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Last name" name='delete_last_name' style="width: 200px;">
-            <button type="submit" class="btn btn-danger">Remove student</button>
-        </form>
-    </div>
-</div>
-
-<br>
-
-<form action="/assignment" method="GET">
-    <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
-</form>
+  </div>

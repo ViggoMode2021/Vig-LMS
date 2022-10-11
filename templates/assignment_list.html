@@ -1,6 +1,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/class_roster.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
 
 <head>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
@@ -60,7 +60,7 @@
         <button class="navbar-toggler" type="button" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
           <i class="uil-bars text-white"></i>
         </button>
-        <a class="navbar-brand" href="#">Vig<span class="main-color">LMS</span></a>
+        <a class="navbar-brand" href="/">Vig<span class="main-color">LMS</span></a>
       </div>
       <div class="collapse navbar-collapse" id="toggle-navbar">
         <ul class="navbar-nav ms-auto">
@@ -98,8 +98,6 @@
 
 <br>
 
-<br>
-
 <p>The grades inputted for the following assignments will automatically update
 the respective student's overall grade. In the 'class roster & gradebook page',
 the user is able to override the main grades for the students enrolled in the class.
@@ -116,27 +114,27 @@ first before doing so.</p>
                 <th>Assignment Name:</th>
                 <th>Category:</th>
                 <th>Due Date:</th>
-                <th>Grade Out Of:</th>
+                <th>Max Grade:</th>
                 <th>Add grades:</th>
             </tr>
         </thead>
         <tbody>
-            {<tbody>
+            <tbody>
              {% for row in assignments %}
             <tr>
                 <td>{{row[0]}}</td>
                 <td>{{row[1]}} <form action="/update_assignment_name/{{row[0]}}" method="POST">
                     <div class="form-group"> <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="update name" name='update_assignment_name' style="width: 200px;"></form>
-                         <button type="submit" class="btn btn-warning">update assignment name</button></td>
+            placeholder="update name" name='update_assignment_name' style="width: 120px;"></form>
+                         <button type="submit" class="btn btn-warning">update name</button></td>
                 <td>{{row[2]}}</td>
                 <td>{{row[3]}} <form action="/update_assignment_due_date/{{row[0]}}" method="POST">
                     <div class="form-group"> <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="update due date" name='update_assignment_due_date' style="width: 200px;"></form>
-                         <button type="submit" class="btn btn-warning">update assignment due date</button></td>
+            placeholder="update due date" name='update_assignment_due_date' style="width: 130px;"></form>
+                         <button type="submit" class="btn btn-warning">update due date</button></td>
                 <td>{{row[4]}}</td>
                 <td width="110">
-                    <a href="/edit_assignment_grade/{{row[0]}}" class="btn btn-success btn-delete btn-sm">Add/update student grades</a>
+                    <a href="/edit_assignment_grade/{{row[0]}}" class="btn btn-success btn-delete btn-sm">assignment grades</a>
                     <form action="/edit_assignment_grade/{{row[0]}}" method="POST">
                         </form>
                 </td>
@@ -147,23 +145,106 @@ first before doing so.</p>
     </table>
 </div>
 </div>
-</div>
 
-<div class="box">
-    <p>Input fields below to remove student:</p>
-            <form action="delete_student" method="POST">
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add new assignment</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"></button>
+          <h4 class="modal-title">Create new assignment</h4>
+        </div>
+        <div class="modal-body">
+          <p>Input fields below</p>
+            <form action="/new_assignment" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="First name" name='delete_first_name' style="width: 200px;">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Last name" name='delete_last_name' style="width: 200px;">
-            <button type="submit" class="btn btn-danger">Remove student</button>
-        </form>
+            placeholder="Assignment name" name='assignment name' style="width: 200px;">
     </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Category" name='category' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Due date" name='due date' style="width: 200px;">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Max points" name='max points' style="width: 200px;">
+    </div>
+
+    <form action="/assignment" method="GET">
+    <button type="submit" class="btn btn-success">Create assignment</button>
+</form>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
-<br>
+ <hr style="width:66%;text-align:center;margin-left:0">
 
-<form action="/assignment" method="GET">
-    <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
+
+  </body>
+
+</body>
+
+   <form action="/view_assignment_scores" method="GET">
+    <button type="submit" class="btn btn-success">View scores for all assignments and students</button>
 </form>
+
+<br /><br />
+
+<form action="/view_assignment_scores_by_student" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Student last name" name='student_name' style="width: 200px;">
+    </div>
+        <button type="submit" class="btn btn-success">View scores and assignments for a particular student (search by last name).</button>
+</form>
+
+    <html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Table Style</title>
+	<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+</head>
+
+  </body>
+
+</body>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}

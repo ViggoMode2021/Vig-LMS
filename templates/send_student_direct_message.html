@@ -1,9 +1,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/send_student_direct_message.css') }}">
 
 <head>
-<title>VigLMS | View today's attendance {{ date_object }}</title>
+<title>VigLMS | Send Message</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -74,8 +74,8 @@
   <div class="p-4">
     <div class="welcome">
       <div class="content rounded-3 p-3">
-        <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">View attendance for {{ class_name }} today {{ date_object }}</p>
+        <h1 class="fs-3">Welcome to VigLMS</h1>
+        <p class="mb-0">Hello {{username}}, welcome to your VigLMS dashboard for {{class_name}}!</p>
       </div>
     </div>
 
@@ -97,6 +97,10 @@
     {% endwith %}
 
 <br>
+
+    <form action="/enroll_page" method="GET">
+    <button type="submit" class="btn btn-success">Enroll new student</button>
+</form>
 
 <br>
 

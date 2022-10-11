@@ -1,9 +1,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home_page.css') }}">
 
 <head>
-<title>VigLMS | View today's attendance {{ date_object }}</title>
+<title>VigLMS | Upload File For {{ class_name }}</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -71,17 +71,14 @@
     </div>
   </nav>
 
-  <div class="p-4">
+     <div class="p-4">
     <div class="welcome">
       <div class="content rounded-3 p-3">
-        <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">View attendance for {{ class_name }} today {{ date_object }}</p>
+        <h1 class="fs-3">Welcome to VigLMS</h1>
+        <p class="mb-0">Use the navbar on the left to navigate!</p>
       </div>
     </div>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/class_roster.js') }}"></script>
-
-  </body>
 
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
@@ -98,83 +95,51 @@
 
 <br>
 
-<br>
+</div class="container">
 
-<div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style=background-color:#ffffff;">
-        <thead>
-            <tr>
-                <th>ID <br /> (click to view more information)</th>
-                <th>Subject</th>
-                <th>Teacher</th>
-                <th>Student First Name</th>
-                <th>Student Last Name</th>
-                <th>Graduation Year</th>
-                <th>Grade</th>
-                <th>Enrolled on</th>
-                <th>Update grade</th>
-                <th>Student email</th>
-                <th>Send direct message</th>
-                <th>View direct messages (Outbox)</th>
-                <th>View direct messages (Inbox)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in records_2 %}
-            <tr>
-                <td><a href="/query_individual_student/{{row[0]}}">{{row[0]}}</a></td>
-	</div>
-</div>
-             </a></td>
-                <td>{{row[1]}}</td>
-                <td>{{row[2]}}</td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[3]}}</a></td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
-                <td>{{row[5]}}</a></td>
-                <td>{{row[6]}}</a></td>
-                <td>{{row[9]}}</a></td>
+                        <p>This app was created with Python/Flask, as well as PostgreSQL/psycopg2. It is a gradebook
+                        that reinforces CRUD (Create, Read, Update, Delete). The 'create' allows students to be enrolled, 'read'
+                        allows the user to see the class roster, 'update' allows the user to update a student's grade, and 'delete'
+                        allows the user to remove a student from a class. Please use the navbar above to navigate through the app! Thank
+                        you! - Ryan Viglione</p>
 
-                <td width="130">
-       <form action="/update_grade/{{row[0]}}" method="POST">
-                    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="width: 75px"
-            placeholder="" name='update grade' style="width: 200px;" maxlength="3">
-                         <button type="submit" class="btn btn-warning">update</button>
-
-</form>
-                        </div>
-</div>
-<td><a href="/query_individual_student/{{row[0]}}">{{row[8]}}</a></td
-
-                </td>
-<td> <a href="/student_direct_message_page/{{row[0]}}" class="btn btn-info btn-delete btn-sm">Send direct message</a>
-</td>
-<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages (Outbox)</a>
-</td>
-<td> <a href="/view_teacher_direct_message_page/{{row[0]}}" class="btn btn-primary btn-delete btn-sm">View direct messages (Inbox)</a>
-</td>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
-
-    <h2>Input fields below to remove student:</h2>
-<div class="box">
-            <form action="delete_student" method="POST">
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="First name" name='delete_first_name' style="width: 200px;">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Last name" name='delete_last_name' style="width: 200px;">
-            <button type="submit" class="btn btn-danger">Remove student</button>
-        </form>
+                        <div class="col align-self-center">
+         <img src="static/images/postgresql.png" width="150">
     </div>
-</div>
 
-<br>
+<br /><br />
 
-<form action="/assignment" method="GET">
-    <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
-</form>
+<h4>My account information:</h4>
+
+<h6>Name: {{ name }}</h6>
+<h6>Username: {{ username }}</h6>
+<h6>Email: {{ email }}</h6>
+<h6>Class name: {{ class_name }}</h6>
+<h6>Account created on: {% for date in account_creation_date %} {{date}} {% endfor %}</h6>
+<h6>Number of students enrolled in {{class_name}}: {% for number in student_count %} {{number}} {% endfor %}</h6>
+<h6>Number of assignments created in {{class_name}}: {% for assignment_number in assignment_count %} {{assignment_number}} {% endfor %}</h6>
+<h6>Number of documents uploaded to {{class_name}}: {% for document in teacher_document_count %} {{document}} {% endfor %}</h6>
+<h6>Number of logins: {% for count in login_count %} {{count}} {% endfor %}</h6>
+
+<br /><br />
+
+<h222>Table design credited to: <a href="https://github.com/pablorgarcia" target="_blank">Pablo García</a></h222>
+
+<table class="container">
+	<thead>
+		<tr>
+			<th><h111>Latest login date:</h111></th>
+			<th><h111>Latest login time:</h111></th>
+		</tr>
+	</thead>
+	<tbody>
+                 {% for row in login_info %}
+		<tr>
+			<td>{{row[1]}}</td>
+			<td>{{row[2]}}</td>
+		</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+

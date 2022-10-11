@@ -1,9 +1,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_scores.css') }}">
 
 <head>
-<title>VigLMS | View today's attendance {{ date_object }}</title>
+<title>VigLMS | Class Roster For {{ class_name }}</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -75,7 +75,7 @@
     <div class="welcome">
       <div class="content rounded-3 p-3">
         <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">View attendance for {{ class_name }} today {{ date_object }}</p>
+        <p class="mb-0">Assignment scores for students in {{ class_name }}</p>
       </div>
     </div>
 
@@ -101,58 +101,30 @@
 <br>
 
 <div class="col-md-8">
-    <table id="example" class="table table-striped table-bordered" style=background-color:#ffffff;">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>
-                <th>ID <br /> (click to view more information)</th>
-                <th>Subject</th>
-                <th>Teacher</th>
-                <th>Student First Name</th>
-                <th>Student Last Name</th>
-                <th>Graduation Year</th>
-                <th>Grade</th>
-                <th>Enrolled on</th>
-                <th>Update grade</th>
-                <th>Student email</th>
-                <th>Send direct message</th>
-                <th>View direct messages (Outbox)</th>
-                <th>View direct messages (Inbox)</th>
+                <td>Score ID</td>
+                <td>First name</td>
+                <td>Last name</td>
+                <td>Score</td>
+                <td>Assignment name</td>
             </tr>
         </thead>
         <tbody>
-            {% for row in records_2 %}
+            {% for row in assignment_scores %}
             <tr>
-                <td><a href="/query_individual_student/{{row[0]}}">{{row[0]}}</a></td>
-	</div>
-</div>
-             </a></td>
+                <td>{{row[0]}}</td>
                 <td>{{row[1]}}</td>
                 <td>{{row[2]}}</td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[3]}}</a></td>
-                <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
-                <td>{{row[5]}}</a></td>
-                <td>{{row[6]}}</a></td>
-                <td>{{row[9]}}</a></td>
-
-                <td width="130">
-       <form action="/update_grade/{{row[0]}}" method="POST">
-                    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="width: 75px"
-            placeholder="" name='update grade' style="width: 200px;" maxlength="3">
-                         <button type="submit" class="btn btn-warning">update</button>
-
+                <td>{{row[3]}}</td>
+                <td>{{row[4]}}</td>
+                <td width="110">
+                <a href="/delete_assignment_score/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete assignment score</a>
+                    <form action="/delete_assignment_score_period_1/{{row[0]}}" method="POST">
 </form>
-                        </div>
-</div>
-<td><a href="/query_individual_student/{{row[0]}}">{{row[8]}}</a></td
-
                 </td>
-<td> <a href="/student_direct_message_page/{{row[0]}}" class="btn btn-info btn-delete btn-sm">Send direct message</a>
-</td>
-<td> <a href="/view_student_direct_message_page/{{row[0]}}" class="btn btn-dark btn-delete btn-sm">View direct messages (Outbox)</a>
-</td>
-<td> <a href="/view_teacher_direct_message_page/{{row[0]}}" class="btn btn-primary btn-delete btn-sm">View direct messages (Inbox)</a>
-</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -160,21 +132,15 @@
 </div>
 </div>
 
-    <h2>Input fields below to remove student:</h2>
-<div class="box">
-            <form action="delete_student" method="POST">
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="First name" name='delete_first_name' style="width: 200px;">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Last name" name='delete_last_name' style="width: 200px;">
-            <button type="submit" class="btn btn-danger">Remove student</button>
-        </form>
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
     </div>
-</div>
-
-<br>
-
-<form action="/assignment" method="GET">
-    <button type="submit" class="btn btn-warning">Edit assignment grades for {{ class_name }}</button>
-</form>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}

@@ -17,29 +17,25 @@
   <a href="{{url_for('logout')}}">Logout of {{username}}</a>
 </div>
 
-<h45>Assignment ID:</h45>
+<h2>ID: {% for record in records_4 %} {{record}} {% endfor %}</h2>
 
-<h46>{% for record in records_4 %} {{record}} {% endfor %}</h46>
+<br />
 
-<br /><br />
+<h2>Assignment name: {% for record in records_4 %} {{record}} {% endfor %}</h2>
 
-<h43>Assignment name:</h43>
-
-<h44>{% for row in records_2 %}{{row[0]}} {% endfor %}</h44>
-
-<br /><br />
+<br />
 
 <h43>Category:</h43>
 
 <h44>{% for row in category %}{{row[0]}} {% endfor %}</h44>
 
-<br /><br />
+<br />
 
 <h43>Due date:</h43>
 
 <h44>{% for row in due_date %}{{row[0]}} {% endfor %}</h44>
 
-<br /><br />
+<br />
 
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
