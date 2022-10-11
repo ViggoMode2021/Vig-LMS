@@ -71,7 +71,7 @@ def home():
         conn.close()
 
         # If user is logged in, they are directed to home page.
-        return render_template('home.html', username=session['username'], class_name=session['class_name'], email=session['email'], name=session['name'],
+        return render_template('home_page.html', username=session['username'], class_name=session['class_name'], email=session['email'], name=session['name'],
                                student_count=student_count, assignment_count=assignment_count, account_creation_date=account_creation_date, login_count=login_count, teacher_document_count=teacher_document_count, login_info=login_info)
     # If user is not logged in, they are directed to the login page.
     return redirect(url_for('login'))
@@ -274,7 +274,7 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
     assignment_files = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template("upload_file_page.html", response=response, assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
+    return render_template("file_page.html", response=response, assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
 
 @app.route('/download/<string:id>', methods=['GET'])
 def download(id): # Download file from S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.
@@ -298,7 +298,7 @@ def download(id): # Download file from S3 bucket from teacher account. Files are
         ExpiresIn=3600
     )
     flash(f"Please check your browser's download folder for the file name {assignment_download_name} after clicking link below.")
-    return render_template("upload_file_page.html", assignment_files=assignment_files, msg_2=msg_2, response=response, account=account, username=session['username'], class_name=session['class_name'])
+    return render_template("file_page.html", assignment_files=assignment_files, msg_2=msg_2, response=response, account=account, username=session['username'], class_name=session['class_name'])
 
 @app.route('/upload_file_page', methods=['GET'])
 def upload_file_page():
@@ -311,7 +311,7 @@ def upload_file_page():
     cursor.close()
     conn.close()
 
-    return render_template("upload_file_page.html", assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
+    return render_template("file_page.html", assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
 
 @app.route('/delete_account', methods=['DELETE', 'GET', 'POST'])
 def delete_account():
@@ -943,7 +943,7 @@ def query_individual_student(id):
          cursor.close()
          conn.close()
 
-         return render_template('query_individual_student.html', student_uploads=student_uploads, student_tardy_count=student_tardy_count, student_absent_count=student_absent_count,student_present_count = student_present_count,
+         return render_template('individual_student.html', student_uploads=student_uploads, student_tardy_count=student_tardy_count, student_absent_count=student_absent_count,student_present_count = student_present_count,
                                 search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch,
                                 student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name, records_2=records_2,
                                 account=account, username=session['username'], class_name=session['class_name'])
@@ -1105,7 +1105,7 @@ def download_uploads_query_individual_student(id):
         cursor.close()
         conn.close()
 
-        return render_template('query_individual_student.html', account=account, username=session['username'], class_name=session['class_name'], class_fetch=class_fetch, msg_5=msg_5, student_present_count=student_present_count,
+        return render_template('individual_student.html', account=account, username=session['username'], class_name=session['class_name'], class_fetch=class_fetch, msg_5=msg_5, student_present_count=student_present_count,
                                student_tardy_count=student_tardy_count, student_absent_count=student_absent_count, student_uploads=student_uploads,
                                search_attendance_query_student_login=search_attendance_query_student_login, student_assignment_scores=student_assignment_scores,
                                student_first_name=student_first_name, records_2=records_2, student_last_name=student_last_name, response_4=response_4, student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments, student_assignments_originals=student_assignments_originals, assignment_files=assignment_files)
@@ -1147,8 +1147,6 @@ def grade_ASC():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC;", [session['email']])
         records_2 = cursor.fetchall()
 
-        flash('Grade ASC')
-
         cursor.close()
         conn.close()
 
@@ -1182,7 +1180,7 @@ def take_attendance_page():
          cursor.close()
          conn.close()
 
-         return render_template('take_attendance_page.html', attendance_date_object=attendance_date_object, take_attendance_query=take_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('attendance_page.html', attendance_date_object=attendance_date_object, take_attendance_query=take_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1268,7 +1266,7 @@ def view_attendance_for_today():
          cursor.close()
          conn.close()
 
-         return render_template('view_attendance_for_today.html', attendance_date_object=attendance_date_object,search_attendance_query=search_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
+         return render_template('view_todays_attendance.html', attendance_date_object=attendance_date_object,search_attendance_query=search_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -1314,7 +1312,7 @@ def search_attendance_by_date():
          cursor.close()
          conn.close()
 
-         return render_template('search_attendance_by_date.html', search_attendance_query=search_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
+         return render_template('attendance_by_date.html', search_attendance_query=search_attendance_query, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
                                 search_attendance_by_date=search_attendance_by_date)
 
     return redirect(url_for('login'))
@@ -1378,7 +1376,7 @@ def search_attendance_by_student():
          cursor.close()
          conn.close()
 
-         return render_template('search_attendance_by_student.html', search_attendance_query_student=search_attendance_query_student, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
+         return render_template('attendance_by_student.html', search_attendance_query_student=search_attendance_query_student, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'],
                                 search_attendance_by_date=search_attendance_by_date, student_first_name=student_first_name, student_last_name=student_last_name, student_tardy_count=student_tardy_count, student_present_count=student_present_count, student_absent_count=student_absent_count)
 
     return redirect(url_for('login'))
@@ -1593,7 +1591,7 @@ def student_direct_message_page(id):
 
     return redirect(url_for('login'))
 
-@app.route('/delete_direct_message_to_student/<string:id>', methods = ['DELETE', 'GET'])
+@app.route('/delete_direct_message_to_student/<string:id>', methods=['DELETE', 'GET'])
 def delete_direct_message_to_student(id):
 
     if 'loggedin' in session: # This removes an attendance record from the db.
@@ -1679,7 +1677,7 @@ def view_student_direct_message_page(id):
         cursor.close()
         conn.close()
 
-        return render_template('view_student_direct_message_page.html', student_first_name_message=student_first_name_message, student_last_name_message=student_last_name_message, account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('check_student_direct_message_page.html', student_first_name_message=student_first_name_message, student_last_name_message=student_last_name_message, account=account, student_direct_message_id = student_direct_message_id, view_student_direct_messages = view_student_direct_messages, username=session['username'], class_name=session['class_name']
                                )
 
     return redirect(url_for('login'))
@@ -1711,7 +1709,7 @@ def view_teacher_direct_message_page(id):
         cursor.close()
         conn.close()
 
-        return render_template('view_teacher_direct_message_page.html', account=account, student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id=student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
+        return render_template('check_teacher_direct_message_page.html', account=account, student_first_name_message=student_first_name_message,student_last_name_message=student_last_name_message, student_direct_message_id=student_direct_message_id, view_teacher_direct_messages=view_teacher_direct_messages, username=session['username'], class_name=session['class_name']
                                )
 
     return redirect(url_for('login'))
@@ -1754,8 +1752,8 @@ def student_direct_message_page_submit(): #This function routes the logged in us
 
         for first_name, last_name in zip(student_direct_message_first_name, student_direct_message_last_name):
             flash(f'Message sent to {first_name} {last_name} successfully on {date_object} at {current_time}!. '
-                  f'Your subject was: "{student_direct_message_box}" and the \n'
-                  f' message was "{message_subject}".')
+                  f'Your subject was: "{message_subject}" and the \n'
+                  f' message was "{student_direct_message_box}".')
 
         return redirect(request.referrer)
 
@@ -1870,7 +1868,7 @@ def edit_assignment_grade(id):
         cursor.close()
         conn.close()
 
-        return render_template('edit_assignment_grade.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
+        return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -2013,7 +2011,7 @@ def view_assignment_scores():
         cursor.close()
         conn.close()
 
-        return render_template('view_assignment_scores.html', account=account, assignment_scores=assignment_scores, username=session['username'], class_name=session['class_name'])
+        return render_template('assignment_scores.html', account=account, assignment_scores=assignment_scores, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -2079,7 +2077,7 @@ def announcements_page():
         account = cursor.fetchone()
         cursor.close()
         conn.close()
-        return render_template('announcements_page.html', account=account, date_object=date_object, current_time=current_time, username=session['username'], class_name=session['class_name'])
+        return render_template('announcements.html', account=account, date_object=date_object, current_time=current_time, username=session['username'], class_name=session['class_name'])
 
     return redirect(url_for('login'))
 
@@ -2139,12 +2137,12 @@ def view_announcements_by_date():
          cursor.close()
          conn.close()
 
-         return render_template('view_announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object=date_object, account=account, username=session['username'], class_name=session['class_name']
+         return render_template('announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object=date_object, account=account, username=session['username'], class_name=session['class_name']
                                 )
 
     return redirect(url_for('login'))
 
-@app.route('/delete_announcement/<string:id>', methods = ['DELETE', 'GET'])
+@app.route('/delete_announcement/<string:id>', methods=['DELETE', 'GET'])
 def delete_announcement(id):
 
     if 'loggedin' in session: # This removes an attendance record from the db.
@@ -2158,11 +2156,13 @@ def delete_announcement(id):
         cursor.close()
         conn.close()
 
-        return redirect(request.referrer)
+        flash('Announcement deleted!')
+
+        return redirect(url_for('announcements_page'))
 
     return redirect(url_for('login'))
 
-@app.route('/delete_assignment', methods = ['DELETE', 'POST', 'GET'])
+@app.route('/delete_assignment', methods=['DELETE', 'POST', 'GET'])
 def delete_assignment():
 
     if 'loggedin' in session:
