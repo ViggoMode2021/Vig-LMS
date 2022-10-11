@@ -23,6 +23,18 @@
 	box-sizing: border-box;
 }
 
+table, th, td {
+    border: 6px solid black;
+    color: white;
+    font-weight: bold;
+  }
+
+th {
+
+color: white;
+
+}
+
 body {
 	font-family: 'Inter', sans-serif;
 	background-color: var(--dk-darker-bg);
@@ -373,13 +385,35 @@ body {
 	background-color: rgba(0, 0, 0, 0.3);
 }
 
-h2{
+h1{
 
 color: white;
+font-size: 15px;
 
 }
 
+h2{
+
+color: white;
+font-size: 15px;
+
+}
+
+h3{
+
+color: white;
+font-size: 20px;
+
+}
+
+
 #logout{
+
+text-decoration: none;
+
+}
+
+a{
 
 text-decoration: none;
 

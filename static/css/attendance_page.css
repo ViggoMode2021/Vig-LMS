@@ -384,3 +384,42 @@ color: white;
 text-decoration: none;
 
 }
+
+table, th, td {
+    border: 6px solid black;
+    color: white;
+    font-weight: bold;
+  }
+
+th {
+
+color: white;
+
+}
+
+h2{
+
+color: white;
+font-size: 15px;
+
+}
+
+
+h3{
+
+color: white;
+font-size: 15px;
+
+}
+
+h8{
+
+color: white;
+
+}
+
+#file_paragraph{
+
+color: white;
+
+}

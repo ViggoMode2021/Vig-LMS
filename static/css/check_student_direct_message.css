@@ -384,3 +384,15 @@ color: white;
 text-decoration: none;
 
 }
+
+table, th, td {
+    border: 6px solid black;
+    color: white;
+    font-weight: bold;
+  }
+
+th {
+
+color: white;
+
+}
