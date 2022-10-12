@@ -2,9 +2,8 @@
 
 {% block content %}
 
-<title>VigLMS | Student Home For {% for row in first_name %} {{row}} {% endfor %}{% for row in last_name %} {{row}} {% endfor %}</title>
-
 <head>
+    <title>VigLMS | Student Home For {% first_name %} {% last_name %}</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
@@ -14,7 +13,7 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/student_home.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home_page.css') }}">
 
  <div class="topnav">
    <a class="active" href="{{url_for('student_home')}}">Main</a>
