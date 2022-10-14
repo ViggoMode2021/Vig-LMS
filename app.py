@@ -645,7 +645,7 @@ def edit_individual_student(id):
          cursor.close()
          conn.close()
 
-         return render_template('edit_individual_student.html', enrollment_date=enrollment_date, student_first_name=student_first_name, student_last_name=student_last_name, graduation_year=graduation_year,username=session['username'], class_name=session['class_name'], date_object=date_object)
+         return render_template('edit_student.html', enrollment_date=enrollment_date, student_first_name=student_first_name, student_last_name=student_last_name, graduation_year=graduation_year,username=session['username'], class_name=session['class_name'], date_object=date_object)
 
     return redirect(url_for('login'))
 
@@ -2387,7 +2387,7 @@ def student_home():
         FROM classes 
         WHERE student_email = %s;""", [session['student_email']])
 
-        return render_template('student_home.html', first_name=first_name, last_name=last_name, email=email,class_name=class_name, student_class_info=student_class_info,student_login_count=student_login_count,
+        return render_template('student_home_page.html', first_name=first_name, last_name=last_name, email=email,class_name=class_name, student_class_info=student_class_info,student_login_count=student_login_count,
                                student_login_info=student_login_info, account_creation_date=account_creation_date, enrollment_date=enrollment_date, teacher_document_count=teacher_document_count, student_document_count=student_document_count
                                )
 
@@ -2490,7 +2490,7 @@ def student_assignments():
         cursor.close()
         conn.close()
 
-        return render_template('student_assignments.html', first_name=first_name, last_name=last_name, student_assignments=student_assignments, student_assignments_student_s3=student_assignments_student_s3, student_assignments_originals=student_assignments_originals)
+        return render_template('student_portal_assignments.html', first_name=first_name, last_name=last_name, student_assignments=student_assignments, student_assignments_student_s3=student_assignments_student_s3, student_assignments_originals=student_assignments_originals)
 
     return redirect(url_for('student_login'))
 
@@ -2715,7 +2715,7 @@ def student_attendance():
         first_name = session['student_first_name']
         last_name = session['student_last_name']
 
-        return render_template('student_attendance.html', student_attendance=student_attendance, student_tardy_count=student_tardy_count,
+        return render_template('student_portal_attendance.html', student_attendance=student_attendance, student_tardy_count=student_tardy_count,
                                student_absent_count=student_absent_count, first_name=first_name, last_name=last_name, student_present_count=student_present_count )
 
     return redirect(url_for('login'))
@@ -2732,7 +2732,7 @@ def student_announcements():
 
         class_name = session['student_class_name']
 
-        return render_template('student_announcements.html', class_name=class_name, announcements_student_fetch=announcements_student_fetch,student_attendance=student_attendance)
+        return render_template('student_portal_announcements.html', class_name=class_name, announcements_student_fetch=announcements_student_fetch,student_attendance=student_attendance)
 
     return redirect(url_for('login'))
 
@@ -2800,7 +2800,7 @@ def student_messages():
         cursor.close()
         conn.close()
 
-        return render_template('student_messages.html', view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages,
+        return render_template('student_portal_messages.html', view_student_direct_messages=view_student_direct_messages, view_teacher_direct_messages=view_teacher_direct_messages,
                                first_name=first_name, last_name=last_name)
 
     return redirect(url_for('login'))
