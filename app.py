@@ -5,15 +5,9 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
-import pytz
-#US/Eastern
+import pytz #US/Eastern
 import boto3
 import os
-
-# To do: Get new s3 private s3 bucket and new AWS credentials
-
-# Change 'debug' to False
-
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -114,7 +108,6 @@ def login():
         # If above information is adequate:
         if account and account_2:
             password_rs = account['password']
-            print(password_rs)
             # If account exists in users table in out database
             if check_password_hash(password_rs, password):
                 # Create session data, we can access this data in other routes
@@ -179,7 +172,7 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
                 conn.commit()
                 cursor.close()
                 conn.close()
-                class_name=session['class_name']
+                class_name = session['class_name']
                 s3.upload_file(
                     Bucket=BUCKET_NAME,
                     Filename=filename,
@@ -645,7 +638,7 @@ def edit_individual_student(id):
          cursor.close()
          conn.close()
 
-         return render_template('edit_student.html', enrollment_date=enrollment_date, student_first_name=student_first_name, student_last_name=student_last_name, graduation_year=graduation_year,username=session['username'], class_name=session['class_name'], date_object=date_object)
+         return render_template('edit_student.html', enrollment_date=enrollment_date, student_first_name=student_first_name, student_last_name=student_last_name, graduation_year=graduation_year, username=session['username'], class_name=session['class_name'], date_object=date_object)
 
     return redirect(url_for('login'))
 
@@ -741,6 +734,48 @@ def edit_individual_student_graduation_year():
 
          for first_name, last_name, graduation_year in zip(student_first_name, student_last_name, student_graduation_year_original):
              flash(f'Graduation year updated from {graduation_year} to {update_graduation_year} successfully for {first_name} {last_name}!')
+
+         conn.commit()
+
+         cursor.close()
+         conn.close()
+
+         return redirect(url_for('query'))
+
+    return redirect(url_for('login'))
+
+@app.route('/edit_individual_student_email', methods=['POST'])
+def edit_individual_student_email():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         update_student_email = request.form.get('update_student_email')
+
+         cursor.execute("""SELECT student_email FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_email_original = cursor.fetchone()
+
+         cursor.execute("""SELECT student_first_name FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_first_name = cursor.fetchone()
+
+         cursor.execute("""SELECT student_last_name FROM classes WHERE id = %s;""",
+                        (session['student_id'],))
+
+         student_last_name = cursor.fetchone()
+
+         cursor.execute("""UPDATE classes 
+            SET student_email = %s 
+            WHERE id = %s;""", (update_student_email, session['student_id']))
+
+         conn.commit()
+
+         for first_name, last_name, graduation_year in zip(student_first_name, student_last_name, student_email_original):
+             flash(f'Student email updated from {student_email_original} to {update_student_email} successfully for {first_name} {last_name}!')
 
          conn.commit()
 
@@ -1098,7 +1133,7 @@ def download_uploads_query_individual_student(id):
         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Present';", [session['student_id']])
         student_present_count = cursor.fetchone()
 
-        cursor.execute("""SELECT * FROM classes WHERE id = %s;""", [session['student_id']])
+        cursor.execute("SELECT * FROM classes WHERE id = %s;", [session['student_id']])
 
         class_fetch = cursor.fetchall()
 
@@ -1863,7 +1898,7 @@ def edit_assignment_grade(id):
         cur.execute("SELECT * FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_5 = cur.fetchone()
         session['assignment_id'] = records_5[0]
-        session['assignment_name'] = records_5[1] # work on
+        session['assignment_name'] = records_5[1]
 
         cursor.close()
         conn.close()
@@ -1964,11 +1999,13 @@ def edit_assignment_grade_2():
 
             conn.commit()
 
-            cur.execute("""UPDATE classes 
-                        SET student_grade = (
-                        SELECT ROUND(AVG(score))
-                        FROM assignment_results WHERE student_id = %s AND assignment_id = %s)
-                        WHERE id = %s;""", (student_id, session['assignment_id'], student_id))
+            cursor.execute("""SELECT ROUND(AVG(score)) FROM assignment_results WHERE student_id = %s""", (student_id,))
+
+            updated_grade_average = cursor.fetchone()[0]
+
+            cursor.execute("""UPDATE classes 
+                            SET student_grade = %s
+                            WHERE id = %s;""", (updated_grade_average, student_id))
 
             conn.commit()
 
