@@ -161,8 +161,8 @@ def upload(): # Upload file to S3 bucket from teacher account. Files are accessi
                 now = datetime.datetime.now(tz=timezone)
                 current_time = now.strftime("%I:%M %p")
                 email = [session['email']]
-                email_save = "  email  " + str(email)
-                filename = secure_filename(img.filename + email_save)
+                email_save = str(email)
+                filename = secure_filename(email_save + "-" + img.filename)
                 img.save(filename)
                 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
