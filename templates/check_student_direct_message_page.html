@@ -31,28 +31,24 @@
 
   <ul class="categories list-unstyled">
     <li class="has-dropdown">
-      <i class="uil-estate fa-fw"></i><a href="/alphabetically">View grades (A-Z)</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_ASC')}}">View grades (low-high)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="/grade_ASC">View grades (low-high)</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="/grade_DESC">View grades (high-low)</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('assignment')}}">Assignments - {{ class_name }}</a>
-    </li>
-    <li class="has-dropdown">
-     <i class="uil-calendar-alt"></i><a href="{{url_for('take_attendance_page')}}">Attendance - {{ class_name }}</a>
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
     </li>
     <li class="">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('announcements_page')}}">Announcements - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-chart-pie-alt"></i><a href="{{url_for('upload_file_page')}}">Files - {{ class_name }}</a>
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
     </li>
 </aside>
-
 <section id="wrapper">
   <nav class="navbar navbar-expand-md">
     <div class="container-fluid mx-2">
@@ -121,8 +117,8 @@
                 <td>{{row[1]}}</td>
                 <td>{{row[6]}}</td>
                 <td>{{row[7]}}</td>
-                <td>{{row[5]}}</td>
                 <td>{{row[4]}}</td>
+                <td>{{row[5]}}</td>
                 <td><a href="/delete_direct_message_to_student/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">Delete Message</a></td>
 </td>
                                         </form>

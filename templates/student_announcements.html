@@ -17,12 +17,12 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/student_portal.css') }}">
 
  <div class="topnav">
-   <a class="active" href="{{url_for('student_home')}}">Main</a>
-         <a href="{{url_for('student_messages')}}">View my messages</a>
-        <a href="{{url_for('student_assignments')}}">View my assignments</a>
-     <a href="{{url_for('student_attendance')}}">View my attendance</a>
-          <a href="{{url_for('student_announcements')}}">View announcements</a>
-  <a href="{{url_for('student_logout')}}">Logout</a>
+   <a class="active" href="{{url_for('student_portal.student_home')}}">Main</a>
+         <a href="{{url_for('student_portal.student_messages')}}">View my messages</a>
+        <a href="{{url_for('student_portal.student_assignments')}}">View my assignments</a>
+     <a href="{{url_for('student_portal.student_attendance')}}">View my attendance</a>
+          <a href="{{url_for('student_portal.student_announcements')}}">View announcements</a>
+  <a href="{{url_for('student_portal.student_logout')}}">Logout</a>
 </div>
 
 <h8>Announcements:</h8>

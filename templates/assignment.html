@@ -16,14 +16,26 @@
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/assignment.css') }}">
 
- <div class="topnav">
-   <a class="active" href="{{url_for('home')}}">Main</a>
-         <a href="{{url_for('query')}}">My class roster for {{ class_name }}</a>
-        <a href="{{url_for('assignment')}}">My assignments for {{ class_name }}</a>
-     <a href="{{url_for('take_attendance_page')}}">Take attendance for {{ class_name }}</a>
-          <a href="{{url_for('announcements_page')}}">Create announcements for {{ class_name }}</a>
-               <a href="{{url_for('upload_file_page')}}">Upload files for {{ class_name }}</a>
-  <a href="{{url_for('logout')}}">Logout of {{username}}</a>
+  <ul class="categories list-unstyled">
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_ASC')}}">View grades (low-high)</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
+    </li>
+    <li class="has-dropdown">
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
+    </li>
+    <li class="">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
+    </li>
+</aside>
 
 </div>
 

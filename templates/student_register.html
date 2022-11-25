@@ -28,7 +28,7 @@ body {
  <div class="login">
   <div class="login-triangle"></div>
   <h2 class="login-header">Register student account below</h2>
-  <form class="login-container" action="{{ url_for('student_register') }}" method="POST">
+  <form class="login-container" action="{{ url_for('student_portal.student_register') }}" method="POST">
 <span data-title="To login to use VigLMS, you need to remember: your email, your username, your password."></span>
       <div class="form-group">
        <label for="name" class="cols-sm-2 control-label">Your first name:</label>
@@ -115,7 +115,7 @@ body {
 
        <input type="submit" value="Register" class="form-control btn btn-primary " name="">
        <p style="padding:5px;">
-       <a href="{{ url_for('student_login') }}" class="btn btn-dark ">Login as a student</a></p>
+       <a href="{{ url_for('student_portal.student_login') }}" class="btn btn-dark ">Login as a student</a></p>
 
       </div>
 

@@ -40,7 +40,7 @@
       <i class="uil-calendar-alt"></i><a href="/student_attendance">View attendance</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('student_announcements')}}">View announcements</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('student_portal.student_announcements')}}">View announcements</a>
     </li>
 </aside>
 
@@ -143,18 +143,6 @@
     </table>
 </div>
 
-                    {% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
 
                 <h6>Send direct message to teacher:</h6>
                 <td width="130">

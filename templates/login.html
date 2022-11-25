@@ -3,13 +3,13 @@
  <head>
        <title>VigLMS | Teacher Login</title>
         <link rel="image_src" href="/static/images/VigLMS_thumbnail.jpg">
+     </head>
   <meta charset="utf-8">
      <style>
 #Title {
   text-align: center;
 }
 </style>
-      </head>
      <div id="Title">
   <h22>Welcome to the Teacher login page for Vig LMS!</h22>
          </div>
@@ -33,9 +33,9 @@
   <div class="login-triangle"></div>
   <h2 class="login-header">Welcome back, teacher!</h2>
   <form class="login-container" action="{{ url_for('login') }}" method="POST">
-    <p><input type="email" name="email" placeholder="Email"></p>
-            <p><input type="text" name="username" placeholder="Username"></p>
-    <p><input type="password" name="password" placeholder="Password"></p>
+    <p><input type="email" name="email" placeholder="Email" required=""></p>
+            <p><input type="text" name="username" placeholder="Username" required=""></p>
+    <p><input type="password" name="password" placeholder="Password" required=""></p>
     <p><input type="submit" value="Log in"></p>
   </form>
 </div>
@@ -60,8 +60,8 @@
   </div>
  </div>
  </body>
-<p>Register as a student <a href="{{ url_for('student_register') }}">Register</a></p>
-<p>Login as a student <a href="{{ url_for('student_login') }}">Login</a></p>
+<p>Register as a student <a href="{{ url_for('student_portal.student_register') }}">Register</a></p>
+<p>Login as a student <a href="{{ url_for('student_portal.student_login') }}">Login</a></p>
 <div id="Title">
            <h100>As of {{ date_object }} at {{ current_time }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
          </div>
@@ -78,9 +78,9 @@
                                   </div>
           <div id="Delete_Teacher_Account_Container">
   <form class="login-container" action="{{ url_for('delete_account') }}" method="post">
-    <p><input type="email" name="delete_email" placeholder="Email"></p>
-            <p><input type="text" name="delete_username" placeholder="Username"></p>
-    <p><input type="password" name="delete_password" placeholder="Password"></p>
+    <p><input type="email" name="delete_email" placeholder="Email" required=""></p>
+            <p><input type="text" name="delete_username" placeholder="Username" required=""></p>
+    <p><input type="password" name="delete_password" placeholder="Password" required=""></p>
     <p><input type="submit" value="Delete my account"></p>
   </form>
 </div>

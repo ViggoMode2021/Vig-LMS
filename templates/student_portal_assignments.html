@@ -22,9 +22,9 @@
          alt="">
     <div class="ms-2">
       <h5 class="fs-6 mb-0">
-        <a class="text-decoration-none" href="/student_home">Student: {% for name in first_name %} {{ name }} {% endfor %} {% for name in last_name %} {{ name }} {% endfor %}</a>
+        <a class="text-decoration-none" href="/student_home">Student: {{ first_name }} {{ last_name }}</a>
       </h5>
-      <p class="mt-1 mb-0">Class: {% for class in class_name %} {{ class }} {% endfor %}</p>
+      <p class="mt-1 mb-0">Class: {{ class }}</p>
     </div>
   </div>
 
@@ -39,9 +39,10 @@
       <i class="uil-calendar-alt"></i><a href="/student_attendance">View attendance</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('student_announcements')}}">View announcements</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('student_portal.student_announcements')}}">View announcements</a>
     </li>
 </aside>
+
 
 <h8>Your grade:</h8>
 
@@ -76,8 +77,9 @@
     {% endif %}
     {% endwith %}
 
-
+<br>
 <h8>Your assignment grades:</h8>
+<br>
 
 <div class="col-md-8">
     <table id="example_2" class="table table-striped table-bordered" style="width:100%">
@@ -106,8 +108,9 @@
     </table>
 </div>
 
+    <br>
 <h8>Documents posted by your teacher:</h8>
-
+<br>
 <a href="{{response_2}}">{{msg_3}}</a>
 
 <div class="col-md-8">
@@ -139,6 +142,7 @@
 </div>
 </div>
 
+    <br>
 <h30>Upload files to the teacher portal</h30>
 
 <form action="/student_documents_to_teacher" method="POST" enctype="multipart/form-data">

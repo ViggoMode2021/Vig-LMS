@@ -1,5 +1,5 @@
 <head>
-    <title>VigLMS | View today's attendance {{ date_object }}</title>
+    <title>VigLMS | Edit student info</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
@@ -41,25 +41,22 @@
 
   <ul class="categories list-unstyled">
     <li class="has-dropdown">
-      <i class="uil-estate fa-fw"></i><a href="/alphabetically">View grades (A-Z)</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_ASC')}}">View grades (low-high)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="/grade_ASC">View grades (low-high)</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="/grade_DESC">View grades (high-low)</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('assignment')}}">Assignments - {{ class_name }}</a>
-    </li>
-    <li class="has-dropdown">
-     <i class="uil-calendar-alt"></i><a href="{{url_for('take_attendance_page')}}">Attendance - {{ class_name }}</a>
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
     </li>
     <li class="">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('announcements_page')}}">Announcements - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-chart-pie-alt"></i><a href="{{url_for('upload_file_page')}}">Files - {{ class_name }}</a>
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
     </li>
 </aside>
 
@@ -125,6 +122,6 @@
                     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
             placeholder="update graduation year" name='update_graduation_year' style="width: 200px;">
-                         <button type="submit" class="btn btn-outline-secondary">update graduation year</button>
+                         <button type="submit" class="btn btn-outline-secondary">update graduation yr</button>
 </form>
   </div>

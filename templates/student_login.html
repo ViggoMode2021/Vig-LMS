@@ -3,8 +3,8 @@
  <head>
      <title>VigLMS | Student Login</title>
      <link rel="image_src" href="/static/images/VigLMS_thumbnail.jpg">
+     </head>
   <meta charset="utf-8">
-           </head>
      <div id="Title">
   <h22>Welcome to the Student login page for Vig LMS!</h22>
      </div>
@@ -30,7 +30,7 @@ body {
           <div class="login">
   <div class="login-triangle"></div>
   <h2 class="login-header">Welcome back, student!</h2>
-  <form class="login-container" action="{{ url_for('student_login') }}" method="POST">
+  <form class="login-container" action="{{ url_for('student_portal.student_login') }}" method="POST">
     <p><input type="email" name="student_email_2" placeholder="Email"></p>
     <p><input type="password" name="student_password_2" placeholder="Password"></p>
     <p><input type="submit" value="Log in"></p>
@@ -49,8 +49,8 @@ body {
     {% endfor %}
     {% endif %}
     {% endwith %}
-    <p>No account? <a href="{{ url_for('student_register') }}">Register</a></p>
-          <p>Forgot password? <a href="{{ url_for('student_reset_password') }}">Reset password here</a></p>
+    <p>No account? <a href="{{ url_for('student_portal.student_register') }}">Register</a></p>
+          <p>Forgot password? <a href="{{ url_for('student_portal.student_reset_password') }}">Reset password here</a></p>
 
   </div>
  </div>
@@ -72,7 +72,7 @@ body {
   <h2 class="login-header">Delete student account</h2>
                                   </div>
           <div id="Delete_Teacher_Account_Container">
-  <form class="login-container" action="{{ url_for('delete_student_account') }}" method="POST">
+  <form class="login-container" action="{{ url_for('student_portal.delete_student_account') }}" method="POST">
     <p><input type="email" name="delete_student_email" placeholder="Email"></p>
     <p><input type="password" name="delete_student_password" placeholder="Password"></p>
     <p><input type="submit" value="Delete my student account"></p>
