@@ -1,0 +1,146 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+
+<head>
+<title>VigLMS | Post announcements for {{ class_name }}</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+
+<link rel="manifest" href="/site.webmanifest">
+</head>
+
+<body>
+<aside class="sidebar position-fixed top-0 left-0 overflow-auto h-100 float-left" id="show-side-navigation1">
+  <i class="uil-bars close-aside d-md-none d-lg-none" data-close="show-side-navigation1"></i>
+  <div class="sidebar-header d-flex justify-content-center align-items-center px-3 py-4">
+    <img
+         class="rounded-pill img-fluid"
+         width="65"
+         src="{{ url_for('static', filename='images/home.jpg') }}"
+         alt="">
+    <div class="ms-2">
+      <h5 class="fs-6 mb-0">
+        <a class="text-decoration-none" href="#">Teacher: {{username}}</a>
+      </h5>
+      <p class="mt-1 mb-0">Class roster: {{class_name}}</p>
+    </div>
+  </div>
+
+  <ul class="categories list-unstyled">
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_ASC')}}">View grades (low-high)</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
+    </li>
+    <li class="has-dropdown">
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
+    </li>
+    <li class="">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
+    </li>
+</aside>
+
+<section id="wrapper">
+  <nav class="navbar navbar-expand-md">
+    <div class="container-fluid mx-2">
+      <div class="navbar-header">
+        <button class="navbar-toggler" type="button" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="uil-bars text-white"></i>
+        </button>
+        <a class="navbar-brand" href="/">Vig<span class="main-color">LMS</span></a>
+      </div>
+      <div class="collapse navbar-collapse" id="toggle-navbar">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="" id = "logout" href="/logout" id="" role="button" aria-expanded="false">
+              Logout
+            </a>
+    </div>
+  </nav>
+
+  <div class="p-4">
+    <div class="welcome">
+      <div class="content rounded-3 p-3">
+        <h1 class="fs-3">VigLMS</h1>
+        <p class="mb-0">Post announcements for {{ class_name }} on {{date_object}} at {{current_time}}<br><br>
+        Announcements posted here will be posted to the student portal</p>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/class_roster.js') }}"></script>
+
+  </body>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<br>
+
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+
+<title>VigLMS | Post Announcements For {{ class_name }}</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="/static/css/announcements.css">
+
+<form action="/announcements_page_submit" method="POST">
+
+    <div class="form-group">
+        <textarea name="announcement_box" cols="30" rows="10" required=""></textarea>
+
+    </div>
+
+    <br>
+
+    <button type="submit" class="btn btn-warning">Post announcement for today, {{date_object}} at {{current_time}}</button>
+
+    <br>
+
+</form>
+
+<br>
+
+<h1>Search announcements by date. Please type in the format: month-day-year, such as: 03-30-2022 (March 30, 2022).</h1>
+<h1>Upon search, you can also update announcement records.</h1>
+
+<br>
+
+<form action="{{url_for('messaging_and_announcements.view_announcements_by_date')}}" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Search" name='search_announcements_by_date' style="width: 200px;" required="">
+    </div>
+    <br>
+        <button type="submit" class="btn btn-success">Search announcements by date</button>
+</form>
+
+ </body>
+
+</html>

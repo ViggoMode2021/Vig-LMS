@@ -1,0 +1,174 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_scores.css') }}">
+
+<head>
+<title>VigLMS | Edit Assignment Grades</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+
+<link rel="manifest" href="/site.webmanifest">
+</head>
+
+<body>
+<aside class="sidebar position-fixed top-0 left-0 overflow-auto h-100 float-left" id="show-side-navigation1">
+  <i class="uil-bars close-aside d-md-none d-lg-none" data-close="show-side-navigation1"></i>
+  <div class="sidebar-header d-flex justify-content-center align-items-center px-3 py-4">
+    <img
+         class="rounded-pill img-fluid"
+         width="65"
+         src="{{ url_for('static', filename='images/home.jpg') }}"
+         alt="">
+    <div class="ms-2">
+      <h5 class="fs-6 mb-0">
+        <a class="text-decoration-none" href="#">Teacher: {{username}}</a>
+      </h5>
+      <p class="mt-1 mb-0">Class roster: {{class_name}}</p>
+    </div>
+  </div>
+
+  <ul class="categories list-unstyled">
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_ASC')}}">View grades (low-high)</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
+    </li>
+    <li class="has-dropdown">
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
+    </li>
+    <li class="">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
+    </li>
+</aside>
+
+<section id="wrapper">
+  <nav class="navbar navbar-expand-md">
+    <div class="container-fluid mx-2">
+      <div class="navbar-header">
+        <button class="navbar-toggler" type="button" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="uil-bars text-white"></i>
+        </button>
+        <a class="navbar-brand" href="/">Vig<span class="main-color">LMS</span></a>
+      </div>
+      <div class="collapse navbar-collapse" id="toggle-navbar">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="" id = "logout" href="/logout" id="" role="button" aria-expanded="false">
+              Logout
+            </a>
+    </div>
+  </nav>
+
+  <div class="p-4">
+    <div class="welcome">
+      <div class="content rounded-3 p-3">
+        <h1 class="fs-3">VigLMS</h1>
+        <p class="mb-0">Assignment scores for students in {{ class_name }}</p>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/class_roster.js') }}"></script>
+
+  </body>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<br>
+
+<h2>Assignment ID: {% for record in records_4 %} {{record}} {% endfor %}</h2>
+
+<br />
+
+<h2>Category: {% for row in category %}{{row[0]}} {% endfor %}</h2>
+
+<br />
+
+<h2>Due date: {% for row in due_date %}{{row[0]}} {% endfor %}</h2>
+
+<br />
+
+<br />
+
+<h3>Assignment name: {% for row in records_2 %}{{row[0]}} {% endfor %}</h3>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Class</th>
+                <th>Teacher</th>
+                <th>Student First Name</th>
+                <th>Student Last Name</th>
+                <th>Assignment Grade</th></tr>
+        </thead>
+        <tbody>
+            {% for row in records_3 %}<tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+                <td>{{row[2]}}</td>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[3]}}</a></td>
+                <td><a href="/query_individual_student/{{row[0]}}">{{row[4]}}</a></td>
+                <td width="130">
+                    <div class="form-group">
+                <form action="/edit_assignment_grade_2/{{row[0]}}" method="POST">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="grade" name='grade_assignment' maxlength="3" size="3" style="width: 130px;" required="">
+                         <button type="submit" class="btn btn-warning">update grade</button>
+</form>
+                        </div>
+
+                </td>
+            </tr>
+                                                  {% endfor %}
+            </tbody>
+    </table>
+</div>
+
+  </div>
+
+<h3>Grades inputted for {% for row in records_2 %}{{row[0]}} {% endfor %}</h3>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Student First Name</th>
+                <th>Student Last Name</th>
+                <th>Score</th>
+        </thead>
+        <tbody>
+            {% for score in scores %}<tr>
+        <td>{{score[1]}}</td>
+        <td>{{score[2]}}</td>
+        <td>{{score[3]}}</td>
+                        </div>
+
+                </td>
+            </tr>
+                                                  {% endfor %}
+            </tbody>
+    </table>
+</div>
+
+  </div>
