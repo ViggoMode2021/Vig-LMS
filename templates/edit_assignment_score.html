@@ -132,11 +132,10 @@
                 <td><a href="/query_individual_student/{{row[0]}}">{{row[4]}}</a></td>
                 <td width="130">
                     <div class="form-group">
-                <form action="/edit_assignment_grade_2" method="POST">
+                <form action="/edit_assignment_grade_2/{{row[0]}}" method="POST">
         <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="grade" name='grade_assignment' maxlength="3" size="3" style="width: 130px;">
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="student id" name='student_id' maxlength="3" style="width: 130px;">
+            placeholder="grade" name='grade_assignment' maxlength="3" size="3" style="width: 130px;" required="">
+
                          <button type="submit" class="btn btn-warning">update grade</button>
 </form>
                         </div>
