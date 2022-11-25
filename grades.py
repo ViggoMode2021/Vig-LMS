@@ -124,7 +124,7 @@ def edit_assignment_grade(id):
         cur.execute("SELECT assignment_name FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_2 = cur.fetchall()
 
-        cur.execute('SELECT * FROM classes WHERE class_creator = %s;', [session['email']])
+        cur.execute('SELECT * FROM classes WHERE class_creator = %s ORDER BY id ASC;', [session['email']])
         records_3 = cur.fetchall()
 
         cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
@@ -143,15 +143,30 @@ def edit_assignment_grade(id):
         session['assignment_id'] = records_5[0]
         session['assignment_name'] = records_5[1]
 
+        assignment_id = records_4[0]
+
+        cur.execute("""SELECT
+        ar.student_id AS student_id,
+        cl.student_first_name,
+        cl.student_last_name,
+        ar.score
+        FROM classes cl
+        INNER JOIN assignment_results AS ar
+        ON ar.student_id = cl.id
+        WHERE assignment_id = %s
+        ORDER BY ar.student_id ASC;""", (assignment_id,))
+
+        scores = cur.fetchall()
+
         cursor.close()
         conn.close()
 
-        return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'])
+        return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'], scores=scores)
 
     return redirect(url_for('login'))
 
-@grades.route('/edit_assignment_grade_2', methods=['POST', 'GET'])
-def edit_assignment_grade_2():
+@grades.route('/edit_assignment_grade_2/<id>', methods=['POST', 'GET'])
+def edit_assignment_grade_2(id):
 
     if 'loggedin' in session:
 
@@ -170,35 +185,23 @@ def edit_assignment_grade_2():
             cursor.close()
             conn.close()
             return redirect(url_for('assignment'))
-        elif not student_id:
-            flash('Please confirm the student ID here (located in this row on the left).')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('assignment'))
-        elif grade_assignment.isalpha():
-            flash('Please enter an assignment grade (0-100).')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('assignment'))
-        elif student_id.isalpha():
-            flash('Please enter a grade number between 0 - 100.')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('assignment'))
         else:
+            cur.execute("""SELECT id FROM classes WHERE id = %s;""", (id,))
+            student_id_query = cur.fetchone()
+
             cur.execute("""INSERT INTO assignment_results
             (score, student_id, assignment_id) VALUES (%s, %s, %s) 
-            """, (grade_assignment, student_id, session['assignment_id']))
+            """, (grade_assignment, student_id_query, session['assignment_id']))
 
             conn.commit()
 
-            cursor.execute("""SELECT ROUND(AVG(score)) FROM assignment_results WHERE student_id = %s""", (student_id,))
+            cursor.execute("""SELECT ROUND(AVG(score)) FROM assignment_results WHERE student_id = %s""", (student_id_query,))
 
             updated_grade_average = cursor.fetchone()[0]
 
             cursor.execute("""UPDATE classes 
                             SET student_grade = %s
-                            WHERE id = %s;""", (updated_grade_average, student_id))
+                            WHERE id = %s;""", (updated_grade_average, student_id_query))
 
             conn.commit()
 

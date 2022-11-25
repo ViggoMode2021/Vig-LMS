@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for, render_template, flash, Blueprint
+from flask import request, session, redirect, url_for, render_template, flash, Blueprint
 import psycopg2
 import psycopg2.extras
 import os
@@ -85,13 +85,20 @@ def view_announcements_by_date():
 
          search_announcements_by_date = request.form.get("search_announcements_by_date")
 
-         cursor.execute("""SELECT
+         if '/' in search_announcements_by_date:
+            mended_search_announcements_by_date = search_announcements_by_date.replace("/", "-")
+            cursor.execute("""SELECT * FROM announcements WHERE announcement_date = %s AND announcement_creator = %s;""", (mended_search_announcements_by_date, session['email']))
+            search_announcements_query = cursor.fetchall()
+            cursor.close()
+            conn.close()
+         else:
+            search_announcements_by_date = request.form.get("search_announcements_by_date")
+            cursor.execute("""SELECT
             * FROM announcements WHERE announcement_date = %s AND announcement_creator = %s;""", (search_announcements_by_date, session['email']))
 
-         search_announcements_query = cursor.fetchall()
-
-         cursor.close()
-         conn.close()
+            search_announcements_query = cursor.fetchall()
+            cursor.close()
+            conn.close()
 
          return render_template('announcements_by_date.html', search_announcements_query=search_announcements_query, search_announcements_by_date=search_announcements_by_date, date_object=date_object, account=account, username=session['username'], class_name=session['class_name'])
 

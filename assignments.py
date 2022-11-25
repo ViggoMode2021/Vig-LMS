@@ -123,41 +123,13 @@ def new_assignment():
         due_date = request.form.get("due date")
         overall_points = request.form.get("max points")
 
-        if not assignment_name:
-            flash('Please enter an assignment name.')
-            cursor.close()
-            conn.close()
-        elif not category:
-            flash('Please enter a category.')
-            cursor.close()
-            conn.close()
-            return render_template('assignment_list.html')
-        if not due_date:
-            flash('Please enter a due date.')
-            cursor.close()
-            conn.close()
-            return render_template('assignment_list.html')
-        if not overall_points:
-            flash('Please enter an overall point amount.')
-            cursor.close()
-            conn.close()
-            return render_template('assignment_list.html')
-        else:
-            cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
-            conn.commit()
+        cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
+        conn.commit()
 
-            cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
-            account = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-            cursor.execute("SELECT * FROM assignments WHERE assignment_creator = %s ORDER BY due_date DESC;", [session['email']])
-            assignments = cursor.fetchall()
-
-            cursor.close()
-            conn.close()
-
-            flash('New assignment created!')
-
-        return render_template('assignment_list.html', account=account, assignments=assignments, username=session['username'], class_name=session['class_name'])
+        return redirect(url_for('assignments.assignment'))
 
     return redirect(url_for('login'))
 
@@ -211,8 +183,8 @@ def update_assignment_due_date(id):
 
     return redirect(url_for('login'))
 
-@assignments.route('/delete_assignment', methods=['DELETE', 'POST', 'GET'])
-def delete_assignment():
+@assignments.route('/delete_assignment/<string:id>', methods=['DELETE', 'POST', 'GET'])
+def delete_assignment(id):
 
     if 'loggedin' in session:
 
@@ -224,7 +196,7 @@ def delete_assignment():
 
         delete_assignment_name = request.form.get('delete_assignment_name')
 
-        cursor.execute('DELETE FROM assignments WHERE assignment_name = %s AND assignment_creator = %s;', (delete_assignment_name, session['email']))
+        cursor.execute('DELETE FROM assignments WHERE id = %s;', (id,))
 
         conn.commit()
 
@@ -237,7 +209,7 @@ def delete_assignment():
         cursor.close()
         conn.close()
 
-        return redirect(url_for('assignment', account=account, assignments=assignments))
+        return redirect(url_for('assignments.assignment', account=account, assignments=assignments))
 
     return redirect(url_for('login'))
 
