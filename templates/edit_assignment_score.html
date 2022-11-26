@@ -37,16 +37,16 @@
       <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments</a>
     </li>
     <li class="has-dropdown">
-     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance</a>
     </li>
     <li class="">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files</a>
     </li>
 </aside>
 
@@ -123,8 +123,7 @@
                 <th>Assignment Grade</th></tr>
         </thead>
         <tbody>
-            {% for row in records_3 %}
-            <tr>
+            {% for row in records_3 %}<tr>
                 <td>{{row[0]}}</td>
                 <td>{{row[1]}}</td>
                 <td>{{row[2]}}</td>
@@ -135,10 +134,36 @@
                 <form action="/edit_assignment_grade_2/{{row[0]}}" method="POST">
         <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
             placeholder="grade" name='grade_assignment' maxlength="3" size="3" style="width: 130px;" required="">
-
                          <button type="submit" class="btn btn-warning">update grade</button>
 </form>
                         </div>
+
+                </td>
+            </tr>
+                                                  {% endfor %}
+            </tbody>
+    </table>
+</div>
+
+  </div>
+
+<h3>Grades inputted for {% for row in records_2 %}{{row[0]}} {% endfor %}</h3>
+
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Student First Name</th>
+                <th>Student Last Name</th>
+                <th>Score</th>
+        </thead>
+        <tbody>
+            {% for score in scores %}<tr>
+        <td>{{score[1]}}</td>
+        <td>{{score[2]}}</td>
+        <td>{{score[3]}}</td>
+                        </div>
+
                 </td>
             </tr>
                                                   {% endfor %}

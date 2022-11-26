@@ -37,16 +37,16 @@
       <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments</a>
     </li>
     <li class="has-dropdown">
-     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance</a>
     </li>
     <li class="">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files</a>
     </li>
 </aside>
 
@@ -134,6 +134,10 @@ first before doing so.</p>
                     <a href="/edit_assignment_grade/{{row[0]}}" class="btn btn-success btn-delete btn-sm">assignment grades</a>
                     <form action="/edit_assignment_grade/{{row[0]}}" method="POST">
                         </form>
+                    <br>
+                    <a href="/delete_assignment/{{row[0]}}" class="btn btn-danger btn-delete btn-sm">delete assignment</a>
+                    <form action="/delete_assignment/{{row[0]}}" method="POST">
+                        </form>
                 </td>
             </tr>
                      </thead>
@@ -169,22 +173,22 @@ first before doing so.</p>
             <form action="/new_assignment" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Assignment name" name='assignment name' style="width: 200px;">
+            placeholder="Assignment name" name='assignment name' style="width: 200px;" required="">
     </div>
 
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Category" name='category' style="width: 200px;">
+            placeholder="Category" name='category' style="width: 200px;" required="">
     </div>
 
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Due date" name='due date' style="width: 200px;">
+            placeholder="Due date" name='due date' style="width: 200px;" required="">
     </div>
 
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Max points" name='max points' style="width: 200px;">
+            placeholder="Max points" name='max points' style="width: 200px;" required="">
     </div>
 
     <form action="/assignment" method="GET">
