@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for, render_template, flash, Blueprint
+from flask import request, session, redirect, url_for, render_template, flash, Blueprint
 import psycopg2
 import psycopg2.extras
 import os
@@ -162,7 +162,7 @@ def delete_file(id): # Delete file from S3 bucket from teacher account.
     assignment_files = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template("file_page.html", response=response, assignment_files=assignment_files, account=account, username=session['username'], class_name=session['class_name'])
+    return redirect(request.referrer)
 
 @files.route('/download/<string:id>', methods=['GET'])
 def download(id): # Download file from S3 bucket from teacher account. Files are accessible from the teacher's account and corresponding student accounts.

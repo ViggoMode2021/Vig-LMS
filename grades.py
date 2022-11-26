@@ -2,7 +2,19 @@ from flask import request, session, redirect, url_for, render_template, flash, B
 import psycopg2
 import psycopg2.extras
 import os
+import datetime
+import pytz
 from dotenv import load_dotenv, find_dotenv
+import csv
+import io
+import boto3
+
+s3 = boto3.client('s3',
+                    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                     )
+
+BUCKET_NAME = os.getenv('BUCKET_NAME_VAR')
 
 # Start environment variables #
 
@@ -34,7 +46,51 @@ def grade_ASC():
         cursor.close()
         conn.close()
 
-        return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name = session['class_name'])
+        return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'])
+
+    return redirect(url_for('login'))
+
+@grades.route('/request_csv', methods=['GET'])
+def request_csv():
+
+    if 'loggedin' in session: # This orders the students by grade (lowest - highest)
+
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cursor.execute('SELECT * FROM users WHERE id = %s;', [session['id']])
+        account = cursor.fetchone()
+
+        cursor.execute('SELECT email FROM users WHERE id = %s;', [session['id']])
+        email = cursor.fetchone()[0]
+
+        cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC;", [session['email']])
+        records_2 = cursor.fetchall()
+
+        csvio = io.StringIO()
+        writer = csv.writer(csvio)
+        for row in records_2:
+            writer.writerow(row)
+
+        s3.put_object(Body=csvio.getvalue(), ContentType='application/vnd.ms-excel', Bucket=BUCKET_NAME, Key=f'{email}-class_grade_ascending.csv')
+
+        csvio.close()
+
+        csv_url = s3.generate_presigned_url(
+                    'get_object',
+                    Params={
+                        'Bucket': BUCKET_NAME,
+                        'Key': f'{email}-class_grade_ascending.csv'
+                    },
+                    ExpiresIn=3600
+                )
+
+        csv_message = "Click link to download a csv copy of your gradebook"
+
+        cursor.close()
+        conn.close()
+
+        return render_template('class_roster.html', records_2=records_2, account=account, username=session['username'], class_name=session['class_name'], csv_url=csv_url, csv_message=csv_message)
 
     return redirect(url_for('login'))
 
@@ -180,15 +236,27 @@ def edit_assignment_grade_2(id):
 
         conn.commit()
 
+        cur.execute("""SELECT id FROM classes WHERE id = %s;""", (id,))
+        student_id_query = cur.fetchone()
+
+        cur.execute("""SELECT * FROM assignment_results WHERE student_id = %s AND assignment_id = %s;""", (id, session['assignment_id']))
+        result_check = cur.fetchall()
+
         if not grade_assignment:
             flash('Please input the updated grade here.')
             cursor.close()
             conn.close()
-            return redirect(url_for('assignment'))
-        else:
-            cur.execute("""SELECT id FROM classes WHERE id = %s;""", (id,))
-            student_id_query = cur.fetchone()
+            return redirect(url_for('assignments.assignment'))
+        if result_check:
+            cur.execute("""UPDATE assignment_results SET
+            score = %s WHERE student_id = %s AND assignment_id = %s;
+            """, (grade_assignment, student_id_query, session['assignment_id']))
 
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect(request.referrer)
+        else:
             cur.execute("""INSERT INTO assignment_results
             (score, student_id, assignment_id) VALUES (%s, %s, %s) 
             """, (grade_assignment, student_id_query, session['assignment_id']))
