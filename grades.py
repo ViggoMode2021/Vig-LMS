@@ -67,8 +67,10 @@ def request_csv():
         cursor.execute("SELECT * FROM classes WHERE class_creator = %s ORDER BY student_grade ASC;", [session['email']])
         records_2 = cursor.fetchall()
 
+        headers = ['id', 'class', 'teacher', 'first name', 'last name', 'graduation year', 'grade', 'email']
         csvio = io.StringIO()
         writer = csv.writer(csvio)
+        writer.writerow(header for header in headers)
         for row in records_2:
             writer.writerow(row)
 
@@ -186,6 +188,9 @@ def edit_assignment_grade(id):
         cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_4 = cur.fetchone()
 
+        cur.execute("SELECT description FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
+        description = cur.fetchall()
+
         session['assignment_id'] = records_4
 
         cur.execute("SELECT due_date FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
@@ -217,7 +222,8 @@ def edit_assignment_grade(id):
         cursor.close()
         conn.close()
 
-        return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'], scores=scores)
+        return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'], scores=scores,
+                               description=description)
 
     return redirect(url_for('login'))
 
@@ -313,47 +319,5 @@ def view_assignment_scores():
         conn.close()
 
         return render_template('assignment_scores.html', account=account, assignment_scores=assignment_scores, username=session['username'], class_name=session['class_name'])
-
-    return redirect(url_for('login'))
-
-@grades.route('/view_assignment_scores_by_student', methods=['POST', 'GET'])
-def view_assignment_scores_by_student():
-
-    if 'loggedin' in session:
-        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
-        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        cursor.execute('SELECT * FROM users WHERE id = %s', [session['id']])
-        account = cursor.fetchone()
-
-        session['student_name'] = request.form['student_name']
-
-        cursor.execute("""SELECT
-        ci.id AS score_id,
-        s.student_first_name,
-        s.student_last_name,
-        ci.score,
-        cu.assignment_name
-        FROM classes s
-        INNER JOIN assignment_results AS ci
-        ON ci.student_id = s.id
-        INNER JOIN assignments cu  
-        ON cu.id = ci.assignment_id
-        WHERE class_creator = %s AND s.student_last_name = %s
-        ORDER BY cu.assignment_name ASC;""", [session['email'], session['student_name']])
-
-        assignment_scores_by_student = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-        if not assignment_scores_by_student:
-            flash('Student not enrolled in class.')
-            cursor.close()
-            conn.close()
-
-            return redirect(url_for('assignment'))
-
-        return render_template('view_assignment_scores_by_student.html', account=account, assignment_scores_by_student=assignment_scores_by_student, username=session['username'], class_name=session['class_name'], student_name=session['student_name'])
 
     return redirect(url_for('login'))

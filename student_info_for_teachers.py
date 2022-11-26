@@ -3,7 +3,10 @@ import psycopg2
 import psycopg2.extras
 import os
 from dotenv import load_dotenv, find_dotenv
+import boto3
 import datetime
+import csv
+import io
 
 load_dotenv(find_dotenv())
 
@@ -13,6 +16,13 @@ DB_HOST = os.getenv('DB_HOST')
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
 DB_PASS = os.getenv('DB_PASS')
+
+s3 = boto3.client('s3',
+                    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                     )
+
+BUCKET_NAME = os.getenv('BUCKET_NAME_VAR')
 
 student_info_for_teachers = Blueprint("student_info_for_teachers", __name__)
 
@@ -234,10 +244,120 @@ def query_individual_student(id):
          cursor.close()
          conn.close()
 
-         return render_template('individual_student.html', student_uploads=student_uploads, student_tardy_count=student_tardy_count, student_absent_count=student_absent_count,student_present_count = student_present_count,
+         return render_template('individual_student.html', student_uploads=student_uploads, student_tardy_count=student_tardy_count, student_absent_count=student_absent_count, student_present_count = student_present_count,
                                 search_attendance_query_student_login=search_attendance_query_student_login, class_fetch=class_fetch,
                                 student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name, records_2=records_2,
                                 account=account, username=session['username'], class_name=session['class_name'])
+
+    return redirect(url_for('login'))
+
+@student_info_for_teachers.route('/request_csv_student_grades', methods=['GET'])
+def request_csv_student_grades():
+
+    if 'loggedin' in session: # Show user and student information from the db
+         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+         email = session['email']
+
+         cursor.execute("""SELECT
+         *
+         FROM classes 
+         WHERE id = %s AND class_creator = %s;""", (session['student_id'], session['email'],))
+
+         student_overall_grade = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         student_first_name
+         FROM classes 
+         WHERE id = %s;""", [session['student_id']])
+
+         student_first_name = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         student_last_name
+         FROM classes 
+         WHERE id = %s;""", [session['student_id']])
+
+         student_last_name = cursor.fetchone()
+
+         cursor.execute("""SELECT
+         ci.id AS score_id,
+         s.student_first_name,
+         s.student_last_name,
+         cu.assignment_name,
+         ci.score
+         FROM classes s
+         INNER JOIN assignment_results AS ci
+         ON ci.student_id = s.id
+         INNER JOIN assignments cu  
+         ON cu.id = ci.assignment_id
+         WHERE s.id = %s
+         ORDER BY cu.assignment_name ASC;""", [session['student_id']])
+
+         student_assignment_scores = cursor.fetchall()
+
+         cursor.execute("""SELECT
+         a.id,
+         s.student_first_name,
+         s.student_last_name,
+         s.class_creator,
+         a.date,
+         a.attendance_status
+         FROM classes s
+         INNER JOIN attendance AS a
+         ON a.student_id = s.id
+         WHERE s.id = %s;""", [session['student_id']])
+
+         search_attendance_query_student_login = cursor.fetchall()
+
+         headers = ['Score Id', 'First name', 'Last name', 'Assignment name', 'Score']
+         csvio = io.StringIO()
+         writer = csv.writer(csvio)
+         writer.writerow(header for header in headers)
+         for row in student_assignment_scores:
+             writer.writerow(row)
+
+         s3.put_object(Body=csvio.getvalue(), ContentType='application/vnd.ms-excel', Bucket=BUCKET_NAME, Key=f'{email}-student_grades_for_{student_first_name}{student_last_name}.csv')
+
+         csvio.close()
+
+         csv_url = s3.generate_presigned_url(
+                     'get_object',
+                     Params={
+                         'Bucket': BUCKET_NAME,
+                         'Key': f'{email}-student_grades_for_{student_first_name}{student_last_name}.csv'
+                     },
+                     ExpiresIn=3600
+                 )
+
+         csv_message = "Click link to download a csv copy of your gradebook"
+
+         cursor.execute("""SELECT
+         student_email
+         FROM classes 
+         WHERE id = %s AND class_creator = %s;""", (session['student_id'], session['email'],))
+
+         student_email = cursor.fetchone()[0]
+
+         cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s ORDER BY upload_date ASC;', (student_email,))
+         student_uploads = cursor.fetchall()
+
+         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Tardy';", (session['student_id'],))
+         student_tardy_count = cursor.fetchone()
+
+         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Absent';", (session['student_id'],))
+         student_absent_count = cursor.fetchone()
+
+         cursor.execute("SELECT COUNT (attendance_status) FROM attendance WHERE student_id = %s AND attendance_status = 'Present';", (session['student_id'],))
+         student_present_count = cursor.fetchone()
+
+         cursor.close()
+         conn.close()
+
+         return render_template('individual_student.html', student_overall_grade=student_overall_grade, student_uploads=student_uploads, student_tardy_count=student_tardy_count, student_absent_count=student_absent_count, student_present_count=student_present_count,
+                                student_assignment_scores=student_assignment_scores, student_first_name=student_first_name, student_last_name=student_last_name, search_attendance_query_student_login=search_attendance_query_student_login,
+                                username=session['username'], class_name=session['class_name'], csv_url=csv_url, csv_message=csv_message)
 
     return redirect(url_for('login'))
 

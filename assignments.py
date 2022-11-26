@@ -122,8 +122,12 @@ def new_assignment():
         category = request.form.get("category")
         due_date = request.form.get("due date")
         overall_points = request.form.get("max points")
+        description = request.form.get("description")
 
-        cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator) VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s))", (assignment_name, category, due_date, overall_points, session['email']))
+        cursor.execute("INSERT INTO assignments (assignment_name, category, due_date, overall_points, assignment_creator, description) "
+                       "VALUES (%s, %s, %s, %s, (SELECT email from users WHERE email = %s), %s)", (assignment_name, category,
+                        due_date, overall_points, session['email'], description))
+
         conn.commit()
 
         cursor.close()
@@ -242,6 +246,6 @@ def delete_assignment_score(id):
         cursor.close()
         conn.close()
 
-        return redirect(url_for('view_assignment_scores', account=account, assignments=assignments, username=session['username'], class_name=session['class_name']))
+        return redirect(url_for('assignments.view_assignment_scores', account=account, assignments=assignments, username=session['username'], class_name=session['class_name']))
 
     return redirect(url_for('login'))
