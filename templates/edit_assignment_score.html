@@ -80,6 +80,8 @@
 
   </body>
 
+<br>
+
 {% with messages = get_flashed_messages()  %}
     {% if messages %}
     {% for message in messages %}
@@ -93,7 +95,6 @@
     {% endif %}
     {% endwith %}
 
-<br>
 
 <h2>Assignment ID: {% for record in records_4 %} {{record}} {% endfor %}</h2>
 
@@ -107,9 +108,11 @@
 
 <br />
 
-<br />
-
 <h3>Assignment name: {% for row in records_2 %}{{row[0]}} {% endfor %}</h3>
+
+<br>
+
+<h4>Description: {% for row in description %}{{row[0]}} {% endfor %}</h4>
 
 <div class="col-md-8">
     <table id="example" class="table table-striped table-bordered" style="width:100%">

@@ -127,6 +127,12 @@
 
 <h2>Assignment scores for {% for row in student_first_name %} {{row}} {% endfor %}{% for row in student_last_name %} {{row}}: {% endfor %}</h2>
 
+<form action="/request_csv_student_grades" method="GET">
+    <button type="submit" class="btn btn-success">Download a CSV copy of grades for {% for row in student_first_name %} {{row}} {% endfor %}{% for row in student_last_name %} {{row}}: {% endfor %}</button>
+</form>
+
+<a href="{{csv_url}}">{{csv_message}}</a>
+
 <div class="col-md-8">
     <table id="example" class="table table-striped table-bordered" style="width:100%">
         <thead>

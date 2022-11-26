@@ -1,6 +1,6 @@
 
 <head>
-    <title>VigLMS | Student Home For {{ first_name }} {{ last_name }}</title>
+    <title>VigLMS | Assignments</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
@@ -24,7 +24,7 @@
       <h5 class="fs-6 mb-0">
         <a class="text-decoration-none" href="/student_home">Student: {{ first_name }} {{ last_name }}</a>
       </h5>
-      <p class="mt-1 mb-0">Class: {{ class }}</p>
+      <p class="mt-1 mb-0">Class: {{ class_name }}</p>
     </div>
   </div>
 
@@ -78,28 +78,51 @@
     {% endwith %}
 
 <br>
-<h8>Your assignment grades:</h8>
+<h8>Graded assignments:</h8>
 <br>
 
 <div class="col-md-8">
     <table id="example_2" class="table table-striped table-bordered" style="width:100%">
         <thead>
             <tr>
-                <th>Score ID</th>
-                <th>First name</th>
-                <th>Last name</th>
+                <th>Assignment</th>
+                <th>Description</th>
                 <th>Score</td>
-                <th>Assignment name</th>
             </tr>
         </thead>
         <tbody>
             {% for row in student_assignments %}
             <tr>
-                <td>{{row[0]}}</td>
-                <td>{{row[1]}}</td>
-                <td>{{row[2]}}</td>
-                <td>{{row[3]}}</td>
                 <td>{{row[4]}}</td>
+                <td>{{row[5]}}</td>
+                <td>{{row[3]}}</td>
+                            </tr>
+             </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    <br>
+<h8>Ungraded or incomplete assignments</h8>
+<br>
+
+<div class="col-md-8">
+    <table id="example_2" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>Assignment</th>
+                <th>Description</th>
+                <th>Score</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in student_assignments_null %}
+            <tr>
+                <td>{{row[4]}}</td>
+                <td>{{row[5]}}</td>
+                <td>{{row[3]}}</td>
                             </tr>
              </td>
             </tr>

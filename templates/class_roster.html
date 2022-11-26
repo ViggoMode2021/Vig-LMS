@@ -102,7 +102,7 @@
 <br>
 
 <form action="/request_csv" method="GET">
-    <button type="submit" class="btn btn-success">Download a copy of gradebook</button>
+    <button type="submit" class="btn btn-success">Download a CSV copy of your grade book</button>
 </form>
 
 <a href="{{csv_url}}">{{csv_message}}</a>
@@ -114,8 +114,6 @@
         <thead>
             <tr>
                 <th>ID <br /> (click to view more information)</th>
-                <th>Subject</th>
-                <th>Teacher</th>
                 <th>Student First Name</th>
                 <th>Student Last Name</th>
                 <th>Graduation Year</th>
@@ -135,8 +133,6 @@
 	</div>
 </div>
              </a></td>
-                <td>{{row[1]}}</td>
-                <td>{{row[2]}}</td>
                 <td><a href="/edit_individual_student/{{row[0]}}">{{row[3]}}</a></td>
                 <td><a href="/edit_individual_student/{{row[0]}}">{{row[4]}}</a></td>
                 <td>{{row[5]}}</a></td>
