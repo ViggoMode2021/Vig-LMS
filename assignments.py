@@ -7,6 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env_vig_lms")
+load_dotenv(dotenv_path)
 
 #Database info below:
 
