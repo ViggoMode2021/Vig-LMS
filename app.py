@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import pytz #US/Eastern
 import boto3
+from botocore.exceptions import ClientError
 import os
 from dotenv import load_dotenv, find_dotenv
 
@@ -130,10 +131,70 @@ def register():
             conn.commit()
             flash(f'You have successfully registered as "{username}"! Your email is "{email}", your username is "{username}" and your class name is'
                   f'" {class_name}".')
+
+            client = boto3.client("cognito-idp", region_name="us-east-1")
+
+            # The below code, will do the sign-up
+            client.sign_up(
+                ClientId='5ns5fte4evivu3bqtb2k5oalrv',
+                Username=email,
+                Password=password,
+                UserAttributes=[{"Name": "email", "Value": email}],
+            )
+
             cursor.close()
             conn.close()
+
+            session['loggedin'] = True
+
+            session['username'] = email
+
+            return redirect(url_for('authenticate_page'))
         # Show registration form with message (if applicable)
     return render_template('register.html')
+
+@app.route('/authenticate_page', methods=['GET'])
+def authenticate_page():
+    if 'loggedin' in session:
+        return render_template('authenticate.html')
+
+    return redirect(url_for('login'))
+
+@app.route('/authenticate', methods=['POST'])
+def authenticate():
+    try:
+        if 'loggedin' in session:
+            authentication_code = request.form.get('authentication_code')
+            client = boto3.client("cognito-idp", region_name="us-east-1")
+
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+            client.confirm_sign_up(
+                ClientId='5ns5fte4evivu3bqtb2k5oalrv',
+                Username=session['username'],
+                ConfirmationCode=authentication_code,
+                ForceAliasCreation=False
+            )
+
+            flash('You have authenticated!')
+
+            cursor.execute("UPDATE users SET authenticated_account = %s WHERE email = %s", ('Authenticated', session['username']))
+
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            session.pop('username')
+
+            return redirect(url_for('login'))
+
+    except ClientError as e:
+        flash("Incorrect authentication code")
+        return redirect(url_for('authenticate_page'))
+
+    return redirect(url_for('login'))
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -160,7 +221,7 @@ def login():
         email = request.form['email']
 
         # Check if account exists
-        cursor.execute('SELECT * FROM users WHERE username = %s;', (username,))
+        cursor.execute('SELECT * FROM users WHERE username = %s AND authenticated_account = %s;', (username, 'Authenticated'))
         account = cursor.fetchone()
         # Grab user information from classes table. The classes table contains information that the user submitted. This is student information and grades.
         cursor.execute('SELECT * FROM classes WHERE class_creator = %s;', (email,))
