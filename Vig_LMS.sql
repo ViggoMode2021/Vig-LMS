@@ -15,6 +15,14 @@ ALTER TABLE users
 ADD COLUMN
 account_creation_date TEXT;
 
+ALTER TABLE classes
+ADD COLUMN
+enrollment_date TEXT;
+
+ALTER TABLE assignments
+ADD COLUMN
+description TEXT;
+
 CREATE TABLE logins(
 id SERIAL,
 login_date TEXT,
@@ -40,6 +48,11 @@ CREATE TABLE classes(
 	class_creator VARCHAR (50) NOT NULL,
 	FOREIGN KEY ("class_creator") REFERENCES users("email") ON DELETE CASCADE);
 
+ALTER TABLE classes
+ADD COLUMN
+student_email TEXT,
+ADD UNIQUE (student_email);
+
 CREATE TABLE assignments(
     id SERIAL PRIMARY KEY,
     assignment_name TEXT NOT NULL,
@@ -48,6 +61,18 @@ CREATE TABLE assignments(
     overall_points INT NOT NULL,
 	assignment_creator VARCHAR (50) NOT NULL,
 	FOREIGN KEY ("assignment_creator") REFERENCES users("email") ON DELETE CASCADE);
+
+CREATE TABLE assignment_files_teacher_s3(
+    id SERIAL PRIMARY KEY,
+    assignment_name TEXT NOT NULL,
+	assignment_creator VARCHAR (50) NOT NULL,
+	FOREIGN KEY ("assignment_creator") REFERENCES users("email") ON DELETE CASCADE);
+
+CREATE TABLE assignment_files_student_s3(
+    id SERIAL PRIMARY KEY,
+    file_name TEXT NOT NULL,
+	student_email VARCHAR (50) NOT NULL,
+	FOREIGN KEY ("student_email") REFERENCES classes("student_email") ON DELETE CASCADE);
 
 CREATE TABLE assignment_results(
     id SERIAL PRIMARY KEY,
@@ -60,6 +85,7 @@ CREATE TABLE assignment_results(
 CREATE TABLE announcements(
     id SERIAL PRIMARY KEY,
     announcement_date TEXT NOT NULL,
+    announcement_time TEXT NOT NULL,
     class TEXT NOT NULL,
     announcement TEXT NOT NULL,
 	announcement_creator VARCHAR (50) NOT NULL,
@@ -81,12 +107,37 @@ CREATE TABLE student_accounts(
 	class TEXT NOT NULL,
 	teacher_email TEXT NOT NULL,
     secret_question VARCHAR (30) NOT NULL,
-    UNIQUE (student_email)
-);
+    account_creation_date TEXT NOT NULL,
+    FOREIGN KEY ("student_email") REFERENCES classes("student_email") ON DELETE CASCADE);
+
+ALTER TABLE assignment_files_student_s3
+ADD COLUMN
+upload_date TEXT;
+
+ALTER TABLE assignment_files_student_s3
+ADD COLUMN
+upload_time TEXT;
+
+ALTER TABLE assignment_files_student_s3
+ADD COLUMN
+upload_date TEXT;
+
+ALTER TABLE assignment_files_student_s3
+ADD COLUMN
+upload_time TEXT;
+
+ALTER TABLE assignment_files_teacher_s3
+ADD COLUMN
+upload_date TEXT;
+
+ALTER TABLE assignment_files_teacher_s3
+ADD COLUMN
+upload_time TEXT;
 
 CREATE TABLE student_direct_message(
 id SERIAL PRIMARY KEY,
 date TEXT NOT NULL,
+time TEXT NOT NULL,
 class TEXT NOT NULL,
 message_subject TEXT,
 message TEXT NOT NULL,
@@ -99,6 +150,7 @@ FOREIGN KEY ("message_sender") REFERENCES users("email") ON DELETE CASCADE);
 
 CREATE TABLE student_direct_message_teacher_copy(
 id SERIAL PRIMARY KEY,
+time TEXT NOT NULL,
 date TEXT NOT NULL,
 class TEXT NOT NULL,
 message_subject TEXT,
@@ -113,6 +165,7 @@ FOREIGN KEY ("message_sender") REFERENCES users("email") ON DELETE CASCADE);
 CREATE TABLE teacher_direct_message(
 id SERIAL PRIMARY KEY,
 date TEXT NOT NULL,
+time TEXT NOT NULL,
 class TEXT NOT NULL,
 message_subject TEXT,
 message TEXT NOT NULL,
@@ -126,6 +179,7 @@ FOREIGN KEY ("message_recipient") REFERENCES users("email") ON DELETE CASCADE);
 CREATE TABLE teacher_direct_message_student_copy(
 id SERIAL PRIMARY KEY,
 date TEXT NOT NULL,
+time TEXT NOT NULL,
 class TEXT NOT NULL,
 message_subject TEXT,
 message TEXT NOT NULL,
@@ -141,4 +195,10 @@ ALTER TABLE student_accounts ADD UNIQUE (student_email);
 ALTER TABLE student_accounts
 ADD COLUMN
 account_creation_date TEXT;
+
+ALTER TABLE student_direct_message ADD student_email TEXT;
+ALTER TABLE student_direct_message ADD CONSTRAINT student_email FOREIGN KEY (student_email) REFERENCES classes(student_email);
+
+ALTER TABLE student_direct_message_teacher_copy ADD student_email TEXT;
+ALTER TABLE student_direct_message_teacher_copy ADD CONSTRAINT student_email FOREIGN KEY (student_email) REFERENCES classes(student_email);
 
