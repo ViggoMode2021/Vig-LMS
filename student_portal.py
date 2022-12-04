@@ -1,19 +1,18 @@
 from flask import request, session, redirect, url_for, render_template, flash, Blueprint
 import psycopg2
 import psycopg2.extras
-import re
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import pytz #US/Eastern
 import boto3
+from botocore.exceptions import ClientError
 import os
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.utils import secure_filename
 
 load_dotenv(find_dotenv())
 
-dotenv_path = os.path.join(os.path.dirname(__file__), ".env_vig_lms")
-load_dotenv(dotenv_path)
+CLIENT_ID = os.getenv('CLIENT_ID')
 
 #Database info below:
 
@@ -46,7 +45,6 @@ def student_register():
         student_password = request.form['student_password']
         student_class_name = request.form['student_class_name']
         teacher_email = request.form['teacher_email']
-        student_secret_question = request.form['student_secret_question']
 
         _hashed_password_student = generate_password_hash(student_password)
 
@@ -90,11 +88,27 @@ def student_register():
             flash('Please fill out the form!')
         else:
             # Account doesn't exist and the form data is valid, now insert new account into users table
-            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, student_email, password, class, teacher_email, secret_question, account_creation_date) VALUES (%s,%s,%s,%s,%s,%s,%s,%s);", (student_firstname, student_lastname, student_email, _hashed_password_student, student_class_name, teacher_email, student_secret_question, date_object))
+            cursor.execute("INSERT INTO student_accounts (student_first_name, student_last_name, student_email, password, class, teacher_email, account_creation_date) VALUES (%s,%s,%s,%s,%s,%s,%s);", (student_firstname, student_lastname, student_email, _hashed_password_student, student_class_name, teacher_email, date_object))
             conn.commit()
             flash(f'You have successfully registered with the email "{student_email}". Your other credentials are: First Name: "{student_firstname}" Last Name:  "{student_lastname}" Class Name:  "{student_class_name}".!')
             cursor.close()
             conn.close()
+            client = boto3.client("cognito-idp", region_name="us-east-1")
+
+            # The below code, will do the sign-up
+            client.sign_up(
+                ClientId=CLIENT_ID,
+                Username=student_email,
+                Password=student_password,
+                UserAttributes=[{"Name": "email", "Value": student_email}],
+            )
+
+            session['loggedin'] = True
+
+            session['username'] = student_email
+
+            return redirect(url_for('student_portal.student_authenticate_page'))
+
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         flash('Please fill out the form!')
@@ -102,6 +116,49 @@ def student_register():
         conn.close()
     # Show registration form with message (if any)
     return render_template('student_register.html')
+
+@student_portal.route('/student_authenticate_page', methods=['GET'])
+def student_authenticate_page():
+    if 'loggedin' in session:
+        return render_template('student_authenticate.html')
+
+    return redirect(url_for('student_portal.student_login'))
+
+@student_portal.route('/student_authenticate', methods=['POST'])
+def student_authenticate():
+    try:
+        if 'loggedin' in session:
+            authentication_code = request.form.get('authentication_code')
+            client = boto3.client("cognito-idp", region_name="us-east-1")
+
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+            client.confirm_sign_up(
+                ClientId=CLIENT_ID,
+                Username=session['username'],
+                ConfirmationCode=authentication_code,
+                ForceAliasCreation=False
+            )
+
+            flash('You have authenticated!')
+
+            cursor.execute("UPDATE student_accounts SET authenticated_account = %s WHERE student_email = %s", ('Authenticated', session['username']))
+
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            session.pop('username')
+
+            return redirect(url_for('student_portal.student_login'))
+
+    except ClientError as e:
+        flash("Incorrect authentication code")
+        return redirect(url_for('student_portal.student_authenticate_page'))
+
+    return redirect(url_for('login'))
 
 @student_portal.route('/student_home', methods=['GET'])
 def student_home():
@@ -179,7 +236,7 @@ def student_login():
         student_email_2 = request.form['student_email_2']
         student_password_2 = request.form['student_password_2']
 
-        cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s;', (student_email_2,))
+        cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s AND authenticated_account = %s;', (student_email_2, 'Authenticated'))
         student_account = cursor.fetchone()
         if not student_account:
             flash(f'Account does not exist for {student_email_2}!')
@@ -240,6 +297,22 @@ def student_assignments():
 
         student_assignments = cursor.fetchall()
 
+        cursor.execute("""SELECT
+                ci.id AS score_id,
+                s.student_first_name,
+                s.student_last_name,
+                ci.score,
+                cu.assignment_name
+                FROM classes s
+                INNER JOIN assignment_results AS ci
+                ON ci.student_id = s.id
+                INNER JOIN assignments cu  
+                ON cu.id = ci.assignment_id
+                WHERE s.student_email = %s AND ci.score IS NULL
+                ORDER BY cu.assignment_name ASC;""", [session['student_email']])
+
+        student_assignments_null = cursor.fetchall()
+
         cursor.execute('SELECT * FROM assignment_files_teacher_s3 WHERE assignment_creator = %s ORDER BY upload_date DESC;', [session['class_creator']])
         student_assignments_originals = cursor.fetchall()
 
@@ -250,10 +323,13 @@ def student_assignments():
 
         last_name = session['student_last_name']
 
+        class_name = session['student_class_name']
+
         cursor.close()
         conn.close()
 
-        return render_template('student_portal_assignments.html', first_name=first_name, last_name=last_name, student_assignments=student_assignments, student_assignments_student_s3=student_assignments_student_s3, student_assignments_originals=student_assignments_originals)
+        return render_template('student_portal_assignments.html', first_name=first_name, last_name=last_name, class_name=class_name, student_assignments=student_assignments, student_assignments_student_s3=student_assignments_student_s3, student_assignments_originals=student_assignments_originals,
+                               student_assignments_null=student_assignments_null)
 
     return redirect(url_for('student_portal.student_login'))
 
@@ -318,7 +394,8 @@ def download_uploads_student_account(id):
                     s.student_first_name,
                     s.student_last_name,
                     ci.score,
-                    cu.assignment_name
+                    cu.assignment_name,
+                    cu.description
                     FROM classes s
                     INNER JOIN assignment_results AS ci
                     ON ci.student_id = s.id
@@ -431,6 +508,8 @@ def student_documents_to_teacher():
                     cursor.execute('SELECT * FROM assignment_files_student_s3 WHERE student_email = %s;', [session['student_email']])
                     student_assignments_student_s3 = cursor.fetchall()
 
+                    class_name = session['student_class_name']
+
                     cursor.close()
                     conn.close()
 
@@ -438,7 +517,7 @@ def student_documents_to_teacher():
                 flash('No file has been selected to upload. Please click "Choose File button".')
                 return redirect(url_for("student_portal.student_assignments"))
             return render_template("student_assignments.html", student_assignments_student_s3=student_assignments_student_s3, student_assignments=student_assignments,
-                                   student_assignments_originals=student_assignments_originals)
+                                   student_assignments_originals=student_assignments_originals, class_name=class_name)
 
     return redirect(url_for('student_portal.student_login'))
 
@@ -478,8 +557,10 @@ def student_attendance():
         first_name = session['student_first_name']
         last_name = session['student_last_name']
 
+        class_name = session['student_class_name']
+
         return render_template('student_portal_attendance.html', student_attendance=student_attendance, student_tardy_count=student_tardy_count,
-                               student_absent_count=student_absent_count, first_name=first_name, last_name=last_name, student_present_count=student_present_count )
+                               student_absent_count=student_absent_count, first_name=first_name, last_name=last_name, class_name=class_name, student_present_count=student_present_count )
 
     return redirect(url_for('login'))
 
@@ -495,7 +576,12 @@ def student_announcements():
 
         class_name = session['student_class_name']
 
-        return render_template('student_portal_announcements.html', class_name=class_name, announcements_student_fetch=announcements_student_fetch,student_attendance=student_attendance)
+        first_name = session['student_first_name']
+
+        last_name = session['student_last_name']
+
+        return render_template('student_portal_announcements.html', class_name=class_name, announcements_student_fetch=announcements_student_fetch,student_attendance=student_attendance,
+                               first_name=first_name, last_name=last_name)
 
     return redirect(url_for('login'))
 
@@ -646,46 +732,75 @@ def delete_direct_message_from_teacher(id):
 
     return redirect(url_for('login'))
 
-@student_portal.route('/student_reset_password', methods=['GET', 'POST'])
-def student_reset_password():
+@student_portal.route('/student_forgot_password_page', methods=['GET'])
+def student_forgot_password_page():
+    return render_template('student_forgot_password_page.html')
+
+@student_portal.route('/request_password_reset', methods=['POST', 'GET'])
+def request_password_reset():
+
+    email_forgot_password = request.form.get('email_forgot_password')
 
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'student_email_reset_password' in request.form and 'student_secret_question_2' in request.form and 'student_new_password' in request.form:
-        student_email_reset_password = request.form['student_email_reset_password']
-        student_secret_question_2 = request.form['student_secret_question_2']
-        student_new_password = request.form['student_new_password']
+    cursor.execute('SELECT student_email FROM student_accounts WHERE student_email = %s;', (email_forgot_password,))
 
-        # Check if account exists
-        cursor.execute('SELECT * FROM student_accounts WHERE student_email = %s AND secret_question = %s;', (student_email_reset_password, student_secret_question_2))
+    email_confirmation = cursor.fetchone()
 
-        student_account_password_reset = cursor.fetchone()
+    conn.close()
+    cursor.close()
 
-        _hashed_password_reset_student = generate_password_hash(student_new_password)
+    if email_confirmation:
 
-        if student_account_password_reset:
+        client = boto3.client("cognito-idp", region_name="us-east-1")
+        # Initiating the Authentication,
+        client.forgot_password(
+            ClientId=CLIENT_ID,
+            Username=email_forgot_password
+        )
+
+        session['username'] = email_forgot_password
+        return render_template('authenticate_new_student_password.html')
+
+    else:
+
+        flash('User is not in system!')
+        return render_template('student_forgot_password_page.html')
+
+@student_portal.route('/confirm_forgot_password', methods=['POST', 'GET'])
+def confirm_forgot_password():
+        try:
+            email_new_password = request.form.get('username_new_password')
+            authentication_code_new_password = request.form.get('authentication_code_new_password')
+            new_password = request.form.get('new_password')
+
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+            client = boto3.client("cognito-idp", region_name="us-east-1")
+
+            client.confirm_forgot_password(
+                ClientId=CLIENT_ID,
+                Username=email_new_password,
+                ConfirmationCode=authentication_code_new_password,
+                Password=new_password
+            )
+
+            _hashed_password_reset = generate_password_hash(new_password)
 
             cursor.execute("""UPDATE student_accounts 
             SET password = %s 
-            WHERE student_email = %s;""", (_hashed_password_reset_student, student_email_reset_password))
+            WHERE student_email = %s;""", (_hashed_password_reset, email_new_password))
 
             conn.commit()
 
-            # Redirect to home page
-            flash(f'Password updated for {student_email_reset_password}')
+            flash(f'Password reset successfully for {email_new_password}.')
+            return redirect(url_for('student_portal.student_login'))
 
-            cursor.close()
-            conn.close()
-            return redirect(url_for('student_portal.student_reset_password'))
-        else:
-            # Account doesn't exist or username/password incorrect
-            flash('Incorrect credentials')
-            cursor.close()
-            conn.close()
-
-    return render_template('student_reset_password.html')
+        except:
+            flash('One or more fields are incorrect. Please try again.')
+            return render_template('authenticate_new_student_password.html')
 
 @student_portal.route('/delete_student_account', methods=['DELETE', 'GET', 'POST'])
 def delete_student_account():

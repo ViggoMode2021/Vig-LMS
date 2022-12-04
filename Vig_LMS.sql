@@ -5,7 +5,7 @@ CREATE TABLE users(
 	password VARCHAR ( 255 ) NOT NULL,
 	email VARCHAR ( 50 ) NOT NULL,
 	class VARCHAR (20) NOT NULL,
-	secret_question VARCHAR ( 50 ) NOT NULL,
+	authenticate_account VARCHAR,
 	UNIQUE (email)
 );
 
@@ -106,8 +106,10 @@ CREATE TABLE student_accounts(
 	password VARCHAR (250) NOT NULL,
 	class TEXT NOT NULL,
 	teacher_email TEXT NOT NULL,
-    secret_question VARCHAR (30) NOT NULL,
     account_creation_date TEXT NOT NULL,
+    authenticated_account VARCHAR,
+    UNIQUE (student_email),
+
     FOREIGN KEY ("student_email") REFERENCES classes("student_email") ON DELETE CASCADE);
 
 ALTER TABLE assignment_files_student_s3

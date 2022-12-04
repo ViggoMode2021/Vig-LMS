@@ -314,10 +314,12 @@ def faq_page():
 def forgot_password_page():
     return render_template('forgot_password_page.html')
 
-@app.route('/teacher_request_password_reset', methods=['POST', 'GET'])
-def teacher_request_password_reset():
+@app.route('/request_password_reset', methods=['POST', 'GET'])
+def request_password_reset():
 
     teacher_email_forgot_password = request.form.get('teacher_email_forgot_password')
+
+    print(teacher_email_forgot_password)
 
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -325,6 +327,8 @@ def teacher_request_password_reset():
     cursor.execute('SELECT email FROM users WHERE email = %s;', (teacher_email_forgot_password,))
 
     email_confirmation = cursor.fetchone()
+
+    print(email_confirmation)
 
     conn.close()
     cursor.close()
@@ -346,8 +350,8 @@ def teacher_request_password_reset():
         flash('User is not in system!')
         return render_template('forgot_password_page.html')
 
-@app.route('/teacher_confirm_forgot_password', methods=['POST', 'GET'])
-def teacher_confirm_forgot_password():
+@app.route('/confirm_forgot_password', methods=['POST', 'GET'])
+def confirm_forgot_password():
         try:
             email_new_password = request.form.get('username_new_password')
             authentication_code_new_password = request.form.get('authentication_code_new_password')
