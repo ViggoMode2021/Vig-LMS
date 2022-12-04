@@ -37,16 +37,19 @@
       <i class="uil-calendar-alt"></i><a href="{{url_for('grades.grade_DESC')}}">View grades (high-low)</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('assignments.assignment')}}">Assignments</a>
     </li>
     <li class="has-dropdown">
-     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance - {{ class_name }}</a>
+     <i class="uil-calendar-alt"></i><a href="{{url_for('attendance.take_attendance_page')}}">Attendance</a>
     </li>
     <li class="">
-      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements - {{ class_name }}</a>
+      <i class="uil-calendar-alt"></i><a href="{{url_for('messaging_and_announcements.announcements_page')}}">Announcements</a>
     </li>
     <li class="has-dropdown">
-      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files - {{ class_name }}</a>
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('files.upload_file_page')}}">Files</a>
+    </li>
+      <li class="has-dropdown">
+      <i class="uil-chart-pie-alt"></i><a href="{{url_for('delete_teacher_account_page')}}">Delete account</a>
     </li>
 </aside>
 
@@ -191,6 +194,11 @@ first before doing so.</p>
             placeholder="Max points" name='max points' style="width: 200px;" required="">
     </div>
 
+                <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Description" name='description' style="width: 200px;">
+    </div>
+
     <form action="/assignment" method="GET">
     <button type="submit" class="btn btn-success">Create assignment</button>
 </form>
@@ -217,14 +225,6 @@ first before doing so.</p>
 </form>
 
 <br /><br />
-
-<form action="/view_assignment_scores_by_student" method="POST">
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Student last name" name='student_name' style="width: 200px;">
-    </div>
-        <button type="submit" class="btn btn-success">View scores and assignments for a particular student (search by last name).</button>
-</form>
 
     <html lang="en">
 <head>

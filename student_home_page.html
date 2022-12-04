@@ -1,0 +1,149 @@
+{% block title %}{{title}}{% endblock %}
+
+<title>VigLMS | Student Home For {% for row in first_name %} {{row}} {% endfor %}{% for row in last_name %} {{row}} {% endfor %}</title>
+
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student_home.css') }}">
+
+<aside class="sidebar position-fixed top-0 left-0 overflow-auto h-100 float-left" id="show-side-navigation1">
+  <i class="uil-bars close-aside d-md-none d-lg-none" data-close="show-side-navigation1"></i>
+  <div class="sidebar-header d-flex justify-content-center align-items-center px-3 py-4">
+    <img
+         class="rounded-pill img-fluid"
+         width="65"
+         src="{{ url_for('static', filename='images/home.jpg') }}"
+         alt="">
+    <div class="ms-2">
+      <h5 class="fs-6 mb-0">
+        <a class="text-decoration-none" href="/student_home">Student: {% for name in first_name %} {{ name }} {% endfor %} {% for name in last_name %} {{ name }} {% endfor %}</a>
+      </h5>
+      <p class="mt-1 mb-0">Class: {% for class in class_name %} {{ class }} {% endfor %}</p>
+    </div>
+  </div>
+
+  <ul class="categories list-unstyled">
+    <li class="has-dropdown">
+      <i class="uil-estate fa-fw"></i><a href="/student_messages">View messages</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="/student_assignments">View assignments</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="/student_attendance">View attendance</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('student_portal.student_announcements')}}">View announcements</a>
+    </li>
+    <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('student_portal.delete_student_account_page')}}">Delete account</a>
+    </li>
+</aside>
+
+<h8>Your grade:</h8>
+
+<section id="wrapper">
+  <nav class="navbar navbar-expand-md">
+    <div class="container-fluid mx-2">
+      <div class="navbar-header">
+        <button class="navbar-toggler" type="button" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="uil-bars text-white"></i>
+        </button>
+        <a class="navbar-brand" href="/student_home">Vig<span class="main-color">LMS</span></a>
+      </div>
+      <div class="collapse navbar-collapse" id="toggle-navbar">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="" id = "logout" href="/student_logout" id="" role="button" aria-expanded="false">
+              Logout
+            </a>
+    </div>
+  </nav>
+
+    {% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+     <div class="p-4">
+    <div class="welcome">
+      <div class="content rounded-3 p-3">
+        <h1 class="fs-3">Welcome to VigLMS Student Portal</h1>
+        <p class="mb-0">Use the navbar on the left to navigate!</p>
+      </div>
+    </div>
+
+<br>
+
+</div class="container">
+
+                        <p>This app was created with Python/Flask, as well as PostgreSQL/psycopg2. It is a gradebook
+                        that reinforces CRUD (Create, Read, Update, Delete). The 'create' allows students to be enrolled, 'read'
+                        allows the user to see the class roster, 'update' allows the user to update a student's grade, and 'delete'
+                        allows the user to remove a student from a class. Please use the navbar above to navigate through the app! Thank
+                        you! - Ryan Viglione</p>
+
+                        <div class="col align-self-center">
+         <img src="static/images/postgresql.png" width="150">
+    </div>
+
+<br /><br />
+
+<h4>My account information:</h4>
+<br />
+<h6>First Name:</h6>
+<h7>{% for name in first_name %} {{ name }} {% endfor %}</h7>
+<h6>Last Name:</h6>
+<h7>{% for name in last_name %} {{ name }} {% endfor %}</h7>
+<h6>Email:</h6>
+<h7>{% for email in email %} {{ email }} {% endfor %}</h7>
+<h6>Class name:</h6>
+<h7>{% for class in class_name %} {{ class }} {% endfor %}</h7>
+<h6>Enrolled on:</h6>
+<h7>{% for date in enrollment_date %} {{date}} {% endfor %}</h7>
+<h6>Number of documents uploaded by your teacher:</h6>
+<h7>{% for document in teacher_document_count %} {{document}} {% endfor %}</h7>
+<h6>Number of documents uploaded by you:</h6>
+<h7>{% for document in student_document_count %} {{document}} {% endfor %}</h7>
+<h6>Account created on:</h6>
+<h7>{% for date in account_creation_date %} {{date}} {% endfor %}</h7>
+<h6>Number of logins:</h6>
+<h7>{% for count in student_login_count %} {{count}} {% endfor %}</h7>
+<br /><br />
+
+<h222>Table design credited to: <a href="https://github.com/pablorgarcia" target="_blank">Pablo García</a></h222>
+
+<table class="container">
+	<thead>
+		<tr>
+			<th><h111>Latest login date:</h111></th>
+			<th><h111>Latest login time:</h111></th>
+		</tr>
+	</thead>
+	<tbody>
+                 {% for row in login_info %}
+		<tr>
+			<td>{{row[1]}}</td>
+			<td>{{row[2]}}</td>
+		</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+

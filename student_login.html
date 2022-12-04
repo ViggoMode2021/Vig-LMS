@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+ <head>
+     <title>VigLMS | Student Login</title>
+     <link rel="image_src" href="/static/images/VigLMS_thumbnail.jpg">
+     </head>
+  <meta charset="utf-8">
+     <div id="Title">
+  <h22>Welcome to the Student login page for Vig LMS!</h22>
+     </div>
+     <br />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/student_style.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+ <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ </head>
+  <style>
+body {
+  background-image: url('/static/images/space.jpg');
+}
+</style>
+  <div class="login-box" >
+  <div class="login-body">
+    <p>Please enter your credentials below:</p>
+          <div class="login">
+  <div class="login-triangle"></div>
+  <h2 class="login-header">Welcome back, student!</h2>
+  <form class="login-container" action="{{ url_for('student_portal.student_login') }}" method="POST">
+    <p><input type="email" name="student_email_2" placeholder="Email"></p>
+    <p><input type="password" name="student_password_2" placeholder="Password"></p>
+    <p><input type="submit" value="Log in"></p>
+  </form>
+</div>
+
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="confirmation-box" class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <p>No account? <a href="{{ url_for('student_portal.student_register') }}">Register</a></p>
+          <p>Forgot password? <a href="{{ url_for('student_portal.student_forgot_password_page') }}">Reset password here</a></p>
+
+  </div>
+ </div>
+ </body>
+
+ <p>Register as a teacher <a href="{{ url_for('register') }}">Register</a></p>
+<p>Login as a teacher <a href="{{ url_for('login') }}">Login</a></p>
+
+<div id="Title">
+       <h101>As of {{ date_object }} at {{ current_time }}, there are {% for row in student_count %} {{row}} {% endfor %} students that are using Vig LMS!</h101>
+</div>
+
+       <a href="{{url_for('faq_page')}}"><img src="/static/images/faq.png" alt="HTML tutorial" style="width:42px;height:42px;">Link to FAQ (frequently asked questions)</a>
+
+<a href = "mailto:ryansviglione@gmail.com?subject = Feedback&body = Message"><img src="/static/images/email.png">
+Email the creator: ryansviglione@gmail.com</a>
+

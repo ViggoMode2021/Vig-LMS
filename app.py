@@ -49,6 +49,8 @@ BUCKET_NAME = os.getenv('BUCKET_NAME_VAR') # Set as environment variable
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 
+USER_POOL_ID = os.getenv('USER_POOL_ID')
+
 #Database info below:
 
 DB_HOST = os.getenv('DB_HOST')
@@ -380,6 +382,10 @@ def teacher_confirm_forgot_password():
             flash('One or more fields are incorrect. Please try again.')
             return render_template('authenticate_new_password.html')
 
+@app.route('/delete_teacher_account_page', methods=['GET'])
+def delete_teacher_account_page():
+    return render_template("delete_teacher_account.html")
+
 @app.route('/delete_account', methods=['DELETE', 'GET', 'POST'])
 def delete_account():
 
@@ -418,17 +424,18 @@ def delete_account():
                 cursor.execute('DELETE FROM student_accounts WHERE teacher_email = %s;', (delete_email,))
                 cursor.execute('DELETE FROM assignment_files_teacher_s3 WHERE assignment_creator = %s', (delete_email,))
 
+                conn.commit()
+                cursor.close()
+                conn.close()
+
                 client = boto3.client('cognito-idp', region_name="us-east-1")
 
                 client.admin_delete_user(
-                UserPoolId='us-east-1_zayXMo2Jg',
+                UserPoolId=USER_POOL_ID,
                 Username=delete_email
                 )
 
                 flash(f'Account successfully deleted for Username: {delete_username} with email: {delete_email}.')
-                conn.commit()
-                cursor.close()
-                conn.close()
                 return redirect(url_for('login'))
             else:
                 flash('Incorrect password.')

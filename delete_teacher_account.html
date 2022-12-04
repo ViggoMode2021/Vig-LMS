@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+ <head>
+       <title>VigLMS | Delete teacher account</title>
+        <link rel="image_src" href="/static/images/VigLMS_thumbnail.jpg">
+     </head>
+  <meta charset="utf-8">
+     <style>
+#Title {
+  text-align: center;
+}
+</style>
+     <div id="Title">
+  <h22></h22>
+         </div>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+ <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <p>Please enter your credentials below:</p>
+     <style>
+    body{
+    background-color: black;
+}
+     </style>
+
+<hr class="double">
+
+ <h46>Delete teacher account below:</h46>
+
+      <div class="login">
+                    <div id="Delete_Teacher_Account">
+  <h2 class="login-header">Delete teacher account</h2>
+                                  </div>
+          <div id="Delete_Teacher_Account_Container">
+  <form class="login-container" action="{{ url_for('delete_account') }}" method="post">
+    <p><input type="email" name="delete_email" placeholder="Email" required=""></p>
+            <p><input type="text" name="delete_username" placeholder="Username" required=""></p>
+    <p><input type="password" name="delete_password" placeholder="Password" required=""></p>
+    <p><input type="submit" value="Delete my account"></p>
+  </form>
+</div>
+          </div>
+
+          <br /><br />

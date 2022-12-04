@@ -1,9 +1,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance_page.css') }}">
 
 <head>
-<title>VigLMS | Post announcements for {{ class_name }}</title>
+<title>VigLMS | Take Attendance For {{ class_name }}</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -74,9 +74,8 @@
   <div class="p-4">
     <div class="welcome">
       <div class="content rounded-3 p-3">
-        <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">Post announcements for {{ class_name }} on {{date_object}} at {{current_time}}<br><br>
-        Announcements posted here will be posted to the student portal</p>
+        <h1 class="fs-3">Welcome to VigLMS</h1>
+        <p class="mb-0">Take attendance for {{ class_name }} on {{ date_object }}</p>
       </div>
     </div>
 
@@ -99,51 +98,76 @@
 
 <br>
 
-<head>
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-</head>
+<br>
 
-<title>VigLMS | Post Announcements For {{ class_name }}</title>
-
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="/static/css/announcements.css">
-
-<form action="/announcements_page_submit" method="POST">
-
-    <div class="form-group">
-        <textarea name="announcement_box" cols="30" rows="10" required=""></textarea>
-
-    </div>
-
-    <br>
-
-    <button type="submit" class="btn btn-warning">Post announcement for today, {{date_object}} at {{current_time}}</button>
-
-    <br>
-
+<form action="/view_attendance_for_today" method="GET">
+        <button type="submit" class="btn btn-success">View today's attendance</button>
 </form>
 
 <br>
 
-<h1>Search announcements by date. Please type in the format: month-day-year, such as: 03-30-2022 (March 30, 2022).</h1>
-<h1>Upon search, you can also update announcement records.</h1>
+<div class="col-md-8">
+    <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student First Name:</th>
+                <th>Student Last Name:</th>
+                <th>Date:</th>
+                <th>Attendance Status:</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in take_attendance_query %}
+            <tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[3]}}</td>
+                <td>{{row[4]}}</td>
+                <td>{{ date_object }}</td>
+                <td><label for=""></label>
+                    <form action="/take_attendance/{{row[0]}}" method="POST">
+                    <div class="form-group">
+                <select name="attendance" id="attendance">
+                  <option value="Present">Present</option>
+                  <option value="Tardy">Tardy</option>
+                  <option value="Absent">Absent</option>
+                </select>  <button type="submit" class="btn btn-warning">Submit</button>
+</td>
+                </form>
+                        </div>
 
-<br>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
 
-<form action="{{url_for('messaging_and_announcements.view_announcements_by_date')}}" method="POST">
+<hr style="width:66%;text-align:center;margin-left:0">
+
+<h2>Search attendance by date. Please type in the format: month-day-year, such as: 03-30-2022 (March 30, 2022).</h2>
+<br />
+<h3>Upon search, you can also update attendance records.</h3>
+
+<form action="/search_attendance_by_date" method="POST">
     <div class="form-group">
         <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Search" name='search_announcements_by_date' style="width: 200px;" required="">
+            placeholder="Date" name='search_attendance_by_date' style="width: 200px;">
     </div>
-    <br>
-        <button type="submit" class="btn btn-success">Search announcements by date</button>
+        <button type="submit" class="btn btn-success">Search attendance by date.</button>
 </form>
 
- </body>
+<hr style="width:66%;text-align:center;margin-left:0">
 
-</html>
+<h3>Search attendance by student. Please type student id in the box to search. Student ID is found in the left-hand column
+of the table above.</h3>
+
+<form action="/search_attendance_by_student" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
+            placeholder="Student ID" name='search_attendance_by_student' style="width: 200px;">
+    </div>
+        <button type="submit" class="btn btn-success">Search attendance by student.</button>
+</form>

@@ -30,6 +30,8 @@ s3 = boto3.client('s3',
 
 BUCKET_NAME = os.getenv('BUCKET_NAME_VAR')
 
+USER_POOL_ID = os.getenv('USER_POOL_ID')
+
 @student_portal.route('/student_register', methods=['GET', 'POST'])
 def student_register():
 
@@ -802,6 +804,10 @@ def confirm_forgot_password():
             flash('One or more fields are incorrect. Please try again.')
             return render_template('authenticate_new_student_password.html')
 
+@student_portal.route('/delete_student_account_page', methods=['GET'])
+def delete_student_account_page():
+    return render_template("delete_student_account.html")
+
 @student_portal.route('/delete_student_account', methods=['DELETE', 'GET', 'POST'])
 def delete_student_account():
 
@@ -811,8 +817,9 @@ def delete_student_account():
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and 'delete_student_email' in request.form and 'delete_student_password' in request.form:
         # Create variables to reference for below queries
-        delete_student_email = request.form['delete_student_email']
-        delete_student_password = request.form['delete_student_password']
+        delete_student_email = request.form.get('delete_student_email')
+
+        delete_student_password = request.form.get('delete_student_password')
 
         _hashed_password_delete_student = generate_password_hash(delete_student_password)
 
@@ -827,6 +834,14 @@ def delete_student_account():
             delete_student_password_check = delete_student_account_query['password']
             if check_password_hash(delete_student_password_check, delete_student_password):
                 cursor.execute('DELETE FROM student_accounts WHERE student_email = %s;', (delete_student_email,))
+
+                client = boto3.client('cognito-idp', region_name="us-east-1")
+
+                client.admin_delete_user(
+                UserPoolId=USER_POOL_ID,
+                Username=delete_student_email
+                )
+
                 flash(f'Account successfully deleted for {delete_student_email}.')
                 conn.commit()
                 cursor.close()

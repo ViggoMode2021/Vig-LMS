@@ -1,9 +1,19 @@
+<head>
+    <title>VigLMS | Edit student info</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+
+</div>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/assignment_list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_student.css') }}">
 
 <head>
-<title>VigLMS | Post announcements for {{ class_name }}</title>
+<title>VigLMS | View Attendance On {{ date_object }}</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
@@ -71,79 +81,50 @@
     </div>
   </nav>
 
-  <div class="p-4">
-    <div class="welcome">
-      <div class="content rounded-3 p-3">
-        <h1 class="fs-3">VigLMS</h1>
-        <p class="mb-0">Post announcements for {{ class_name }} on {{date_object}} at {{current_time}}<br><br>
-        Announcements posted here will be posted to the student portal</p>
-      </div>
-    </div>
+    <br>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/class_roster.js') }}"></script>
-
-  </body>
-
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+<h1>Enrolled on {% for date in enrollment_date %} {{date}}{% endfor %}</h1>
 
 <br>
 
-<head>
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-</head>
-
-<title>VigLMS | Post Announcements For {{ class_name }}</title>
-
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<link rel="stylesheet" href="/static/css/announcements.css">
-
-<form action="/announcements_page_submit" method="POST">
-
-    <div class="form-group">
-        <textarea name="announcement_box" cols="30" rows="10" required=""></textarea>
-
-    </div>
+<h1>Current student information as of {{ date_object }}:</h1>
 
     <br>
 
-    <button type="submit" class="btn btn-warning">Post announcement for today, {{date_object}} at {{current_time}}</button>
+<h2>First name: {% for name in student_first_name %} {{name}} {% endfor %}</h2>
 
     <br>
 
+<h2>Last name: {% for name in student_last_name %} {{name}} {% endfor %}</h2>
+
+    <br>
+
+<h2>Graduation year: {% for year in graduation_year%} {{year}} {% endfor %}</h2>
+
+    <hr class="dashed">
+        <div>
+ <form action="/edit_individual_student_first_name" method="POST">
+                    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="update first name" name='update_first_name' style="width: 200px;">
+                         <button type="submit" class="btn btn-outline-success">update first name</button>
 </form>
-
-<br>
-
-<h1>Search announcements by date. Please type in the format: month-day-year, such as: 03-30-2022 (March 30, 2022).</h1>
-<h1>Upon search, you can also update announcement records.</h1>
-
-<br>
-
-<form action="{{url_for('messaging_and_announcements.view_announcements_by_date')}}" method="POST">
-    <div class="form-group">
-        <input type="text" class="form-control" id="exampleInputEmail1" style="width: 150px;" aria-describedby="emailHelp"
-            placeholder="Search" name='search_announcements_by_date' style="width: 200px;" required="">
-    </div>
-    <br>
-        <button type="submit" class="btn btn-success">Search announcements by date</button>
+        </div>
+ <hr class="dashed">
+    <div>
+ <form action="/edit_individual_student_last_name" method="POST">
+                    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="update last name" name='update_last_name' style="width: 200px;">
+                         <button type="submit" class="btn btn-outline-primary">update last name</button>
 </form>
-
- </body>
-
-</html>
+  </div>
+ <hr class="dashed">
+        <div>
+ <form action="/edit_individual_student_graduation_year" method="POST">
+                    <div class="form-group">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="update graduation year" name='update_graduation_year' style="width: 200px;">
+                         <button type="submit" class="btn btn-outline-secondary">update graduation yr</button>
+</form>
+  </div>
