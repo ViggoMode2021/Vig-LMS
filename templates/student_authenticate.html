@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
  <head>
-       <title>VigLMS | Request password reset</title>
+       <title>VigLMS | Authenticate student account</title>
         <link rel="image_src" href="/static/images/VigLMS_thumbnail.jpg">
      </head>
   <meta charset="utf-8">
@@ -11,7 +11,7 @@
 }
 </style>
      <div id="Title">
-  <h22>Please enter your email to request a password request code</h22>
+  <h22>Please check your email for an authentication code.</h22>
          </div>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
@@ -30,8 +30,8 @@
 
       <div class="login">
   <div class="login-triangle"></div>
-  <form class="login-container" action="{{ url_for('student_portal.student_reset_password') }}" method="POST">
-            <p><input type="text" name="email_forgot_password" placeholder="Email" required=""></p>
+  <form class="login-container" action="{{ url_for('student_portal.student_authenticate') }}" method="POST">
+            <p><input type="text" name="authentication_code" placeholder="Authentication Code" required=""></p>
     <p><input type="submit" value="Submit"></p>
   </form>
 </div>

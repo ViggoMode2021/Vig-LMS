@@ -100,19 +100,6 @@ body {
        </div>
       </div>
 
-       <div class="form-group">
-       <label for="secret_question" class="cols-sm-2 control-label">Secret question: What is the name of the street you grew up on?:</label>
-           <br />
-           <h23>This doesn't have to be unique. There is probably more than one 'Stuart Avenue'. You will reset your password with this if need be.</h23>
-       <div class="cols-sm-10">
-        <div class="input-group">
-         <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-         <input type="text" class="form-control" name="student_secret_question" placeholder="Secret question" id="student_secret_question" required  placeholder="Street name"/>
-        </div>
-       </div>
-      </div>
-      <div class="form-group ">
-
        <input type="submit" value="Register" class="form-control btn btn-primary " name="">
        <p style="padding:5px;">
        <a href="{{ url_for('student_portal.student_login') }}" class="btn btn-dark ">Login as a student</a></p>
@@ -128,16 +115,3 @@ body {
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
  </body>
 </html>
-
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-    {% for message in messages %}
-    <div id="confirmation-box" class="alert alert-warning alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" onclick="document.getElementById('confirmation-box').style.display = 'none'" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
