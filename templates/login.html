@@ -34,7 +34,6 @@
   <h2 class="login-header">Welcome back, teacher!</h2>
   <form class="login-container" action="{{ url_for('login') }}" method="POST">
     <p><input type="email" name="email" placeholder="Email" required=""></p>
-            <p><input type="text" name="username" placeholder="Username" required=""></p>
     <p><input type="password" name="password" placeholder="Password" required=""></p>
     <p><input type="submit" value="Log in"></p>
   </form>
@@ -66,27 +65,11 @@
            <h100>As of {{ date_object }} at {{ current_time }}, there are {% for row in user_count %} {{row}} {% endfor %} teachers that are using Vig LMS!</h100>
          </div>
 
+<br /><br />
+
           <a href="{{url_for('faq_page')}}"><img src="/static/images/faq.png" alt="HTML tutorial" style="width:42px;height:42px;">Link to FAQ (frequently asked questions)</a>
 
-<hr class="double">
-
- <h46>Delete teacher account below:</h46>
-
-      <div class="login">
-                    <div id="Delete_Teacher_Account">
-  <h2 class="login-header">Delete teacher account</h2>
-                                  </div>
-          <div id="Delete_Teacher_Account_Container">
-  <form class="login-container" action="{{ url_for('delete_account') }}" method="post">
-    <p><input type="email" name="delete_email" placeholder="Email" required=""></p>
-            <p><input type="text" name="delete_username" placeholder="Username" required=""></p>
-    <p><input type="password" name="delete_password" placeholder="Password" required=""></p>
-    <p><input type="submit" value="Delete my account"></p>
-  </form>
-</div>
-          </div>
-
-          <br /><br />
+ <br /><br />
 
 <a href = "mailto:ryansviglione@gmail.com?subject = Feedback&body = Message"><img src="/static/images/email.png">
 Email the creator: ryansviglione@gmail.com</a>
