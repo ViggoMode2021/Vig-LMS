@@ -10,8 +10,6 @@ from botocore.exceptions import ClientError
 import os
 from dotenv import load_dotenv, find_dotenv
 
-# ADD NEW .ENV FILE TO PROD!!!!!!!!!!!!!!!!!!!!!!!
-
 # Module imports
 from files import files
 from grades import grades
@@ -220,13 +218,12 @@ def login():
     current_time = now.strftime("%I:%M %p")
 
     # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
-        username = request.form['username']
+    if request.method == 'POST' and 'password' in request.form and 'email' in request.form:
         password = request.form['password']
         email = request.form['email']
 
         # Check if account exists
-        cursor.execute('SELECT * FROM users WHERE username = %s AND authenticated_account = %s;', (username, 'Authenticated'))
+        cursor.execute('SELECT * FROM users WHERE email = %s AND authenticated_account = %s;', (email, 'Authenticated'))
         account = cursor.fetchone()
         # Grab user information from classes table. The classes table contains information that the user submitted. This is student information and grades.
         cursor.execute('SELECT * FROM classes WHERE class_creator = %s;', (email,))
