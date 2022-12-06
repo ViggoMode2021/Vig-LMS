@@ -41,8 +41,10 @@
     <li class="has-dropdown">
       <i class="uil-calendar-alt"></i><a href="{{url_for('student_portal.student_announcements')}}">View announcements</a>
     </li>
+      <li class="has-dropdown">
+      <i class="uil-calendar-alt"></i><a href="{{url_for('student_portal.delete_student_account_page')}}">Delete account</a>
+    </li>
 </aside>
-
 
 <h8>Your grade:</h8>
 
@@ -76,6 +78,14 @@
     {% endfor %}
     {% endif %}
     {% endwith %}
+
+    <br>
+
+    <form action="/student_request_csv" method="GET">
+    <button type="submit" class="btn btn-success">Download a CSV copy of your grade book</button>
+</form>
+
+    <a href="{{csv_url}}">{{csv_message}}</a>
 
 <br>
 <h8>Graded assignments:</h8>
