@@ -2,8 +2,6 @@ from flask import request, session, redirect, url_for, render_template, flash, B
 import psycopg2
 import psycopg2.extras
 import os
-import datetime
-import pytz
 from dotenv import load_dotenv, find_dotenv
 import csv
 import io
@@ -19,9 +17,6 @@ BUCKET_NAME = os.getenv('BUCKET_NAME_VAR')
 # Start environment variables #
 
 load_dotenv(find_dotenv())
-
-dotenv_path = os.path.join(os.path.dirname(__file__), ".env_vig_lms")
-load_dotenv(dotenv_path)
 
 #Database info below:
 
