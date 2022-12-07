@@ -179,49 +179,53 @@ def edit_assignment_grade(id):
 
         cur.execute("SELECT assignment_name FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
         records_2 = cur.fetchall()
+        
+        if not records_2:
+          return redirect(url_for('assignments.assignment', flash('Id does not  pertain to an assignment in this class'))
+        else:
 
-        cur.execute('SELECT * FROM classes WHERE class_creator = %s ORDER BY id ASC;', [session['email']])
-        records_3 = cur.fetchall()
+          cur.execute('SELECT * FROM classes WHERE class_creator = %s ORDER BY id ASC;', [session['email']])
+          records_3 = cur.fetchall()
 
-        cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
-        records_4 = cur.fetchone()
+          cur.execute("SELECT id FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
+          records_4 = cur.fetchone()
 
-        cur.execute("SELECT description FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
-        description = cur.fetchall()
+          cur.execute("SELECT description FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
+          description = cur.fetchall()
 
-        session['assignment_id'] = records_4
+          session['assignment_id'] = records_4
 
-        cur.execute("SELECT due_date FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
-        due_date = cur.fetchall()
+          cur.execute("SELECT due_date FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
+          due_date = cur.fetchall()
 
-        cur.execute("SELECT category FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
-        category = cur.fetchall()
+          cur.execute("SELECT category FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
+          category = cur.fetchall()
 
-        cur.execute("SELECT * FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
-        records_5 = cur.fetchone()
-        session['assignment_id'] = records_5[0]
-        session['assignment_name'] = records_5[1]
+          cur.execute("SELECT * FROM assignments WHERE id = {0} AND assignment_creator = %s;".format(id), (session['email'],))
+          records_5 = cur.fetchone()
+          session['assignment_id'] = records_5[0]
+          session['assignment_name'] = records_5[1]
 
-        assignment_id = records_4[0]
+          assignment_id = records_4[0]
 
-        cur.execute("""SELECT
-        ar.student_id AS student_id,
-        cl.student_first_name,
-        cl.student_last_name,
-        ar.score
-        FROM classes cl
-        INNER JOIN assignment_results AS ar
-        ON ar.student_id = cl.id
-        WHERE assignment_id = %s
-        ORDER BY ar.student_id ASC;""", (assignment_id,))
+          cur.execute("""SELECT
+          ar.student_id AS student_id,
+          cl.student_first_name,
+          cl.student_last_name,
+          ar.score
+          FROM classes cl
+          INNER JOIN assignment_results AS ar
+          ON ar.student_id = cl.id
+          WHERE assignment_id = %s
+          ORDER BY ar.student_id ASC;""", (assignment_id,))
 
-        scores = cur.fetchall()
+          scores = cur.fetchall()
 
-        cursor.close()
-        conn.close()
+          cursor.close()
+          conn.close()
 
-        return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'], scores=scores,
-                               description=description)
+          return render_template('edit_assignment_score.html', due_date=due_date, category=category, account=account, records_2=records_2, records_3=records_3, records_4=records_4, username=session['username'], class_name=session['class_name'], scores=scores,
+                                 description=description)
 
     return redirect(url_for('login'))
 
